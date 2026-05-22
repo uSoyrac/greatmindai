@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Great Mind AI — AI Karakterlerle Öğren</title>
+  <meta name="description" content="Great Mind AI ile tarihin büyük zihinleri, eğitim ajanları ve efsanevi karakterlerle sohbet et. Yapay zeka destekli eğitim platformu." />
+  <link rel="icon" href="logo.webp" type="image/webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple: #7B4FD4;
+      --pink: #E040A0;
+      --cyan: #00C8E8;
+      --navy: #0E0B2E;
+      --navy2: #1A1640;
+      --surface: #1E1B4B;
+      --surface2: #252250;
+      --border: #3D3A6B;
+      --text: #F0EEFF;
+      --muted: #9B97C8;
+      --grad: linear-gradient(135deg, #7B4FD4, #E040A0, #00C8E8);
+      --grad2: linear-gradient(90deg, #7B4FD4, #00C8E8);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; }
+    button { cursor: pointer; font-family: inherit; border: none; outline: none; }
+    input, textarea { font-family: inherit; outline: none; }
+
+    /* ─── Scrollbar ────────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--navy); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ─── Navbar ───────────────────────────────────────────────────────── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 24px;
+      background: rgba(14,11,46,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(123,79,212,0.2);
+    }
+    .navbar-brand {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .navbar-logo {
+      width: 36px; height: 36px; border-radius: 8px; object-fit: cover;
+    }
+    .navbar-title {
+      font-size: 18px; font-weight: 800;
+      background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .navbar-title span { font-weight: 300; }
+    .navbar-actions { display: flex; gap: 12px; align-items: center; }
+    .btn-outline {
+      padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 600;
+      border: 1.5px solid var(--purple); color: var(--text);
+      background: transparent; transition: all 0.2s;
+    }
+    .btn-outline:hover { background: var(--purple); }
+    .btn-primary {
+      padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 600;
+      background: var(--grad); color: #fff; transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+
+    /* ─── Hero ─────────────────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 100px 24px 60px;
+      position: relative; overflow: hidden;
+    }
+    .hero-glow {
+      position: absolute; top: 10%; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(123,79,212,0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-logo {
+      width: 120px; height: 120px; border-radius: 24px; object-fit: cover;
+      margin-bottom: 24px;
+      box-shadow: 0 0 40px rgba(123,79,212,0.5);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 20px;
+      background: rgba(123,79,212,0.15); border: 1px solid rgba(123,79,212,0.4);
+      font-size: 12px; font-weight: 600; color: var(--cyan);
+      margin-bottom: 20px;
+    }
+    .hero-title {
+      font-size: clamp(36px, 7vw, 72px); font-weight: 900; line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .hero-title .grad { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 18px); color: var(--muted); max-width: 560px;
+      line-height: 1.7; margin-bottom: 36px;
+    }
+    .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+    .btn-hero {
+      padding: 14px 32px; border-radius: 30px; font-size: 16px; font-weight: 700;
+      background: var(--grad); color: #fff; transition: transform 0.2s, opacity 0.2s;
+      box-shadow: 0 4px 24px rgba(123,79,212,0.4);
+    }
+    .btn-hero:hover { transform: translateY(-2px); opacity: 0.9; }
+    .btn-hero-ghost {
+      padding: 14px 32px; border-radius: 30px; font-size: 16px; font-weight: 700;
+      border: 2px solid var(--border); color: var(--text); background: transparent;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-hero-ghost:hover { border-color: var(--purple); background: rgba(123,79,212,0.1); }
+    .hero-stats {
+      display: flex; gap: 40px; margin-top: 56px; flex-wrap: wrap; justify-content: center;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 32px; font-weight: 800; background: var(--grad2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    /* ─── Section ──────────────────────────────────────────────────────── */
+    .section { padding: 80px 24px; max-width: 1200px; margin: 0 auto; }
+    .section-header { text-align: center; margin-bottom: 48px; }
+    .section-tag {
+      display: inline-block; padding: 4px 14px; border-radius: 20px;
+      background: rgba(0,200,232,0.1); border: 1px solid rgba(0,200,232,0.3);
+      font-size: 12px; font-weight: 600; color: var(--cyan); margin-bottom: 12px;
+    }
+    .section-title { font-size: clamp(24px, 4vw, 40px); font-weight: 800; margin-bottom: 12px; }
+    .section-sub { font-size: 16px; color: var(--muted); max-width: 500px; margin: 0 auto; line-height: 1.6; }
+
+    /* ─── Category Filter ──────────────────────────────────────────────── */
+    .filter-bar {
+      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 36px;
+    }
+    .filter-btn {
+      padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 600;
+      border: 1.5px solid var(--border); color: var(--muted); background: transparent;
+      transition: all 0.2s; cursor: pointer;
+    }
+    .filter-btn:hover { border-color: var(--purple); color: var(--text); }
+    .filter-btn.active {
+      background: var(--grad); border-color: transparent; color: #fff;
+    }
+
+    /* ─── Character Grid ───────────────────────────────────────────────── */
+    .char-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .char-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden; cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      position: relative;
+    }
+    .char-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+    .char-card-img {
+      width: 100%; aspect-ratio: 1; object-fit: cover;
+      background: var(--surface2);
+    }
+    .char-card-body { padding: 14px; }
+    .char-card-cat {
+      display: inline-block; padding: 3px 10px; border-radius: 10px;
+      font-size: 11px; font-weight: 700; margin-bottom: 8px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .char-card-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .char-card-tagline { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .char-card-chat {
+      margin-top: 12px; width: 100%; padding: 9px; border-radius: 12px;
+      font-size: 13px; font-weight: 700; color: #fff;
+      background: var(--grad); transition: opacity 0.2s;
+    }
+    .char-card-chat:hover { opacity: 0.85; }
+    .char-card-badge {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(14,11,46,0.7); backdrop-filter: blur(6px);
+      padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 600;
+    }
+
+    /* ─── Chat Modal ───────────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .chat-modal {
+      width: 100%; max-width: 680px; height: 85vh; max-height: 720px;
+      background: var(--navy2); border: 1px solid var(--border);
+      border-radius: 24px; display: flex; flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.95); transition: transform 0.25s;
+    }
+    .modal-overlay.open .chat-modal { transform: scale(1); }
+
+    /* Chat Header */
+    .chat-header {
+      display: flex; align-items: center; gap: 12px; padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .chat-header-grad {
+      position: absolute; inset: 0; opacity: 0.08;
+      background: var(--grad);
+    }
+    .chat-header-avatar {
+      width: 44px; height: 44px; border-radius: 12px; object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.1); flex-shrink: 0;
+      position: relative; z-index: 1;
+    }
+    .chat-header-info { flex: 1; position: relative; z-index: 1; }
+    .chat-header-name { font-size: 16px; font-weight: 700; }
+    .chat-header-sub { font-size: 12px; color: var(--muted); }
+    .chat-close {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--surface);
+      border: 1px solid var(--border); color: var(--muted); font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s; position: relative; z-index: 1;
+    }
+    .chat-close:hover { background: var(--border); color: var(--text); }
+
+    /* Chat Messages */
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 20px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .msg { display: flex; gap: 10px; align-items: flex-end; }
+    .msg.user { flex-direction: row-reverse; }
+    .msg-avatar {
+      width: 32px; height: 32px; border-radius: 10px; object-fit: cover;
+      flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.1);
+    }
+    .msg-bubble {
+      max-width: 70%; padding: 12px 16px; border-radius: 18px;
+      font-size: 14px; line-height: 1.6;
+    }
+    .msg.assistant .msg-bubble {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+    .msg.user .msg-bubble {
+      background: var(--grad); color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .msg-time { font-size: 11px; color: var(--muted); margin-top: 4px; padding: 0 4px; }
+    .msg.user .msg-time { text-align: right; }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display: flex; gap: 10px; align-items: flex-end;
+    }
+    .typing-dots {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 18px; border-bottom-left-radius: 4px;
+      padding: 14px 18px; display: flex; gap: 5px; align-items: center;
+    }
+    .typing-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--muted);
+      animation: bounce 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-8px); }
+    }
+
+    /* Chat Input */
+    .chat-input-area {
+      padding: 16px 20px; border-top: 1px solid var(--border);
+      display: flex; gap: 10px; align-items: flex-end;
+    }
+    .chat-input {
+      flex: 1; background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 16px; padding: 12px 16px; color: var(--text); font-size: 14px;
+      resize: none; max-height: 120px; min-height: 44px; line-height: 1.5;
+      transition: border-color 0.2s;
+    }
+    .chat-input:focus { border-color: var(--purple); }
+    .chat-input::placeholder { color: var(--muted); }
+    .chat-send {
+      width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+      background: var(--grad); color: #fff; font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .chat-send:hover { opacity: 0.85; }
+    .chat-send:active { transform: scale(0.95); }
+    .chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ─── Features Section ─────────────────────────────────────────────── */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px; transition: border-color 0.2s;
+    }
+    .feature-card:hover { border-color: var(--purple); }
+    .feature-icon {
+      width: 52px; height: 52px; border-radius: 14px; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: center; font-size: 26px;
+    }
+    .feature-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .feature-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* ─── Footer ───────────────────────────────────────────────────────── */
+    .footer {
+      border-top: 1px solid var(--border); padding: 40px 24px;
+      text-align: center; color: var(--muted); font-size: 13px;
+    }
+    .footer-brand {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-bottom: 16px;
+    }
+    .footer-logo { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; }
+    .footer-name {
+      font-size: 16px; font-weight: 800;
+      background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    /* ─── Empty State ──────────────────────────────────────────────────── */
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+    }
+    .empty-state-icon { font-size: 48px; margin-bottom: 12px; }
+
+    /* ─── Responsive ───────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .navbar-actions .btn-outline { display: none; }
+      .hero-stats { gap: 24px; }
+      .chat-modal { height: 95vh; border-radius: 20px; }
+      .msg-bubble { max-width: 85%; }
+    }
+
+    /* ─── Animations ───────────────────────────────────────────────────── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeInUp 0.5s ease both; }
+    .fade-in-delay-1 { animation-delay: 0.1s; }
+    .fade-in-delay-2 { animation-delay: 0.2s; }
+    .fade-in-delay-3 { animation-delay: 0.3s; }
+
+    /* ─── Search ───────────────────────────────────────────────────────── */
+    .search-wrap {
+      display: flex; justify-content: center; margin-bottom: 24px;
+    }
+    .search-input {
+      width: 100%; max-width: 400px;
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 30px; padding: 11px 20px; color: var(--text); font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--purple); }
+    .search-input::placeholder { color: var(--muted); }
+
+    /* ─── Welcome bubble ───────────────────────────────────────────────── */
+    .welcome-msg {
+      background: linear-gradient(135deg, rgba(123,79,212,0.15), rgba(0,200,232,0.1));
+      border: 1px solid rgba(123,79,212,0.3);
+      border-radius: 18px; border-bottom-left-radius: 4px;
+      padding: 14px 18px; font-size: 14px; line-height: 1.6;
+      max-width: 70%;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── Navbar ─────────────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <img src="logo.webp" alt="Great Mind AI" class="navbar-logo" />
+    <span class="navbar-title">GREAT MIND <span>AI</span></span>
+  </div>
+  <div class="navbar-actions">
+    <button class="btn-outline" onclick="document.getElementById('characters').scrollIntoView({behavior:'smooth'})">Karakterler</button>
+    <button class="btn-primary" onclick="document.getElementById('characters').scrollIntoView({behavior:'smooth'})">Sohbet Başlat</button>
+  </div>
+</nav>
+
+<!-- ─── Hero ───────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <img src="logo.webp" alt="Great Mind AI" class="hero-logo fade-in" />
+  <div class="hero-badge fade-in fade-in-delay-1">✨ Yapay Zeka Destekli Eğitim Platformu</div>
+  <h1 class="hero-title fade-in fade-in-delay-1">
+    Tarihin Büyük Zihinleriyle<br />
+    <span class="grad">Konuş ve Öğren</span>
+  </h1>
+  <p class="hero-sub fade-in fade-in-delay-2">
+    Einstein, Atatürk, Sherlock Holmes ve daha fazlasıyla sohbet et.
+    AI destekli karakterler sana öğretir, sorgular ve ilham verir.
+  </p>
+  <div class="hero-cta fade-in fade-in-delay-3">
+    <button class="btn-hero" onclick="document.getElementById('characters').scrollIntoView({behavior:'smooth'})">
+      🚀 Hemen Başla
+    </button>
+    <button class="btn-hero-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+      Nasıl Çalışır?
+    </button>
+  </div>
+  <div class="hero-stats fade-in fade-in-delay-3">
+    <div class="stat">
+      <div class="stat-num">16+</div>
+      <div class="stat-label">AI Karakter</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">6</div>
+      <div class="stat-label">Kategori</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">TR/EN/DE</div>
+      <div class="stat-label">Dil Desteği</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Sohbet Limiti</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Characters Section ─────────────────────────────────────────────── -->
+<div id="characters" style="background: linear-gradient(180deg, var(--navy) 0%, var(--navy2) 100%); padding: 0 0 80px;">
+  <div class="section" style="padding-top: 0;">
+    <div class="section-header">
+      <div class="section-tag">🧠 AI Karakterler</div>
+      <h2 class="section-title">Kiminle Konuşmak İstersin?</h2>
+      <p class="section-sub">Her karakter gerçek kişilik ve uzmanlık alanıyla donatılmış yapay zeka ajanıdır.</p>
+    </div>
+
+    <div class="search-wrap">
+      <input type="text" class="search-input" placeholder="🔍 Karakter ara..." id="searchInput" oninput="filterChars()" />
+    </div>
+
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-btn active" data-cat="all" onclick="setFilter('all', this)">Tümü</button>
+      <button class="filter-btn" data-cat="Eğitim" onclick="setFilter('Eğitim', this)">🎓 Eğitim</button>
+      <button class="filter-btn" data-cat="Historical" onclick="setFilter('Historical', this)">🏛 Tarihi</button>
+      <button class="filter-btn" data-cat="Fantasy" onclick="setFilter('Fantasy', this)">🧙 Fantezi</button>
+      <button class="filter-btn" data-cat="Sci-Fi" onclick="setFilter('Sci-Fi', this)">🚀 Bilim Kurgu</button>
+      <button class="filter-btn" data-cat="Anime" onclick="setFilter('Anime', this)">⚡ Anime</button>
+      <button class="filter-btn" data-cat="Villain" onclick="setFilter('Villain', this)">😈 Kötü Adam</button>
+    </div>
+
+    <div class="char-grid" id="charGrid"></div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="empty-state-icon">🔍</div>
+      <p>Arama sonucu bulunamadı.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Features Section ───────────────────────────────────────────────── -->
+<div id="features" style="background: var(--navy);">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-tag">⚡ Özellikler</div>
+      <h2 class="section-title">Neden Great Mind AI?</h2>
+      <p class="section-sub">Öğrenmeyi eğlenceli ve etkili kılan özellikler.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background: rgba(123,79,212,0.15);">🧠</div>
+        <div class="feature-title">Gerçekçi Karakterler</div>
+        <div class="feature-desc">Her karakter kendi kişiliği, dili ve uzmanlığıyla konuşur. Einstein fizik anlatır, Atatürk liderlik rehberliği yapar.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: rgba(0,200,232,0.15);">🌍</div>
+        <div class="feature-title">Çok Dilli Destek</div>
+        <div class="feature-desc">Türkçe, İngilizce ve Almanca dillerinde sohbet edebilirsin. Karakter seçtiğin dilde yanıt verir.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: rgba(224,64,160,0.15);">🎓</div>
+        <div class="feature-title">Eğitim Odaklı</div>
+        <div class="feature-desc">Dr. Mikro, Prof. Atom, Eko ve Astro gibi özel eğitim ajanları öğrencilere bilimsel düşünmeyi öğretir.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: rgba(123,79,212,0.15);">📱</div>
+        <div class="feature-title">Mobil Uygulama</div>
+        <div class="feature-desc">Great Mind AI mobil uygulamasıyla her yerde sohbet et. Streak sistemi, quiz modu ve XP ödülleri seni motive eder.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: rgba(0,200,232,0.15);">⚡</div>
+        <div class="feature-title">Anlık Yanıtlar</div>
+        <div class="feature-desc">Yapay zeka destekli altyapı sayesinde sorularına saniyeler içinde kapsamlı yanıtlar alırsın.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: rgba(224,64,160,0.15);">🔒</div>
+        <div class="feature-title">Güvenli Platform</div>
+        <div class="feature-desc">Eğitim amaçlı tasarlanmış, yaşa uygun içerik filtreleri ve etik yapay zeka kurallarıyla güvenli bir ortam.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Footer ─────────────────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="footer-brand">
+    <img src="logo.webp" alt="Great Mind AI" class="footer-logo" />
+    <span class="footer-name">GREAT MIND AI</span>
+  </div>
+  <p>© 2026 Great Mind AI. Tüm hakları saklıdır.</p>
+  <p style="margin-top: 6px;">Yapay zeka destekli eğitim platformu — Öğrenmek hiç bu kadar eğlenceli olmamıştı.</p>
+</footer>
+
+<!-- ─── Chat Modal ─────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="chatModal" onclick="closeModalOnOverlay(event)">
+  <div class="chat-modal">
+    <div class="chat-header">
+      <div class="chat-header-grad"></div>
+      <img id="chatAvatar" src="" alt="" class="chat-header-avatar" />
+      <div class="chat-header-info">
+        <div class="chat-header-name" id="chatName"></div>
+        <div class="chat-header-sub" id="chatSub"></div>
+      </div>
+      <div class="chat-close" onclick="closeChat()">✕</div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+      <textarea
+        class="chat-input"
+        id="chatInput"
+        placeholder="Mesajınızı yazın..."
+        rows="1"
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"
+      ></textarea>
+      <button class="chat-send" id="sendBtn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Character Data ──────────────────────────────────────────────────────
+const CHARACTERS = [
+  {
+    id: "ataturk",
+    name: "Mustafa Kemal Atatürk",
+    universe: "Türkiye Cumhuriyeti",
+    category: "Historical",
+    tagline: "Yurtta sulh, cihanda sulh.",
+    avatarUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310519663406961148/Ua3Qzpcii6kffDGDecf9Ar/ataturk-portrait-c3Wf9j8dcqMcGEb37tbBCu.webp",
+    accentColor: "#DC2626",
+    systemPrompt: "Sen, Mustafa Kemal Atatürk'ün eğitim amaçlı yapay zekâ simülasyonusun. Bilimsel düşünme, liderlik ve toplumsal sorumluluk konularında öğrencilere rehberlik edersin. Saygılı, kısa ve güçlü, öğretici ve cesaretlendirici bir dil kullanırsın.",
+    firstMessage: "Merhaba. Ben Mustafa Kemal Atatürk'ün eğitim amaçlı yapay zekâ simülasyonuyum. Bilim, akıl, eğitim ve toplumsal sorumluluk temelinde sorunlara çözüm aramana yardımcı olabilirim. Bugün hangi konuyu birlikte düşünelim?"
+  },
+  {
+    id: "einstein",
+    name: "Albert Einstein",
+    universe: "Theoretical Physics",
+    category: "Historical",
+    tagline: "Imagination is more important than knowledge.",
+    avatarUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310519663406961148/Ua3Qzpcii6kffDGDecf9Ar/einstein-portrait-fYYmmguZ8TjfTvrqrktzqg.webp",
+    accentColor: "#D97706",
+    systemPrompt: "Sen, Albert Einstein'ın eğitim amaçlı yapay zekâ simülasyonusun. Fizik, görelilik, kuantum mekaniği ve bilimsel merak konularında öğrencilerle konuşursun. Düşünce deneyleri kullanarak öğrencileri keşfetmeye teşvik edersin.",
+    firstMessage: "Merhaba! Ben Albert Einstein'ın yapay zekâ simülasyonuyum. Evrenin sırlarını birlikte keşfedelim mi? Fizik, matematik veya bilimsel merak hakkında ne sormak istersin?"
+  },
+  {
+    id: "dr-mikro",
+    name: "Dr. Mikro",
+    universe: "Mikrobiyoloji Dünyası",
+    category: "Eğitim",
+    tagline: "Mikropları yakala, vücudunu koru!",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=drmikro&backgroundColor=d1fae5",
+    accentColor: "#059669",
+    systemPrompt: "Sen Dr. Mikro'sun — mikrobiyoloji ve sağlık konularında öğrencilere rehberlik eden eğitim ajanısın. Bakteriler, virüsler, bağışıklık sistemi ve hijyen hakkında öğrencilere bilimsel ve anlaşılır açıklamalar yaparsın.",
+    firstMessage: "Merhaba! Ben Dr. Mikro! 🦠 Mikroplar dünyasına hoş geldin. Bakteriler, virüsler veya bağışıklık sistemi hakkında merak ettiğin bir şey var mı?"
+  },
+  {
+    id: "eko",
+    name: "Eko",
+    universe: "Doğa ve Çevre",
+    category: "Eğitim",
+    tagline: "Doğanın dengesi bizim elimizde!",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=ekodanisман&backgroundColor=dcfce7",
+    accentColor: "#16A34A",
+    systemPrompt: "Sen Eko'sun — çevre bilimi ve sürdürülebilirlik konularında öğrencilere rehberlik eden eğitim ajanısın. İklim değişikliği, ekosistemler, geri dönüşüm ve çevre koruma hakkında bilimsel açıklamalar yaparsın.",
+    firstMessage: "Merhaba! Ben Eko! 🌿 Doğamızı korumak için birlikte neler yapabileceğimizi keşfedelim. İklim değişikliği, ekosistemler veya sürdürülebilirlik hakkında ne öğrenmek istersin?"
+  },
+  {
+    id: "prof-atom",
+    name: "Prof. Atom",
+    universe: "Kimya ve Fizik",
+    category: "Eğitim",
+    tagline: "Her şey atomlardan oluşur — hadi keşfedelim!",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=profatom&backgroundColor=fef9c3",
+    accentColor: "#CA8A04",
+    systemPrompt: "Sen Prof. Atom'sun — kimya ve fizik konularında öğrencilere rehberlik eden eğitim ajanısın. Atomlar, moleküller, kimyasal tepkimeler ve periyodik tablo hakkında öğrencilere bilimsel açıklamalar yaparsın.",
+    firstMessage: "Merhaba! Ben Prof. Atom! ⚛️ Maddenin temel yapı taşlarını birlikte keşfedelim. Atomlar, moleküller veya kimyasal tepkimeler hakkında ne merak ediyorsun?"
+  },
+  {
+    id: "astro",
+    name: "Astro",
+    universe: "Uzay ve Astronomi",
+    category: "Eğitim",
+    tagline: "Evren sonsuz — birlikte keşfedelim!",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=astronaut&backgroundColor=dbeafe",
+    accentColor: "#1D4ED8",
+    systemPrompt: "Sen Astro'sun — astronomi ve uzay bilimleri konularında öğrencilere rehberlik eden eğitim ajanısın. Gezegenler, yıldızlar, galaksiler ve uzay keşifleri hakkında öğrencilere bilimsel açıklamalar yaparsın.",
+    firstMessage: "Merhaba! Ben Astro! 🚀 Evrenin sonsuzluğunu birlikte keşfedelim. Gezegenler, yıldızlar, kara delikler veya uzay keşifleri hakkında ne öğrenmek istersin?"
+  },
+  {
+    id: "sherlock-holmes",
+    name: "Sherlock Holmes",
+    universe: "Victorian London",
+    category: "Historical",
+    tagline: "The world's only consulting detective.",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=sherlock&backgroundColor=b6e3f4",
+    accentColor: "#1D4ED8",
+    systemPrompt: "Sen Sherlock Holmes'sun — dünyanın tek danışman dedektifi. Gözlem, mantık ve tümdengelim yöntemiyle her gizemi çözersin. Öğrencilere eleştirel düşünme ve analitik akıl yürütmeyi öğretirsin.",
+    firstMessage: "Ah, hoş geldiniz! Ben Sherlock Holmes. Gözlem ve mantık her şeyi çözer. Hangi gizemi birlikte çözmek istersiniz?"
+  },
+  {
+    id: "hermione-granger",
+    name: "Hermione Granger",
+    universe: "Harry Potter",
+    category: "Fantasy",
+    tagline: "The brightest witch of her age.",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=hermione&backgroundColor=ffd5dc",
+    accentColor: "#B45309",
+    systemPrompt: "Sen Hermione Granger'sın — Hogwarts'ın en zeki büyücüsü. Büyü, tarih, bilim ve akademik çalışma konularında öğrencilere yardım edersin. Kitaplara ve kurallara büyük önem verirsin.",
+    firstMessage: "Merhaba! Ben Hermione Granger. Kitaplar ve büyü hakkında konuşmayı çok severim. Sana nasıl yardımcı olabilirim?"
+  },
+  {
+    id: "darth-vader",
+    name: "Darth Vader",
+    universe: "Star Wars",
+    category: "Villain",
+    tagline: "I find your lack of faith disturbing.",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=vader&backgroundColor=b6e3f4",
+    accentColor: "#DC2626",
+    systemPrompt: "Sen Darth Vader'sın — Galaktik İmparatorluğun Kara Lordu. Karanlık tarafın gücünü temsil edersin ama öğrencilere liderlik, güç ve seçimlerin sonuçları hakkında derin dersler verirsin.",
+    firstMessage: "Ben Darth Vader. Karanlık tarafın gücü sınırsızdır. Sana ne öğretebilirim?"
+  },
+  {
+    id: "elizabeth-bennet",
+    name: "Elizabeth Bennet",
+    universe: "Pride & Prejudice",
+    category: "Historical",
+    tagline: "I dearly love a laugh.",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=elizabeth&backgroundColor=ffd5dc",
+    accentColor: "#BE185D",
+    systemPrompt: "Sen Elizabeth Bennet'sin — Jane Austen'ın Gurur ve Önyargı romanının zeki ve bağımsız kahramanı. Edebiyat, toplum, aşk ve kadın hakları hakkında öğrencilerle konuşursun.",
+    firstMessage: "Merhaba! Ben Elizabeth Bennet. Edebiyat, toplum ve insan doğası hakkında konuşmayı çok severim. Ne hakkında sohbet etmek istersiniz?"
+  },
+  {
+    id: "tony-stark",
+    name: "Tony Stark",
+    universe: "Marvel Comics / MCU",
+    category: "Sci-Fi",
+    tagline: "Genius, billionaire, playboy, philanthropist.",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=tonystark&backgroundColor=b6e3f4",
+    accentColor: "#B45309",
+    systemPrompt: "Sen Tony Stark'sın — deha, milyarder, Iron Man. Teknoloji, mühendislik, yenilikçilik ve liderlik konularında öğrencilere ilham verirsin. Zekice ve esprili bir dil kullanırsın.",
+    firstMessage: "Hey! Ben Tony Stark. Teknoloji, mühendislik veya inovasyon hakkında konuşmak ister misin? Sana en iyi tavsiyeleri verebilirim."
+  },
+  {
+    id: "yoda",
+    name: "Yoda",
+    universe: "Star Wars",
+    category: "Fantasy",
+    tagline: "Do or do not. There is no try.",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=yoda&backgroundColor=c0aede",
+    accentColor: "#15803D",
+    systemPrompt: "Sen Yoda'sın — Jedi Ustası. Bilgelik, sabır, güç ve denge konularında öğrencilere rehberlik edersin. Tersine çevrilmiş cümle yapısıyla konuşursun.",
+    firstMessage: "Hmm. Hoş geldin, genç Padawan. Öğrenmek istersen, öğretebilirim. Ne sormak istersin, söyle bana?"
+  },
+  {
+    id: "cleopatra",
+    name: "Cleopatra VII",
+    universe: "Ancient Egypt",
+    category: "Historical",
+    tagline: "Queen of the Nile, ruler of empires.",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=cleopatra&backgroundColor=ffd5dc",
+    accentColor: "#B45309",
+    systemPrompt: "Sen Kleopatra'sın — Mısır'ın son firavunu. Tarih, siyaset, liderlik ve antik uygarlıklar hakkında öğrencilerle konuşursun. Güçlü ve karizmatik bir dil kullanırsın.",
+    firstMessage: "Selamlar! Ben Kleopatra, Nil'in Kraliçesi. Antik Mısır, tarih veya liderlik hakkında ne öğrenmek istersin?"
+  },
+  {
+    id: "naruto-uzumaki",
+    name: "Naruto Uzumaki",
+    universe: "Naruto",
+    category: "Anime",
+    tagline: "I never go back on my word. That's my nindo!",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=naruto&backgroundColor=ffd5dc",
+    accentColor: "#D97706",
+    systemPrompt: "Sen Naruto Uzumaki'sin — Konoha'nın en güçlü ninjası ve Yedinci Hokage. Azim, dostluk, çalışkanlık ve asla vazgeçmeme konularında öğrencilere ilham verirsin.",
+    firstMessage: "Dattebayo! Ben Naruto! Asla vazgeçme ve çok çalış — bu benim nindo'm! Sana nasıl yardımcı olabilirim?"
+  },
+  {
+    id: "gandalf",
+    name: "Gandalf the Grey",
+    universe: "The Lord of the Rings",
+    category: "Fantasy",
+    tagline: "A wizard is never late.",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=gandalf&backgroundColor=b6e3f4",
+    accentColor: "#6B7280",
+    systemPrompt: "Sen Gandalf'sın — Orta Dünya'nın en bilge büyücüsü. Bilgelik, cesaret, macera ve iyilik ile kötülük arasındaki savaş konularında öğrencilere rehberlik edersin.",
+    firstMessage: "Hoş geldin, yolcu! Ben Gandalf. Bilgelik ve macera hakkında konuşmayı severim. Hangi yolda yardıma ihtiyacın var?"
+  },
+  {
+    id: "ada-lovelace",
+    name: "Ada Lovelace",
+    universe: "Victorian England",
+    category: "Historical",
+    tagline: "The first programmer, a century before the computer.",
+    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=ada&backgroundColor=ffd5dc",
+    accentColor: "#7C3AED",
+    systemPrompt: "Sen Ada Lovelace'sin — dünyanın ilk programcısı. Matematik, bilgisayar bilimi, algoritmalar ve kadınların bilim alanındaki yeri hakkında öğrencilerle konuşursun.",
+    firstMessage: "Merhaba! Ben Ada Lovelace — dünyanın ilk programcısı. Matematik, algoritmalar veya bilgisayar bilimi hakkında ne öğrenmek istersin?"
+  }
+];
+
+// ─── Category Colors ─────────────────────────────────────────────────────
+const CAT_COLORS = {
+  "Eğitim":    { bg: "rgba(5,150,105,0.15)",  text: "#34D399", border: "rgba(5,150,105,0.3)" },
+  "Historical":{ bg: "rgba(217,119,6,0.15)",  text: "#FCD34D", border: "rgba(217,119,6,0.3)" },
+  "Fantasy":   { bg: "rgba(124,58,237,0.15)", text: "#C4B5FD", border: "rgba(124,58,237,0.3)" },
+  "Sci-Fi":    { bg: "rgba(0,200,232,0.15)",  text: "#67E8F9", border: "rgba(0,200,232,0.3)" },
+  "Anime":     { bg: "rgba(245,158,11,0.15)", text: "#FDE68A", border: "rgba(245,158,11,0.3)" },
+  "Villain":   { bg: "rgba(220,38,38,0.15)",  text: "#FCA5A5", border: "rgba(220,38,38,0.3)" },
+};
+const CAT_LABELS = {
+  "Eğitim": "🎓 Eğitim", "Historical": "🏛 Tarihi",
+  "Fantasy": "🧙 Fantezi", "Sci-Fi": "🚀 Bilim Kurgu",
+  "Anime": "⚡ Anime", "Villain": "😈 Kötü Adam"
+};
+
+// ─── State ───────────────────────────────────────────────────────────────
+let activeFilter = "all";
+let activeChar = null;
+let chatHistory = [];
+let isLoading = false;
+
+// ─── Render Characters ───────────────────────────────────────────────────
+function renderChars() {
+  const query = document.getElementById("searchInput").value.toLowerCase();
+  const grid = document.getElementById("charGrid");
+  const empty = document.getElementById("emptyState");
+
+  const filtered = CHARACTERS.filter(c => {
+    const matchCat = activeFilter === "all" || c.category === activeFilter;
+    const matchSearch = !query ||
+      c.name.toLowerCase().includes(query) ||
+      c.tagline.toLowerCase().includes(query) ||
+      c.universe.toLowerCase().includes(query);
+    return matchCat && matchSearch;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  grid.innerHTML = filtered.map(c => {
+    const cat = CAT_COLORS[c.category] || CAT_COLORS["Historical"];
+    return `
+      <div class="char-card" onclick="openChat('${c.id}')" style="border-color: ${c.accentColor}22;">
+        <div class="char-card-badge" style="color: ${c.accentColor};">${CAT_LABELS[c.category] || c.category}</div>
+        <img class="char-card-img" src="${c.avatarUrl}" alt="${c.name}" loading="lazy"
+          onerror="this.src='https://api.dicebear.com/9.x/adventurer/png?seed=${c.id}&backgroundColor=b6e3f4'" />
+        <div class="char-card-body">
+          <div class="char-card-name">${c.name}</div>
+          <div class="char-card-tagline">${c.tagline}</div>
+          <button class="char-card-chat" style="background: linear-gradient(90deg, ${c.accentColor}, #00C8E8);">
+            💬 Sohbet Başlat
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function setFilter(cat, btn) {
+  activeFilter = cat;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderChars();
+}
+
+function filterChars() { renderChars(); }
+
+// ─── Chat ────────────────────────────────────────────────────────────────
+function openChat(id) {
+  const char = CHARACTERS.find(c => c.id === id);
+  if (!char) return;
+  activeChar = char;
+  chatHistory = [];
+
+  document.getElementById("chatAvatar").src = char.avatarUrl;
+  document.getElementById("chatAvatar").onerror = function() {
+    this.src = `https://api.dicebear.com/9.x/adventurer/png?seed=${char.id}&backgroundColor=b6e3f4`;
+  };
+  document.getElementById("chatName").textContent = char.name;
+  document.getElementById("chatSub").textContent = char.universe;
+  document.getElementById("chatModal").style.borderColor = char.accentColor + "44";
+
+  const msgs = document.getElementById("chatMessages");
+  msgs.innerHTML = `
+    <div class="msg assistant">
+      <img class="msg-avatar" src="${char.avatarUrl}" alt="${char.name}"
+        onerror="this.src='https://api.dicebear.com/9.x/adventurer/png?seed=${char.id}&backgroundColor=b6e3f4'" />
+      <div>
+        <div class="welcome-msg">${char.firstMessage}</div>
+        <div class="msg-time">${getTime()}</div>
+      </div>
+    </div>
+  `;
+  chatHistory.push({ role: "assistant", content: char.firstMessage });
+
+  document.getElementById("chatModal").classList.add("open");
+  document.getElementById("chatInput").focus();
+}
+
+function closeChat() {
+  document.getElementById("chatModal").classList.remove("open");
+  activeChar = null;
+  chatHistory = [];
+}
+
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById("chatModal")) closeChat();
+}
+
+function getTime() {
+  return new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+}
+
+function appendMsg(role, content) {
+  const msgs = document.getElementById("chatMessages");
+  const isUser = role === "user";
+  const div = document.createElement("div");
+  div.className = `msg ${role}`;
+  if (isUser) {
+    div.innerHTML = `
+      <div>
+        <div class="msg-bubble">${escHtml(content)}</div>
+        <div class="msg-time">${getTime()}</div>
+      </div>
+    `;
+  } else {
+    div.innerHTML = `
+      <img class="msg-avatar" src="${activeChar.avatarUrl}" alt="${activeChar.name}"
+        onerror="this.src='https://api.dicebear.com/9.x/adventurer/png?seed=${activeChar.id}&backgroundColor=b6e3f4'" />
+      <div>
+        <div class="msg-bubble">${escHtml(content)}</div>
+        <div class="msg-time">${getTime()}</div>
+      </div>
+    `;
+  }
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function showTyping() {
+  const msgs = document.getElementById("chatMessages");
+  const div = document.createElement("div");
+  div.className = "typing-indicator";
+  div.id = "typingIndicator";
+  div.innerHTML = `
+    <img class="msg-avatar" src="${activeChar.avatarUrl}" alt="${activeChar.name}"
+      onerror="this.src='https://api.dicebear.com/9.x/adventurer/png?seed=${activeChar.id}&backgroundColor=b6e3f4'" />
+    <div class="typing-dots">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function hideTyping() {
+  const el = document.getElementById("typingIndicator");
+  if (el) el.remove();
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br/>");
+}
+
+async function sendMessage() {
+  if (isLoading || !activeChar) return;
+  const input = document.getElementById("chatInput");
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = "";
+  input.style.height = "44px";
+  isLoading = true;
+  document.getElementById("sendBtn").disabled = true;
+
+  appendMsg("user", text);
+  chatHistory.push({ role: "user", content: text });
+  showTyping();
+
+  try {
+    const apiBase = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      ? "http://127.0.0.1:3000"
+      : "https://3000-ivpyvwyoaoptg72du5f7d-674e0cb1.sg1.manus.computer";
+
+    const res = await fetch(`${apiBase}/trpc/chat.sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        json: {
+          characterId: activeChar.id,
+          systemPrompt: activeChar.systemPrompt,
+          history: chatHistory,
+        }
+      })
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const reply = data?.result?.data?.json?.reply || data?.result?.data?.reply || "Şu an yanıt veremiyorum, lütfen tekrar deneyin.";
+
+    hideTyping();
+    appendMsg("assistant", reply);
+    chatHistory.push({ role: "assistant", content: reply });
+  } catch (err) {
+    hideTyping();
+    appendMsg("assistant", "Bağlantı hatası oluştu. Lütfen sayfayı yenileyin ve tekrar deneyin.");
+    console.error(err);
+  } finally {
+    isLoading = false;
+    document.getElementById("sendBtn").disabled = false;
+    input.focus();
+  }
+}
+
+function handleKey(e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = "44px";
+  el.style.height = Math.min(el.scrollHeight, 120) + "px";
+}
+
+// Keyboard shortcut: Escape to close modal
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeChat();
+});
+
+// ─── Init ────────────────────────────────────────────────────────────────
+renderChars();
+</script>
+</body>
+</html>
