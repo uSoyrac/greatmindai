@@ -408,6 +408,7 @@ input,textarea{font-family:inherit;color:var(--text)}
     <button class="nav-btn nav-btn-icon" id="historyNavBtn" onclick="showPage('history');clearHistoryBadge()" title="Sohbet Geçmişi">💬<span class="notif-badge" id="historyBadge"></span></button>
     <button class="nav-btn nav-btn-icon" onclick="showPage('leaderboard')" title="Liderlik">🏆</button>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
+    <button class="nav-btn nav-btn-icon" onclick="showApiKeyModal()" title="API Key Ayarla" id="apiKeyBtn">🔑</button>
     <button class="nav-btn nav-btn-grad" onclick="openWizard()">+ Karakter Oluştur</button>
   </div>
 </nav>
@@ -1390,6 +1391,77 @@ function getDemoReply(char, userText) {
   return pool[idx];
 }
 
+// ─── API Key yönetimi ────────────────────────────────────────────────────
+function getApiKey() { return localStorage.getItem("gmai_apikey") || ""; }
+function saveApiKey(k) { localStorage.setItem("gmai_apikey", k.trim()); }
+
+function showApiKeyModal() {
+  const existing = getApiKey();
+  const overlay = document.createElement("div");
+  overlay.id = "apikeyOverlay";
+  overlay.style.cssText = "position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:16px";
+  overlay.innerHTML = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:420px;width:100%">
+      <div style="font-size:22px;font-weight:800;margin-bottom:8px">🔑 API Key Girin</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
+        Gerçek AI yanıtları için Anthropic API key'inizi girin.<br/>
+        Key tarayıcınızda saklanır, hiçbir yere gönderilmez.
+      </div>
+      <input id="apikeyInput" type="password" placeholder="sk-ant-api03-..." value="${existing}"
+        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;
+               padding:12px 16px;color:var(--text);font-size:14px;margin-bottom:16px;font-family:monospace"/>
+      <div style="display:flex;gap:10px">
+        <button onclick="cancelApiKey()" style="flex:1;padding:11px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:14px;font-weight:600;cursor:pointer">İptal</button>
+        <button onclick="confirmApiKey()" style="flex:2;padding:11px;border-radius:12px;background:var(--grad);color:#fff;font-size:14px;font-weight:700;cursor:pointer;border:none">✓ Kaydet &amp; Başlat</button>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--muted);text-align:center">
+        Key olmadan demo yanıtlar kullanılır.
+        <a href="https://console.anthropic.com" target="_blank" style="color:var(--cyan)">Key al →</a>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(()=>document.getElementById("apikeyInput")?.focus(), 100);
+}
+function cancelApiKey() { document.getElementById("apikeyOverlay")?.remove(); }
+function confirmApiKey() {
+  const val = document.getElementById("apikeyInput")?.value.trim();
+  if(val) saveApiKey(val);
+  cancelApiKey();
+}
+
+async function callClaudeAPI(systemPrompt, history) {
+  const key = getApiKey();
+  if(!key) return null;
+  try {
+    const messages = history.map(m=>({role:m.role==="assistant"?"assistant":"user", content:m.content}));
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5",
+        max_tokens: 400,
+        system: systemPrompt,
+        messages: messages
+      })
+    });
+    if(!res.ok) {
+      const err = await res.json().catch(()=>({}));
+      if(res.status===401) { saveApiKey(""); return "__invalid_key__"; }
+      throw new Error(err.error?.message || "HTTP "+res.status);
+    }
+    const data = await res.json();
+    return data.content?.[0]?.text || null;
+  } catch(e) {
+    console.error("Claude API hatası:", e);
+    return null;
+  }
+}
+
 async function sendMessage() {
   if(isLoading || !activeChar) return;
   const input = document.getElementById("chatInput");
@@ -1402,9 +1474,23 @@ async function sendMessage() {
   chatHistory.push({role:"user",content:text});
   showTyping();
 
-  const reply = getDemoReply(activeChar, text);
-  const delay = Math.min(900 + reply.length * 11, 2400);
-  await new Promise(r => setTimeout(r, delay));
+  let reply = null;
+
+  // Önce API key ile gerçek Claude'u dene
+  if(getApiKey()) {
+    reply = await callClaudeAPI(activeChar.systemPrompt, chatHistory);
+    if(reply === "__invalid_key__") {
+      reply = null;
+      setTimeout(()=>{ hideTyping(); showApiKeyModal(); }, 100);
+    }
+  }
+
+  // API yoksa veya başarısız olduysa demo yanıt
+  if(!reply) {
+    reply = getDemoReply(activeChar, text);
+    const delay = Math.min(900 + reply.length * 11, 2000);
+    await new Promise(r => setTimeout(r, delay));
+  }
 
   hideTyping();
   appendMsg("assistant", reply, activeChar);
@@ -2081,6 +2167,29 @@ initUsername();
 initAvatar();
 initTheme();
 checkOnboarding();
+
+// API key buton durumu
+function updateApiKeyBtn() {
+  const btn = document.getElementById("apiKeyBtn");
+  if(!btn) return;
+  if(getApiKey()) {
+    btn.textContent = "🟢";
+    btn.title = "API Bağlı — Tıkla değiştir";
+  } else {
+    btn.textContent = "🔑";
+    btn.title = "API Key Gir (şu an demo mod)";
+  }
+}
+updateApiKeyBtn();
+
+// confirmApiKey'i güncelle
+const _origConfirm = confirmApiKey;
+confirmApiKey = function() {
+  const val = document.getElementById("apikeyInput")?.value.trim();
+  if(val) saveApiKey(val);
+  cancelApiKey();
+  updateApiKeyBtn();
+};
 </script>
 </body>
 </html>
