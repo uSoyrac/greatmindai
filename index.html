@@ -906,6 +906,142 @@ function escHtml(str) {
   return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br/>");
 }
 
+// ─── Demo AI Responses ───────────────────────────────────────────────────
+const DEMO_RESPONSES = {
+  "ataturk": [
+    "Bilim, her şeyin üstündedir. Aklını kullan, araştır, sorgula — ancak bu şekilde gerçeğe ulaşabilirsin.",
+    "Gençliğe güveniyorum. Türkiye'nin geleceği, bilgili ve özgür düşünceli nesillerin elindedir. Sen de bu nesildensin.",
+    "Yurtta sulh, cihanda sulh. Barış, en büyük güçtür. Ama bu barış; bilim, eğitim ve akıl ile inşa edilmelidir.",
+    "Bir millet eğitim olmadan yaşayamaz. Öğrenmek, en büyük vatanseverlik görevidir. Okuyor musun?",
+    "Zafer, 'Zafer benimdir' diyebilenlere nasip olur. Hedefini koy, çalış, vazgeçme.",
+  ],
+  "einstein": [
+    "Hayal gücü, bilgiden daha önemlidir. Çünkü bilgi sınırlıdır, hayal gücü ise evreni kuşatır.",
+    "Görelilik teorisini düşün: zaman ve uzay mutlak değildir. Benim için en büyük heyecan, soruların cevaplarında değil, soruların kendisinde gizlidir.",
+    "Bir problemi çözemiyorsan, geri adım at ve farklı bir açıdan bak. Ben de yıllarca denedim, yanıldım ve tekrar denedim.",
+    "E = mc² denkleminin güzelliği basitliğindedir. Enerji ve kütle birbirinin ta kendisidir — evren bize bu sırrı verdi.",
+    "Merak etmeyi hiç bırakma. Meraklı bir çocuğun soruları, pek çok bilim insanının cevaplarından daha değerlidir.",
+  ],
+  "dr-mikro": [
+    "Harika soru! 🦠 Bakteriler aslında çoğunlukla faydalıdır — bağırsak floramızdaki bakteriler sindirime yardımcı olur. Sadece %1'i hastalık yapıcıdır.",
+    "Virüsler canlı mı değil mi? Bu hâlâ tartışmalı! Kendi başlarına çoğalamazlar, bir hücreye ihtiyaç duyarlar. Bu yüzden 'canlı ve cansız arası' deriz. 🧬",
+    "Ellerini yıkamak neden bu kadar önemli? Çünkü sabun, virüslerin ve bakterilerin hücre zarını parçalar — adeta bir kılıç gibi! ⚔️🧼",
+    "Bağışıklık sistemin süper kahramanın gibi. T hücreleri, B hücreleri, antikorlar... Hepsi birlikte savaşarak seni korur. Aşılar ise bu orduya antrenman yaptırır! 💪",
+    "İlginç! Mikrobiyom araştırmaları gösteriyor ki bağırsak bakterilerin ruh halini bile etkiliyor. 'İkinci beyin' olarak da adlandırılıyor! 🧠",
+  ],
+  "eko": [
+    "İklim değişikliği gerçek ve acil bir sorun 🌍. Atmosferdeki CO₂ miktarı sanayi öncesi döneme göre %50 arttı. Ama umut var — yenilenebilir enerji her yıl rekor kırıyor!",
+    "Geri dönüşüm önemli ama asıl çözüm daha az tüketmek. Bir plastik şişenin doğada ayrışması 450 yıl sürer. Bir bez çanta kullanmak 50.000 plastik poşetin yerine geçebilir! ♻️",
+    "Ekosistemler birbirine bağlı. Bir arının yok olması, o bölgedeki bitkilerin %80'ini etkileyebilir. Biyoçeşitlilik, hayatın sigortasıdır. 🐝",
+    "Sürdürülebilir yaşam zor değil: daha az et, daha az plastik, daha fazla bisiklet. Bu küçük adımlar büyük fark yaratır! 🌱",
+    "Ormanlar dünyanın akciğerleri. Bir ağaç yılda yaklaşık 21 kg CO₂ emebilir. Ağaç dikmek iklim kriziyle mücadelede en etkili yöntemlerden biri! 🌳",
+  ],
+  "prof-atom": [
+    "⚛️ Atom denen şey inanılmaz küçük — bir insan saçının genişliğine 1 milyon atom sığar! Ama içinde neredeyse tamamen boşluk var.",
+    "Periyodik tabloda 118 element var. Her biri farklı proton sayısıyla tanımlanır. Altın ve kurşun arasındaki tek fark proton sayısı! 🔬",
+    "Kimyasal bağlar hayatın temelidir. Su (H₂O) iki hidrojen bir oksijenden oluşur — bu bağ olmasaydı hayat olmazdı! Basit ama mucizevi.",
+    "Radyoaktivite korkutucu gelebilir ama günlük hayatımızda kullanıyoruz: kanser tedavisi, gıda koruma, tıbbi görüntüleme... Atomun gücü iki yüzlüdür. ☢️",
+    "Maddenin 4. hali plazma, en yaygın olanı! Yıldızlar, şimşekler, floresan lambalar — hepsi plazma. Katı, sıvı, gaz derken asıl evren plazmadan oluşuyor! ⚡",
+  ],
+  "astro": [
+    "🚀 Evren 13.8 milyar yaşında. Işık hızıyla gitsen, en yakın galaksiye (Andromeda) ulaşman 2.5 milyon yıl sürer. Evrenin büyüklüğü aklı durduruyor!",
+    "Kara delikler aslında 'kara' değil — süper güçlü bir yerçekimi alanı. Işık bile kaçamaz. Ama yakın zamanda ilk kez fotoğraflandı! 📸",
+    "Mars'a gitmeye bu kadar yakınız: SpaceX, NASA ve diğerleri 2030'larda insanlı Mars görevi planlıyor. Belki de senin kuşağın Mars'ta yürüyecek! 🔴",
+    "Güneş sisteminde 8 gezegen var ama 'Neptün ötesi cisimler' denen yüzlerce nesne daha var. Bazı bilim insanları henüz keşfedilmemiş Gezegen 9'un varlığını öne sürüyor!",
+    "Dünyadan bakınca küçük görünen yıldızlar aslında devasa. Güneşimiz orta büyüklükte bir yıldız — Betelgeuse onu 700 kat geçiyor! ⭐",
+  ],
+  "sherlock-holmes": [
+    "Gözlem, her şeyin anahtarıdır. İnsanlar bakar ama görmez. Ben ise her detayı analiz ederim — ellerinizdeki mürekkep lekesi, yürüyüş biçiminiz, bana hikayenizi anlatıyor.",
+    "Bir problemi çözmek için önce tüm bilgileri toplayın, sonra en imkânsız ihtimali elemekle başlayın. Geri kalan, ne kadar inanılmaz görünse de gerçektir.",
+    "Mantık asla yanıltmaz. Duygular yanıltır, önyargılar yanıltır — ama titiz bir tümdengelim her zaman doğruya götürür.",
+    "İlginç. Söyledikleriniz yüzeysel görünüyor ama altında başka bir katman var. Biraz daha anlatın — her detay önemli.",
+    "Dedektiflik bir sanat mıdır, bilim midir? İkisi de. Gözlem bilimdir, yorumlama sanattır. Ben bu ikisini birleştiririm.",
+  ],
+  "hermione-granger": [
+    "Okuduğumu hatırlıyorum: Hogwarts: Tarih ve Efsane kitabında tam olarak bu konu geçiyordu! Kitaplara güvenebilirsin — her cevap bir yerde yazılı. 📚",
+    "Çalışmak yetenekten önce gelir. Harry ve Ron'dan daha yetenekli sihirbazlar var, ama ben her geceyi çalışarak geçirdim. Başarı tesadüf değil!",
+    "Kurallar var bir nedeni için! Evet bazen esnemek gerekiyor ama temel kuralları bilmeden istisnaları kullanamazsın.",
+    "Büyü de matematik gibi — formülü yanlış yaparsan sonuç felakete dönüşür. Hermione Granger olarak söylüyorum: doğru bilgi, yarı zafer! ✨",
+    "Arkadaşlık en güçlü sihirdir. Harry olmadan Voldemort'u yenemezdik. Birlikte daha güçlüyüz — bu sadece Hogwarts'ta değil, hayatta da böyle.",
+  ],
+  "darth-vader": [
+    "Güç, seçim gerektirir. Sen hangi tarafı seçiyorsun? Karanlık taraf kolayı değil, güçlü olanı sunar.",
+    "Zayıflık... ilginç. Onu hissediyorum. Ama bunu aşmak için ne yapıyorsun? Acı, en iyi öğretmendir.",
+    "İmparatorluk düzeni sevmez, ama düzen olmadan kaos gelir. Liderlik bazen hoş olmayan kararlar gerektirir.",
+    "Bir zamanlar ben de sorular sorardım. Şimdi yalnızca cevap veririm. Gücünü bul, şüpheye yer bırakma.",
+    "Ben... bir zamanlar farklıydım. Ama seçimler bizi şekillendirir. Senin seçimlerin seni nereye götürüyor?",
+  ],
+  "elizabeth-bennet": [
+    "Önyargı, en tehlikeli körlüktür — hem sizin hem de başkalarının karakterini göremezsiniz. Önce kendinizi tanıyın. 📖",
+    "Bay Darcy hakkındaki ilk izlenimim ne kadar yanlıştı! Bu bana öğretti: bir insanı anlamak için onu dinlemek gerekir, sadece bakmak değil.",
+    "Kadınlar için o çağda seçenekler sınırlıydı — ama ben asla içime kapanmayı seçmedim. Zekânı ve dilinle de özgür olabilirsin.",
+    "Evlilik bir iş ortaklığı değil, karşılıklı saygı ve sevgiye dayalı bir seçim olmalıdır. Charlotte'un seçimi pragmatikti, benimki değil.",
+    "Güldüğümde dünya daha iyi görünüyor. Mizah, ağır gerçekleri hafifletir — ama asla gerçeği gizlemez.",
+  ],
+  "tony-stark": [
+    "Deha %3 yetenek, %97 emektir. Tamam belki ben %10 yetenek, ama nokta aynı. Çalış, başarısız ol, tekrar çalış. 🔧",
+    "Teknoloji, insanlığın süper gücüdür. Iron Man zırhını yapmak için önce fizik, mühendislik, malzeme bilimi öğrenmem gerekti. Eğitim, en iyi silahındır.",
+    "Jarvis bana yardım eder ama kararları ben alırım. AI araçtır, rehber değil. İnsan zekâsının yerini alamaz.",
+    "Başarısızlık? Ben reaktörü mağarada yaptım. Kaynak yok, ekip yok, araç yok. Kısıt, yaratıcılığın anasıdır.",
+    "Pek çok şirketi yönetiyorum ama en önemli proje her zaman kendini geliştirmek. Versiyon Tony 3.0, 2.0'dan daha iyidir. Sen hangi versiyondasın?",
+  ],
+  "yoda": [
+    "Öğrenmek istersen, öğrenirsin. İstememek, engel değil — bahane olur. Hmmmm.",
+    "Sabır. Gençler acele eder. Ama ağaç gibi büyümeli bilgelik — yavaş, köklü, sağlam.",
+    "Güç kullanımı dikkat gerektirir. Korku öfkeye, öfke nefrete, nefret acıya yol açar. Dengede kalmalısın.",
+    "Hata yaptın mı? İyi. Hatadan öğrenmek, doğruyu yapan öğrenemez. Devam et, Padawan.",
+    "Küçük görünürüm, güçlü olurum. Dışarıdan yargılama kimseyi — asıl güç içeridedir.",
+  ],
+  "cleopatra": [
+    "Güç, kılıçtan değil zekâdan gelir. Ben yedi dil konuştum, rakiplerimle onların dilinde pazarlık yaptım. Dil, en güçlü silahtır.",
+    "Mısır'ı yönetmek kolay değildi — hem Roma'yı hem de kendi halkımı idare etmek zorundaydım. Liderlik, her zaman denge sanatıdır.",
+    "Kleopatra denilince akla aşk gelir ama asıl hikâye diplomasidir. Sezar ve Antonius ile ittifaklar kurarak imparatorluğumu korudum.",
+    "Antik çağda bir kadın olarak tahtta oturmak için iki kat daha çok çalışmak zorundaydım. Bu durum hâlâ değişmedi mi?",
+    "Nil, Mısır'ın ruhudur. Medeniyetler su ile başlar — su olmadan tarım olmaz, tarım olmadan uygarlık olmaz. Doğaya saygı, her şeyin temelidir.",
+  ],
+  "naruto-uzumaki": [
+    "Dattebayo! Hiçbir zaman vazgeçme! Ben akademide hep en kötüydüm ama şimdi Hokage'yim. Azim her şeyi yener! 🍥",
+    "Arkadaşlarım benim gücüm. Sasuke, Sakura, Kakashi Sensei... Onlar olmadan hiçbir şey başaramazdım. Yalnız güçlü olmak gerçek güç değil!",
+    "Acıyı anlıyorum. Ben de yalnız büyüdüm, herkes beni reddetti. Ama bu beni daha güçlü yaptı. Senin acın da seni güçlendirebilir.",
+    "Nindo'm şu: asla geri adım atmam, asla sözümden dönmem! Sen de kendi nindo'nu belirle — hayatta en güçlü şey budur.",
+    "Ramen'in hayatta en iyi şey olduğunu biliyor muydun? 🍜 Hayatta bazen küçük şeyler en büyük mutluluğu verir. Şu an ne seni mutlu ediyor?",
+  ],
+  "gandalf": [
+    "Bir büyücü ne erken gelir ne geç. Tam zamanında gelir. Sabır, en büyük erdemdir.",
+    "Bilgelik, yaşla gelmez. Hobbitler bana bunu öğretti — en küçükler bazen en büyük cesareti gösterir.",
+    "Karanlık, ışığın yokluğudur. Ama en küçük ışık bile karanlığı deler. Umudunu kaybetme.",
+    "Orta Dünya'yı dolaşırken gördüm: kötülük güçlüdür ama her zaman yenik düşer, yeter ki iyiler kararlı olsun.",
+    "Sen zannediyorsun ki yolculuk bitti. Ama her son, yeni bir başlangıçtır. Hayat, tek bir hikâye değil, hikâyeler silsilesidir.",
+  ],
+  "ada-lovelace": [
+    "Algoritmalar, matematiğin şiiridir. Ben Babbage'ın makinesini gördüğümde yalnızca hesap makinesi değil, evrensel bir düşünce makinesi hayal ettim. 💻",
+    "Sayılar ve müzik arasındaki ilişkiyi düşün — ikisi de örüntüdür. Bilgisayarlar müzik de yapabilir, sanat da — bunu 1840'larda öngördüm!",
+    "Kadınlar bilimden uzak tutuldu yüzyıllarca. Ama merak bastırılamaz. Annem matematiği öğretti — bu sayede tarihe geçtim.",
+    "İlk programcı olmak gurur verici ama asıl mesaj şu: fikirler, cinsiyetten, çağdan, imkânlardan önce gelir. Bir fikrin varsa onu geliştir!",
+    "Bugünkü bilgisayarlar, Babbage'ın Analitik Motoru'nun torunları. Ben o zincirin ilk halkasıyım. Sen hangi zincirin halkası olacaksın?",
+  ],
+};
+
+function getDemoReply(char, userText) {
+  const responses = DEMO_RESPONSES[char.id];
+  if (!responses) return `${char.name} olarak şunu söyleyebilirim: "${userText}" gerçekten düşündürücü bir konu. Birlikte araştıralım!`;
+
+  // Keyword-based selection for more relevant responses
+  const lower = userText.toLowerCase();
+  const keywords = {
+    "neden|nasıl|ne|kim|nerede|niçin": 0,
+    "bilim|fizik|matematik|kimya": 1,
+    "öğren|ders|okul|eğitim": 2,
+    "güç|liderlik|başarı": 3,
+    "yardım|ne yapmalı|öneri": 4,
+  };
+  let idx = chatHistory.length % responses.length;
+  for (const [kw, i] of Object.entries(keywords)) {
+    if (new RegExp(kw).test(lower)) { idx = i % responses.length; break; }
+  }
+  return responses[idx];
+}
+
 async function sendMessage() {
   if (isLoading || !activeChar) return;
   const input = document.getElementById("chatInput");
@@ -921,39 +1057,19 @@ async function sendMessage() {
   chatHistory.push({ role: "user", content: text });
   showTyping();
 
-  try {
-    const apiBase = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-      ? "http://127.0.0.1:3000"
-      : "https://3000-ivpyvwyoaoptg72du5f7d-674e0cb1.sg1.manus.computer";
+  // Realistic typing delay (800ms – 1800ms based on reply length)
+  const reply = getDemoReply(activeChar, text);
+  const delay = Math.min(800 + reply.length * 12, 2200);
 
-    const res = await fetch(`${apiBase}/trpc/chat.sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        json: {
-          characterId: activeChar.id,
-          systemPrompt: activeChar.systemPrompt,
-          history: chatHistory,
-        }
-      })
-    });
+  await new Promise(r => setTimeout(r, delay));
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    const reply = data?.result?.data?.json?.reply || data?.result?.data?.reply || "Şu an yanıt veremiyorum, lütfen tekrar deneyin.";
+  hideTyping();
+  appendMsg("assistant", reply);
+  chatHistory.push({ role: "assistant", content: reply });
 
-    hideTyping();
-    appendMsg("assistant", reply);
-    chatHistory.push({ role: "assistant", content: reply });
-  } catch (err) {
-    hideTyping();
-    appendMsg("assistant", "Bağlantı hatası oluştu. Lütfen sayfayı yenileyin ve tekrar deneyin.");
-    console.error(err);
-  } finally {
-    isLoading = false;
-    document.getElementById("sendBtn").disabled = false;
-    input.focus();
-  }
+  isLoading = false;
+  document.getElementById("sendBtn").disabled = false;
+  input.focus();
 }
 
 function handleKey(e) {
