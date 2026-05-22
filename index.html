@@ -2,8 +2,24 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Great Mind AI</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#7B4FD4"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Great Mind AI"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<meta name="description" content="Tarihin en büyük zihinleriyle sohbet et, öğren ve keşfet."/>
+
+<!-- Open Graph (paylaşım önizlemesi) -->
+<meta property="og:title" content="Great Mind AI"/>
+<meta property="og:description" content="Atatürk, Einstein ve daha fazlasıyla sohbet et!"/>
+<meta property="og:image" content="https://usoyrac.github.io/greatmindai/icon-512.png"/>
+<meta property="og:url" content="https://usoyrac.github.io/greatmindai/"/>
 <style>
 :root {
   --purple:#7B4FD4; --pink:#E040A0; --cyan:#00C8E8;
@@ -2286,6 +2302,83 @@ confirmApiKey = function() {
   cancelApiKey();
   updateApiKeyBtn();
 };
+
+// ─── PWA: Ana Ekrana Ekle Banner ─────────────────────────────────────────
+let _pwaPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _pwaPrompt = e;
+  // 3 sn sonra banner göster (sadece bir kez)
+  if(!localStorage.getItem('gmai_pwa_shown')) {
+    setTimeout(showInstallBanner, 3000);
+  }
+});
+
+function showInstallBanner() {
+  if(document.getElementById('pwaBanner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'pwaBanner';
+  banner.style.cssText = `
+    position:fixed;bottom:80px;left:12px;right:12px;z-index:9990;
+    background:linear-gradient(135deg,#7B4FD4,#E040A0);
+    border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;
+    box-shadow:0 8px 32px rgba(123,79,212,.5);animation:popIn .3s ease;
+  `;
+  banner.innerHTML = `
+    <img src="icon-192.png" style="width:40px;height:40px;border-radius:10px;flex-shrink:0"/>
+    <div style="flex:1">
+      <div style="font-weight:800;font-size:14px;color:#fff">Ana Ekrana Ekle 📲</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.8)">Uygulama gibi kullan, internet olmadan bile açılır</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <button onclick="installPWA()" style="padding:7px 14px;border-radius:10px;background:#fff;color:#7B4FD4;font-weight:800;font-size:13px;border:none;cursor:pointer">Ekle</button>
+      <button onclick="dismissInstallBanner()" style="padding:4px;background:transparent;border:none;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer">Şimdi değil</button>
+    </div>`;
+  document.body.appendChild(banner);
+  localStorage.setItem('gmai_pwa_shown', '1');
+}
+
+function installPWA() {
+  document.getElementById('pwaBanner')?.remove();
+  if(_pwaPrompt) {
+    _pwaPrompt.prompt();
+    _pwaPrompt.userChoice.then(r => { _pwaPrompt = null; });
+  }
+}
+function dismissInstallBanner() {
+  document.getElementById('pwaBanner')?.remove();
+}
+
+// iOS Safari'de özel rehber (beforeinstallprompt desteklemez)
+(function checkIOSInstall() {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone;
+  if(isIOS && !isStandalone && !localStorage.getItem('gmai_ios_hint')) {
+    setTimeout(() => {
+      const banner = document.createElement('div');
+      banner.id = 'iosBanner';
+      banner.style.cssText = `
+        position:fixed;bottom:80px;left:12px;right:12px;z-index:9990;
+        background:linear-gradient(135deg,#7B4FD4,#E040A0);
+        border-radius:16px;padding:14px 16px;
+        box-shadow:0 8px 32px rgba(123,79,212,.5);animation:popIn .3s ease;
+      `;
+      banner.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <img src="icon-192.png" style="width:36px;height:36px;border-radius:9px"/>
+          <div style="font-weight:800;color:#fff">Ana Ekrana Ekle 📲</div>
+          <button onclick="this.closest('#iosBanner').remove();localStorage.setItem('gmai_ios_hint','1')"
+            style="margin-left:auto;background:transparent;border:none;color:#fff;font-size:20px;cursor:pointer">✕</button>
+        </div>
+        <div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.5">
+          Safari'de alttaki <b>Paylaş</b> butonuna <b>⬆️</b> dokun →<br/>
+          "<b>Ana Ekrana Ekle</b>" seç → uygulama gibi açılır!
+        </div>`;
+      document.body.appendChild(banner);
+      localStorage.setItem('gmai_ios_hint', '1');
+    }, 4000);
+  }
+})();
 </script>
 </body>
 </html>
