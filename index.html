@@ -375,15 +375,15 @@ input,textarea{font-family:inherit;color:var(--text)}
 .share-preview-btn-close{background:var(--surface2);border:1.5px solid var(--border)}
 
 /* ── Guided Tour Tooltip ── */
-.tour-overlay{position:fixed;inset:0;z-index:850;pointer-events:none}
-.tour-overlay.active{pointer-events:auto}
+.tour-overlay{position:fixed;inset:0;z-index:850;display:none}
+.tour-overlay.active{display:block}
 .tour-spotlight{position:absolute;border-radius:16px;box-shadow:0 0 0 9999px rgba(0,0,0,.75);pointer-events:none;transition:.3s;border:2px solid var(--cyan)}
-.tour-tooltip{position:absolute;background:var(--surface);border:1.5px solid var(--cyan);border-radius:16px;padding:16px 18px;max-width:240px;z-index:851;animation:popIn .3s ease}
+.tour-tooltip{position:fixed;background:var(--surface);border:1.5px solid var(--cyan);border-radius:16px;padding:16px 18px;max-width:260px;z-index:9999;animation:popIn .3s ease;pointer-events:auto}
 .tour-tooltip-title{font-size:14px;font-weight:800;color:var(--cyan);margin-bottom:4px}
 .tour-tooltip-text{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:12px}
 .tour-tooltip-actions{display:flex;gap:8px;justify-content:flex-end}
-.tour-btn-skip{font-size:12px;color:var(--muted);padding:6px 10px;border-radius:8px;background:var(--surface2);cursor:pointer}
-.tour-btn-next{font-size:12px;color:#fff;padding:6px 12px;border-radius:8px;background:var(--grad);cursor:pointer;font-weight:700}
+.tour-btn-skip{font-size:12px;color:var(--muted);padding:6px 10px;border-radius:8px;background:var(--surface2);cursor:pointer;border:1px solid var(--border)}
+.tour-btn-next{font-size:12px;color:#fff;padding:6px 12px;border-radius:8px;background:var(--grad);cursor:pointer;font-weight:700;border:none}
 
 /* ── Responsive ── */
 @media(max-width:600px){
@@ -2087,26 +2087,31 @@ function startTour() {
 function showTourStep() {
   const step = TOUR_STEPS[tourStep];
   if(!step) { endTour(); return; }
-  const target = document.querySelector(step.selector);
-  if(!target) { tourStep++; showTourStep(); return; }
   const overlay = document.getElementById('tourOverlay');
   const spotlight = document.getElementById('tourSpotlight');
   const tooltip = document.getElementById('tourTooltip');
   overlay.classList.add('active');
-  const rect = target.getBoundingClientRect();
-  const pad = 8;
-  spotlight.style.cssText = `left:${rect.left-pad}px;top:${rect.top-pad}px;width:${rect.width+pad*2}px;height:${rect.height+pad*2}px`;
+
+  const target = document.querySelector(step.selector);
+  if(target) {
+    const rect = target.getBoundingClientRect();
+    const pad = 8;
+    spotlight.style.cssText = `left:${rect.left-pad}px;top:${rect.top-pad}px;width:${rect.width+pad*2}px;height:${rect.height+pad*2}px;position:absolute`;
+    // Tooltip pozisyonu: hedefin altına veya üstüne
+    const tW = 260, tH = 140;
+    let tLeft = Math.max(8, Math.min(rect.left, window.innerWidth - tW - 8));
+    let tTop = rect.bottom + 16;
+    if(tTop + tH > window.innerHeight - 8) tTop = Math.max(8, rect.top - tH - 16);
+    tooltip.style.cssText = `left:${tLeft}px;top:${tTop}px;width:${tW}px;position:fixed`;
+  } else {
+    // Hedef element bulunamazsa ortada göster
+    spotlight.style.cssText = 'display:none';
+    tooltip.style.cssText = `left:50%;top:50%;transform:translate(-50%,-50%);width:260px;position:fixed`;
+  }
+
   document.getElementById('tourTitle').textContent = step.title;
   document.getElementById('tourText').textContent = step.text;
   document.getElementById('tourNextBtn').textContent = step.isLast ? 'Bitir ✓' : 'Sonraki →';
-  // Position tooltip below or above target
-  const tW = 260, tH = 130;
-  let tLeft = rect.left;
-  let tTop = rect.bottom + 16;
-  if(tTop + tH > window.innerHeight) tTop = rect.top - tH - 16;
-  if(tLeft + tW > window.innerWidth) tLeft = window.innerWidth - tW - 16;
-  if(tLeft < 8) tLeft = 8;
-  tooltip.style.cssText = `left:${tLeft}px;top:${tTop}px;width:${tW}px`;
 }
 function nextTourStep() {
   tourStep++;
@@ -2117,6 +2122,11 @@ function endTour() {
   localStorage.setItem('gmai_tour_done','1');
   const overlay = document.getElementById('tourOverlay');
   overlay.classList.remove('active');
+  // Tooltip ve spotlight'ı tamamen gizle
+  const tooltip = document.getElementById('tourTooltip');
+  const spotlight = document.getElementById('tourSpotlight');
+  if(tooltip) tooltip.style.display = 'none';
+  if(spotlight) spotlight.style.display = 'none';
 }
 
 // ─── Notification Chime (Web Audio API) ───────────────────────────────────────────────
