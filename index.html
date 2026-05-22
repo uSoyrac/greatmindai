@@ -682,7 +682,7 @@ input,textarea{font-family:inherit;color:var(--text)}
     <div class="ob-sub">Tarihîn en büyük zihinleriyle sohbet et, öğren ve keşfet.</div>
     <div class="ob-field">
       <label class="ob-label">Kullanıcı Adın</label>
-      <input id="obNameInput" class="ob-input" type="text" placeholder="Örn: Kaşif, Araştırmacı..." maxlength="20" />
+      <input id="obNameInput" class="ob-input" type="text" placeholder="Örn: Kaşif, Araştırmacı..." maxlength="20" onkeydown="if(event.key==='Enter') finishOnboarding()" />
     </div>
     <div class="ob-field">
       <label class="ob-label">Avatar Seç</label>
@@ -1156,7 +1156,7 @@ function openDetail(id) {
   const chatBtn = document.getElementById("detailChatBtn");
   if(locked) {
     chatBtn.textContent = `🔒 ${char.unlockXp} XP ile Aç`;
-    chatBtn.onclick = ()=>{ alert(`Bu karakteri açmak için ${char.unlockXp} XP gerekiyor. Şu an ${STATE.xp} XP'niz var.`); };
+    chatBtn.onclick = ()=>{ closeDetail(); showCelebration("🔒", `${char.name} Kilitli`, `Bu karakteri açmak için ${char.unlockXp} XP gerekiyor. Şu an: ${STATE.xp} XP`); };
   } else {
     chatBtn.textContent = "💬 Sohbet Başlat";
     chatBtn.onclick = startChatFromDetail;
@@ -1175,7 +1175,10 @@ function startChatWithQuestion(id, question) {
 function openChat(id, prefillQuestion) {
   const char = allChars().find(c=>c.id===id);
   if(!char) return;
-  if(!isUnlocked(char)) { alert(`Bu karakteri açmak için ${char.unlockXp} XP gerekiyor!`); return; }
+  if(!isUnlocked(char)) {
+    showCelebration("🔒", `${char.name} Kilitli`, `Bu karakteri açmak için ${char.unlockXp} XP gerekiyor. Şu an: ${STATE.xp} XP`);
+    return;
+  }
   activeChar = char;
   chatHistory = [];
   document.getElementById("quizPrompt").style.display = "none";
@@ -1402,12 +1405,12 @@ function showApiKeyModal() {
   overlay.style.cssText = "position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:16px";
   overlay.innerHTML = `
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:420px;width:100%">
-      <div style="font-size:22px;font-weight:800;margin-bottom:8px">🔑 API Key Girin</div>
+      <div style="font-size:22px;font-weight:800;margin-bottom:8px">🔑 Gemini API Key</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
-        Gerçek AI yanıtları için Anthropic API key'inizi girin.<br/>
-        Key tarayıcınızda saklanır, hiçbir yere gönderilmez.
+        Gerçek AI yanıtları için Google Gemini API key'ini girin.<br/>
+        Key sadece tarayıcında saklanır, hiçbir yere gönderilmez.
       </div>
-      <input id="apikeyInput" type="password" placeholder="sk-ant-api03-..." value="${existing}"
+      <input id="apikeyInput" type="password" placeholder="AIzaSy..." value="${existing}"
         style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;
                padding:12px 16px;color:var(--text);font-size:14px;margin-bottom:16px;font-family:monospace"/>
       <div style="display:flex;gap:10px">
@@ -1415,8 +1418,8 @@ function showApiKeyModal() {
         <button onclick="confirmApiKey()" style="flex:2;padding:11px;border-radius:12px;background:var(--grad);color:#fff;font-size:14px;font-weight:700;cursor:pointer;border:none">✓ Kaydet &amp; Başlat</button>
       </div>
       <div style="margin-top:12px;font-size:11px;color:var(--muted);text-align:center">
-        Key olmadan demo yanıtlar kullanılır.
-        <a href="https://console.anthropic.com" target="_blank" style="color:var(--cyan)">Key al →</a>
+        Key olmadan demo yanıtlar çalışır. &nbsp;
+        <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--cyan)">Ücretsiz key al →</a>
       </div>
     </div>`;
   document.body.appendChild(overlay);
@@ -1429,35 +1432,43 @@ function confirmApiKey() {
   cancelApiKey();
 }
 
-async function callClaudeAPI(systemPrompt, history) {
+async function callGeminiAPI(systemPrompt, history) {
   const key = getApiKey();
   if(!key) return null;
   try {
-    const messages = history.map(m=>({role:m.role==="assistant"?"assistant":"user", content:m.content}));
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST",
-      headers:{
-        "x-api-key": key,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-        "anthropic-dangerous-direct-browser-access": "true"
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5",
-        max_tokens: 400,
-        system: systemPrompt,
-        messages: messages
-      })
-    });
+    // Dil + stil talimatı ekle
+    const langMap = {tr:"Türkçe yanıt ver.", en:"Respond in English.", de:"Antworte auf Deutsch."};
+    const styleNote = "\n\nÖNEMLİ: Yanıtların kısa ve doğal olsun (2-4 cümle). Ders verme, öğüt verme. Soru sor, deneyim paylaş, hikaye anlat. Sohbet gibi konuş.";
+    const fullSystem = systemPrompt + "\n\n" + (langMap[activeLang]||langMap.tr) + styleNote;
+
+    // Gemini formatı: user / model
+    const contents = history.map(m => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }]
+    }));
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: fullSystem }] },
+          contents: contents,
+          generationConfig: { maxOutputTokens: 400, temperature: 0.9 }
+        })
+      }
+    );
     if(!res.ok) {
-      const err = await res.json().catch(()=>({}));
-      if(res.status===401) { saveApiKey(""); return "__invalid_key__"; }
-      throw new Error(err.error?.message || "HTTP "+res.status);
+      if(res.status===400||res.status===401||res.status===403) {
+        saveApiKey(""); return "__invalid_key__";
+      }
+      throw new Error("HTTP "+res.status);
     }
     const data = await res.json();
-    return data.content?.[0]?.text || null;
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
   } catch(e) {
-    console.error("Claude API hatası:", e);
+    console.error("Gemini API hatası:", e);
     return null;
   }
 }
@@ -1476,12 +1487,16 @@ async function sendMessage() {
 
   let reply = null;
 
-  // Önce API key ile gerçek Claude'u dene
+  // Önce Gemini API ile gerçek AI dene
   if(getApiKey()) {
-    reply = await callClaudeAPI(activeChar.systemPrompt, chatHistory);
+    reply = await callGeminiAPI(activeChar.systemPrompt, chatHistory);
     if(reply === "__invalid_key__") {
-      reply = null;
-      setTimeout(()=>{ hideTyping(); showApiKeyModal(); }, 100);
+      // Geçersiz key: modal aç, demo yanıt gösterme
+      hideTyping();
+      isLoading = false;
+      document.getElementById("sendBtn").disabled = false;
+      showApiKeyModal();
+      return;
     }
   }
 
@@ -1538,12 +1553,20 @@ function speakTextDirect(text, char) {
 // ─── Username ────────────────────────────────────────────────────────────
 function editUsername() {
   const current = STATE.username||"Kullanıcı";
-  const name = prompt("Kullanıcı adını gir:", current);
-  if(name && name.trim()) {
-    STATE.username = name.trim().slice(0,20);
-    saveState(STATE);
-    document.getElementById("profileNameDisplay").innerHTML = STATE.username+' <span style="font-size:12px;opacity:.5">✏️</span>';
-  }
+  const el = document.getElementById("profileNameDisplay");
+  el.innerHTML = `<input id="usernameEditInput" type="text" maxlength="20" value="${current}"
+    style="background:var(--surface2);border:1.5px solid var(--purple);border-radius:8px;padding:4px 10px;
+           color:var(--text);font-size:15px;font-weight:700;width:140px;outline:none;"
+    onblur="saveUsername()" onkeydown="if(event.key==='Enter')this.blur()"/>`;
+  document.getElementById("usernameEditInput").select();
+}
+function saveUsername() {
+  const inp = document.getElementById("usernameEditInput");
+  if(!inp) return;
+  const val = inp.value.trim().slice(0,20);
+  STATE.username = val||"Kullanıcı";
+  saveState(STATE);
+  document.getElementById("profileNameDisplay").innerHTML = STATE.username+' <span style="font-size:12px;opacity:.5">✏️</span>';
 }
 function initUsername() {
   const el = document.getElementById("profileNameDisplay");
@@ -1552,7 +1575,7 @@ function initUsername() {
 
 // ─── Share Chat (Canvas Card) ─────────────────────────────────────────────────────
 function shareChat() {
-  if(!activeChar || chatHistory.length < 2) { alert("Paylaşmak için önce sohbet et!"); return; }
+  if(!activeChar || chatHistory.length < 2) { showCelebration("💬", "Önce Sohbet Et!", "Paylaşabilmek için karakterle en az bir mesaj alışverişi yap."); return; }
   const canvas = document.getElementById("shareCanvas");
   const ctx = canvas.getContext("2d");
   const W = 340, H = 200;
@@ -1596,7 +1619,7 @@ function shareChat() {
   wrapText(aiMsg.slice(0,100), 16, 162, W-32, 16);
   // Bottom URL
   ctx.font = "10px -apple-system,sans-serif"; ctx.fillStyle = "#6B63A0";
-  ctx.fillText("charagents-ua3qzpci.manus.space/web", 16, H-10);
+  ctx.fillText("usoyrac.github.io/greatmindai", 16, H-10);
   // Show/hide native share button based on Web Share API support
   const shareBtn = document.getElementById("nativeShareBtn");
   if(shareBtn) shareBtn.style.display = navigator.share ? "block" : "none";
@@ -1612,20 +1635,20 @@ async function nativeShareCard() {
       if(navigator.canShare && navigator.canShare({files:[file]})) {
         await navigator.share({
           title: "Great Mind AI - " + charName + " ile sohbet",
-          text: "Great Mind AI'da " + charName + " ile harika bir sohbet yaptım! Sen de dene: charagents-ua3qzpci.manus.space/web",
+          text: "Great Mind AI'da " + charName + " ile harika bir sohbet yaptım! Sen de dene: usoyrac.github.io/greatmindai",
           files: [file]
         });
       } else if(navigator.share) {
         await navigator.share({
           title: "Great Mind AI - " + charName + " ile sohbet",
-          text: "Great Mind AI'da " + charName + " ile harika bir sohbet yaptım! Sen de dene: charagents-ua3qzpci.manus.space/web",
-          url: "https://charagents-ua3qzpci.manus.space/web"
+          text: "Great Mind AI'da " + charName + " ile harika bir sohbet yaptım! Sen de dene: usoyrac.github.io/greatmindai",
+          url: "https://usoyrac.github.io/greatmindai"
         });
       } else {
         // Clipboard fallback
         try {
-          await navigator.clipboard.writeText("Great Mind AI - " + charName + " ile sohbet: https://charagents-ua3qzpci.manus.space/web");
-          alert("📋 Bağlantı panoya kopyalandı!");
+          await navigator.clipboard.writeText("Great Mind AI - " + charName + " ile sohbet: https://usoyrac.github.io/greatmindai");
+          showCelebration("📋","Kopyalandı!","Bağlantı panoya kopyalandı.");
         } catch { downloadShareCard(); }
       }
     }, "image/png");
@@ -1651,15 +1674,32 @@ function toggleLangDropdown(e) {
   document.getElementById("langDropdown").classList.toggle("open");
 }
 function setLang(lang, e) {
-  e.stopPropagation();
+  if(e) e.stopPropagation();
   activeLang = lang;
+  localStorage.setItem("gmai_lang", lang);
   document.getElementById("langFlag").textContent = LANG_META[lang].flag;
   document.getElementById("langCode").textContent = LANG_META[lang].label;
   ["tr","en","de"].forEach(l=>document.getElementById("lang-"+l).classList.toggle("active",l===lang));
   document.getElementById("langDropdown").classList.remove("open");
   if(activeChar) document.getElementById("chatSub").textContent = activeChar.universe+" · "+lang.toUpperCase();
 }
+// Kaydedilmiş dili yükle
+(function initLang(){
+  const saved = localStorage.getItem("gmai_lang");
+  if(saved && ["tr","en","de"].includes(saved)) setLang(saved, null);
+})();
 document.addEventListener("click",()=>{ const dd=document.getElementById("langDropdown"); if(dd) dd.classList.remove("open"); });
+
+// ESC tuşu ile açık overlay'leri kapat
+document.addEventListener("keydown", e => {
+  if(e.key !== "Escape") return;
+  if(document.getElementById("chatOverlay").classList.contains("open")) { closeChat(); return; }
+  if(document.getElementById("detailOverlay").classList.contains("open")) { closeDetail(); return; }
+  if(document.getElementById("quizOverlay").classList.contains("open")) { closeQuiz(); return; }
+  if(document.getElementById("wizardOverlay").classList.contains("open")) { closeWizard(); return; }
+  if(document.getElementById("sharePreviewOverlay").classList.contains("open")) { closeSharePreview(); return; }
+  if(document.getElementById("apikeyOverlay")) { cancelApiKey(); return; }
+});
 
 // ─── Chat History ─────────────────────────────────────────────────────────
 function saveChatHistory() {
@@ -1748,25 +1788,50 @@ function renderLeaderboard() {
 }
 
 // ─── Quiz ─────────────────────────────────────────────────────────────────
+async function generateQuizWithGemini(char) {
+  const key = getApiKey();
+  if(!key) return null;
+  const langNote = activeLang==="en" ? "in English" : activeLang==="de" ? "auf Deutsch" : "Türkçe";
+  const prompt = `${char.name} (${char.universe}) hakkında 4 çoktan seçmeli quiz sorusu oluştur. ${langNote} yaz.\nSadece geçerli JSON array döndür, başka açıklama ekleme:\n[{"question":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."}]\n"correct" alanı doğru cevabın 0-tabanlı indexi. 4 farklı seçenek olsun.`;
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+      { method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+          contents:[{role:"user",parts:[{text:prompt}]}],
+          generationConfig:{maxOutputTokens:800,temperature:0.7}
+        })
+      }
+    );
+    if(!res.ok) return null;
+    const data = await res.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const match = text.match(/\[[\s\S]*?\]/);
+    if(!match) return null;
+    const questions = JSON.parse(match[0]);
+    if(Array.isArray(questions) && questions.length) return questions;
+  } catch(e) { console.error("Quiz Gemini hatası:", e); }
+  return null;
+}
+
 async function startQuiz() {
   if(!activeChar) return;
   document.getElementById("quizPrompt").style.display = "none";
   document.getElementById("quizOverlay").classList.add("open");
   document.getElementById("quizContent").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted)">🤖 AI Quiz Oluşturuyor...</div>`;
   quizData = {questions:[],current:0,score:0,answered:false};
-  try {
-    const apiBase = window.location.origin;
-    const summary = chatHistory.slice(-6).map(m=>`${m.role}: ${m.content}`).join("\n");
-    const res = await fetch(`${apiBase}/api/trpc/chat.generateQuiz`,{
-      method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({json:{characterId:activeChar.id,characterName:activeChar.name,subject:activeChar.universe,conversationSummary:summary,language:activeLang}})
-    });
-    if(!res.ok) throw new Error("HTTP "+res.status);
-    const data = await res.json();
-    const questions = data?.result?.data?.json?.questions || data?.result?.data?.questions || [];
-    if(questions.length) { quizData.questions = questions; renderQuizQuestion(); return; }
-  } catch(err) { console.error(err); }
-  // Fallback static questions
+
+  // Gemini ile AI quiz dene
+  if(getApiKey()) {
+    const aiQuestions = await generateQuizWithGemini(activeChar);
+    if(aiQuestions?.length) {
+      quizData.questions = aiQuestions;
+      renderQuizQuestion();
+      return;
+    }
+  }
+
+  // Fallback: statik sorular
   const t0 = activeChar.traits?.[0] || "Bilge";
   const t1 = activeChar.traits?.[1] || "Cesur";
   quizData.questions = [
@@ -1899,8 +1964,8 @@ function selectColor(c) { wizardData.accentColor=c; renderWizardStep(); }
 function selectPersonality(p) { wizardData.personality=p; renderWizardStep(); }
 function selectVoice(v) { wizardData.voiceId=v; renderWizardStep(); }
 function wizardNext() {
-  if(wizardStep===0 && !wizardData.name.trim()) { alert("Lütfen bir isim girin!"); return; }
-  if(wizardStep===2 && !wizardData.subject.trim()) { alert("Lütfen uzmanlık alanı girin!"); return; }
+  if(wizardStep===0 && !wizardData.name.trim()) { showCelebration("✍️","İsim Gerekli","Karakterin için bir isim gir!"); return; }
+  if(wizardStep===2 && !wizardData.subject.trim()) { showCelebration("🎯","Alan Gerekli","Karakterin uzmanlık alanını yaz!"); return; }
   if(wizardStep<3) { wizardStep++; renderWizardStep(); }
 }
 function wizardBack() { if(wizardStep>0){ wizardStep--; renderWizardStep(); } }
@@ -1937,7 +2002,8 @@ function saveWizard() {
   saveState(STATE);
   closeWizard();
   renderChars();
-  alert(`"${newChar.name}" karakteri oluşturuldu! 🎉`);
+  setTimeout(()=>showCelebration("🎉",`${newChar.name} Oluşturuldu!`,"Kendi karakterinle sohbete başla. +50 XP!"), 200);
+  addXP(50);
 }
 
 // ─── Page Navigation ──────────────────────────────────────────────────────
@@ -2184,19 +2250,39 @@ function updateApiKeyBtn() {
   if(!btn) return;
   if(getApiKey()) {
     btn.textContent = "🟢";
-    btn.title = "API Bağlı — Tıkla değiştir";
+    btn.title = "Gemini AI Bağlı ✓ — Tıkla key'i değiştir";
   } else {
     btn.textContent = "🔑";
-    btn.title = "API Key Gir (şu an demo mod)";
+    btn.title = "Gemini API Key gir — şu an demo mod";
   }
 }
+// Varsayılan Gemini API key — öğrenciler ekstra adım yapmadan kullanabilsin
+(function initDefaultKey() {
+  if(!localStorage.getItem("gmai_apikey")) {
+    localStorage.setItem("gmai_apikey", "AIzaSyD7-CvyexUiwqVeudPvKNIdtTkiRVEcW9g");
+  }
+})();
 updateApiKeyBtn();
 
-// confirmApiKey'i güncelle
-const _origConfirm = confirmApiKey;
+// confirmApiKey — Gemini key kaydeder, butonu günceller
 confirmApiKey = function() {
   const val = document.getElementById("apikeyInput")?.value.trim();
-  if(val) saveApiKey(val);
+  if(val) {
+    // Gemini key formatı kontrolü (AIzaSy ile başlamalı)
+    if(!val.startsWith("AIzaSy") && val.length > 0) {
+      const inputEl = document.getElementById("apikeyInput");
+      if(inputEl) {
+        inputEl.style.border = "1.5px solid #EF4444";
+        inputEl.placeholder = "⚠️ Gemini key AIzaSy... ile başlamalı";
+        setTimeout(()=>{ inputEl.style.border = ""; }, 2000);
+      }
+      return;
+    }
+    saveApiKey(val);
+  } else {
+    // Boş bırakıldıysa key'i sil (demo moda geç)
+    saveApiKey("");
+  }
   cancelApiKey();
   updateApiKeyBtn();
 };
