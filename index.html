@@ -425,6 +425,7 @@ input,textarea{font-family:inherit;color:var(--text)}
     <button class="nav-btn nav-btn-icon" onclick="showPage('leaderboard')" title="Liderlik">🏆</button>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
     <button class="nav-btn nav-btn-icon" onclick="showApiKeyModal()" title="API Key Ayarla" id="apiKeyBtn">🔑</button>
+    <button class="nav-btn nav-btn-icon" onclick="showSheetsModal()" title="Veri Toplama Ayarı" id="sheetsBtn">📊</button>
     <button class="nav-btn nav-btn-grad" onclick="openWizard()">+ Karakter Oluştur</button>
   </div>
 </nav>
@@ -964,6 +965,37 @@ const PERSONALITIES = [
 const EMOJIS = ["🧠","🦁","🐉","🌟","🔮","🎭","🦊","🐺","🦅","🌊","🔥","⚡","🌙","☀️","🎯","💎","🚀","🌺","🎸","🏆"];
 const ACCENT_COLORS = ["#7B4FD4","#E040A0","#00C8E8","#059669","#D97706","#EF4444","#1D4ED8","#374151"];
 
+// ─── Akademik Veri Toplama (Google Sheets) ────────────────────────────────
+function getAnonId() {
+  let id = localStorage.getItem('gmai_uid');
+  if(!id) {
+    id = 'u' + Date.now().toString(36) + Math.random().toString(36).substr(2,6);
+    localStorage.setItem('gmai_uid', id);
+  }
+  return id;
+}
+function getSheetsUrl() { return localStorage.getItem('gmai_sheets_url')||''; }
+
+async function trackEvent(event, extra={}) {
+  const url = getSheetsUrl();
+  if(!url) return;
+  try {
+    await fetch(url, {
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        userId: getAnonId(),
+        event,
+        lang: activeLang||'tr',
+        xp: STATE?.xp||0,
+        streak: STATE?.streak||0,
+        ...extra
+      })
+    });
+  } catch(e) { /* sessizce geç */ }
+}
+
 // ─── State ───────────────────────────────────────────────────────────────
 let activeFilter = "all";
 let activeChar = null;
@@ -1218,6 +1250,8 @@ function openChat(id, prefillQuestion) {
   STATE.totalChats++;
   saveState(STATE);
   updateStreakUI();
+  // 📊 Veri: sohbet başladı
+  trackEvent('chat_start', {character:char.name, category:char.category, charId:char.id});
   if(prefillQuestion) {
     document.getElementById("chatInput").value = prefillQuestion;
     autoResize(document.getElementById("chatInput"));
@@ -1225,9 +1259,19 @@ function openChat(id, prefillQuestion) {
 }
 function closeChat() {
   document.getElementById("chatOverlay").classList.remove("open");
+  const userMsgCount = chatHistory.filter(m=>m.role==='user').length;
   if(chatHistory.length>2) {
     saveChatHistory();
     document.getElementById("quizPrompt").style.display = "flex";
+  }
+  // 📊 Veri: sohbet bitti
+  if(activeChar && userMsgCount>0) {
+    trackEvent('chat_end', {
+      character: activeChar.name,
+      category: activeChar.category,
+      charId: activeChar.id,
+      msgCount: userMsgCount
+    });
   }
   activeChar = null;
 }
@@ -1413,6 +1457,63 @@ function getDemoReply(char, userText) {
 // ─── API Key yönetimi ────────────────────────────────────────────────────
 function getApiKey() { return localStorage.getItem("gmai_apikey") || ""; }
 function saveApiKey(k) { localStorage.setItem("gmai_apikey", k.trim()); }
+
+function showSheetsModal() {
+  const existing = getSheetsUrl();
+  const ov = document.createElement('div');
+  ov.id = 'sheetsOverlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:16px';
+  ov.innerHTML = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:440px;width:100%">
+      <div style="font-size:22px;font-weight:800;margin-bottom:6px">📊 Akademik Veri Toplama</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6">
+        Google Apps Script URL'ini gir — öğrenci etkileşimleri<br/>otomatik Google Sheets'e kaydedilir.
+      </div>
+      <div style="font-size:12px;color:var(--cyan);margin-bottom:10px;font-weight:600">📋 Kaydedilen veriler:</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.7;background:var(--surface2);padding:10px 14px;border-radius:10px">
+        Anonim ID · Karakter · Mesaj sayısı · Quiz skoru · XP · Dil · Cihaz tipi · Tarih/Saat
+      </div>
+      <input id="sheetsUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec" value="${existing}"
+        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;
+               padding:12px 14px;color:var(--text);font-size:13px;margin-bottom:16px;font-family:monospace"/>
+      <div style="display:flex;gap:10px;margin-bottom:14px">
+        <button onclick="document.getElementById('sheetsOverlay').remove()"
+          style="flex:1;padding:11px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:14px;font-weight:600;cursor:pointer">İptal</button>
+        <button onclick="saveSheetsUrl()"
+          style="flex:2;padding:11px;border-radius:12px;background:var(--grad);color:#fff;font-size:14px;font-weight:700;cursor:pointer;border:none">✓ Kaydet</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.6">
+        URL yoksa veri toplanmaz. &nbsp;
+        <a href="https://script.google.com" target="_blank" style="color:var(--cyan)">Google Apps Script →</a>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=>document.getElementById('sheetsUrlInput')?.focus(), 100);
+}
+function saveSheetsUrl() {
+  const val = document.getElementById('sheetsUrlInput')?.value.trim();
+  if(val && !val.startsWith('https://script.google.com')) {
+    const inp = document.getElementById('sheetsUrlInput');
+    inp.style.border = '1.5px solid #EF4444';
+    inp.placeholder = '⚠️ Google Apps Script URL olmalı';
+    setTimeout(()=>{ inp.style.border=''; }, 2000);
+    return;
+  }
+  localStorage.setItem('gmai_sheets_url', val||'');
+  document.getElementById('sheetsOverlay')?.remove();
+  updateSheetsBtn();
+  if(val) {
+    showCelebration('📊','Bağlantı Kuruldu!','Veriler artık Google Sheets\'e kaydediliyor.');
+    trackEvent('sheets_connected');
+  }
+}
+function updateSheetsBtn() {
+  const btn = document.getElementById('sheetsBtn');
+  if(!btn) return;
+  btn.textContent = getSheetsUrl() ? '📊✓' : '📊';
+  btn.title = getSheetsUrl() ? 'Veri Toplama Aktif ✓' : 'Veri Toplama Ayarla';
+  btn.style.color = getSheetsUrl() ? '#059669' : '';
+}
 
 function showApiKeyModal() {
   const existing = getApiKey();
@@ -1890,6 +1991,13 @@ function renderQuizResult() {
   const total = quizData.questions.length;
   const score = quizData.score;
   const pct = Math.round((score/total)*100);
+  // 📊 Veri: quiz bitti
+  trackEvent('quiz_complete', {
+    character: activeChar?.name||'',
+    category: activeChar?.category||'',
+    quizScore: score+'/'+total,
+    quizPct: pct
+  });
   const label = pct>=80?"Mükemmel! 🏆":pct>=60?"İyi iş! 🌟":"Tekrar dene! 💪";
   document.getElementById("quizContent").innerHTML = `
     <div class="quiz-result">
@@ -2133,6 +2241,8 @@ function finishOnboarding() {
   document.getElementById('onboardingOverlay').classList.remove('open');
   initUsername();
   initAvatar();
+  // 📊 Veri: yeni öğrenci kaydoldu
+  trackEvent('onboarding_complete', {device: /mobile|android|iphone/i.test(navigator.userAgent)?'mobile':'desktop'});
   setTimeout(startTour, 600);
 }
 
@@ -2259,6 +2369,9 @@ initUsername();
 initAvatar();
 initTheme();
 checkOnboarding();
+updateSheetsBtn();
+// 📊 Uygulama açılışını kaydet
+setTimeout(()=>trackEvent('app_open', {device:/mobile|android|iphone/i.test(navigator.userAgent)?'mobile':'desktop'}), 1000);
 
 // API key buton durumu
 function updateApiKeyBtn() {
