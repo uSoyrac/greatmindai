@@ -1,912 +1,1256 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Great Mind AI — AI Karakterlerle Öğren</title>
-  <meta name="description" content="Great Mind AI ile tarihin büyük zihinleri, eğitim ajanları ve efsanevi karakterlerle sohbet et. Yapay zeka destekli eğitim platformu." />
-  <link rel="icon" href="logo.webp" type="image/webp" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <style>
-    /* ─── Reset & Base ─────────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --purple: #7B4FD4;
-      --pink: #E040A0;
-      --cyan: #00C8E8;
-      --navy: #0E0B2E;
-      --navy2: #1A1640;
-      --surface: #1E1B4B;
-      --surface2: #252250;
-      --border: #3D3A6B;
-      --text: #F0EEFF;
-      --muted: #9B97C8;
-      --grad: linear-gradient(135deg, #7B4FD4, #E040A0, #00C8E8);
-      --grad2: linear-gradient(90deg, #7B4FD4, #00C8E8);
-    }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--navy);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    a { color: inherit; text-decoration: none; }
-    img { display: block; }
-    button { cursor: pointer; font-family: inherit; border: none; outline: none; }
-    input, textarea { font-family: inherit; outline: none; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Great Mind AI</title>
+<style>
+:root {
+  --purple:#7B4FD4; --pink:#E040A0; --cyan:#00C8E8;
+  --bg:#0E0B2E; --surface:#16133A; --surface2:#1E1A4A;
+  --border:#2A2660; --text:#F0EEFF; --muted:#9B96CC;
+  --grad:linear-gradient(135deg,#7B4FD4,#E040A0,#00C8E8);
+  --grad2:linear-gradient(90deg,#7B4FD4,#00C8E8);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:none;background:none;color:inherit;font-family:inherit}
+input,textarea{font-family:inherit;color:var(--text)}
 
-    /* ─── Scrollbar ────────────────────────────────────────────────────── */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--navy); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+/* ── Navbar ── */
+.navbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:rgba(14,11,46,.92);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
+.navbar-brand{display:flex;align-items:center;gap:10px}
+.navbar-logo{width:32px;height:32px;border-radius:8px;object-fit:cover}
+.navbar-title{font-size:17px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.navbar-actions{display:flex;align-items:center;gap:10px}
+.nav-btn{padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;transition:.2s}
+.nav-btn-outline{border:1.5px solid var(--border);background:transparent}
+.nav-btn-outline:hover{border-color:var(--cyan)}
+.nav-btn-grad{background:var(--grad);color:#fff}
+.nav-btn-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1.5px solid var(--border);font-size:16px;position:relative}
+.nav-btn-icon .badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--pink);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;color:#fff}
 
-    /* ─── Navbar ───────────────────────────────────────────────────────── */
-    .navbar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 24px;
-      background: rgba(14,11,46,0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(123,79,212,0.2);
-    }
-    .navbar-brand {
-      display: flex; align-items: center; gap: 10px;
-    }
-    .navbar-logo {
-      width: 36px; height: 36px; border-radius: 8px; object-fit: cover;
-    }
-    .navbar-title {
-      font-size: 18px; font-weight: 800;
-      background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .navbar-title span { font-weight: 300; }
-    .navbar-actions { display: flex; gap: 12px; align-items: center; }
-    .btn-outline {
-      padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 600;
-      border: 1.5px solid var(--purple); color: var(--text);
-      background: transparent; transition: all 0.2s;
-    }
-    .btn-outline:hover { background: var(--purple); }
-    .btn-primary {
-      padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 600;
-      background: var(--grad); color: #fff; transition: opacity 0.2s;
-    }
-    .btn-primary:hover { opacity: 0.85; }
+/* ── Page tabs ── */
+.page{display:none}
+.page.active{display:block}
 
-    /* ─── Hero ─────────────────────────────────────────────────────────── */
-    .hero {
-      min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center; padding: 100px 24px 60px;
-      position: relative; overflow: hidden;
-    }
-    .hero-glow {
-      position: absolute; top: 10%; left: 50%; transform: translateX(-50%);
-      width: 600px; height: 600px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(123,79,212,0.25) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero-logo {
-      width: 120px; height: 120px; border-radius: 24px; object-fit: cover;
-      margin-bottom: 24px;
-      box-shadow: 0 0 40px rgba(123,79,212,0.5);
-    }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 14px; border-radius: 20px;
-      background: rgba(123,79,212,0.15); border: 1px solid rgba(123,79,212,0.4);
-      font-size: 12px; font-weight: 600; color: var(--cyan);
-      margin-bottom: 20px;
-    }
-    .hero-title {
-      font-size: clamp(36px, 7vw, 72px); font-weight: 900; line-height: 1.1;
-      margin-bottom: 20px;
-    }
-    .hero-title .grad { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .hero-sub {
-      font-size: clamp(15px, 2vw, 18px); color: var(--muted); max-width: 560px;
-      line-height: 1.7; margin-bottom: 36px;
-    }
-    .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
-    .btn-hero {
-      padding: 14px 32px; border-radius: 30px; font-size: 16px; font-weight: 700;
-      background: var(--grad); color: #fff; transition: transform 0.2s, opacity 0.2s;
-      box-shadow: 0 4px 24px rgba(123,79,212,0.4);
-    }
-    .btn-hero:hover { transform: translateY(-2px); opacity: 0.9; }
-    .btn-hero-ghost {
-      padding: 14px 32px; border-radius: 30px; font-size: 16px; font-weight: 700;
-      border: 2px solid var(--border); color: var(--text); background: transparent;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .btn-hero-ghost:hover { border-color: var(--purple); background: rgba(123,79,212,0.1); }
-    .hero-stats {
-      display: flex; gap: 40px; margin-top: 56px; flex-wrap: wrap; justify-content: center;
-    }
-    .stat { text-align: center; }
-    .stat-num { font-size: 32px; font-weight: 800; background: var(--grad2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+/* ── Hero ── */
+.hero{padding:48px 24px 32px;text-align:center;background:linear-gradient(180deg,rgba(123,79,212,.12) 0%,transparent 100%)}
+.hero-logo{width:80px;height:80px;border-radius:20px;object-fit:cover;margin:0 auto 16px;display:block;box-shadow:0 0 32px rgba(123,79,212,.4)}
+.hero-title{font-size:32px;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.hero-sub{color:var(--muted);font-size:15px;margin-bottom:24px}
+.hero-stats{display:flex;justify-content:center;gap:32px;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat-num{font-size:22px;font-weight:800;background:var(--grad2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 
-    /* ─── Section ──────────────────────────────────────────────────────── */
-    .section { padding: 80px 24px; max-width: 1200px; margin: 0 auto; }
-    .section-header { text-align: center; margin-bottom: 48px; }
-    .section-tag {
-      display: inline-block; padding: 4px 14px; border-radius: 20px;
-      background: rgba(0,200,232,0.1); border: 1px solid rgba(0,200,232,0.3);
-      font-size: 12px; font-weight: 600; color: var(--cyan); margin-bottom: 12px;
-    }
-    .section-title { font-size: clamp(24px, 4vw, 40px); font-weight: 800; margin-bottom: 12px; }
-    .section-sub { font-size: 16px; color: var(--muted); max-width: 500px; margin: 0 auto; line-height: 1.6; }
+/* ── Streak bar ── */
+.streak-bar{margin:16px 24px 0;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;gap:12px}
+.streak-flame{font-size:22px}
+.streak-info{flex:1}
+.streak-title{font-size:13px;font-weight:700;color:var(--text)}
+.streak-sub{font-size:11px;color:var(--muted)}
+.xp-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.xp-bar-fill{height:100%;background:var(--grad2);border-radius:3px;transition:width .5s}
+.xp-label{font-size:12px;font-weight:700;color:var(--cyan);white-space:nowrap}
 
-    /* ─── Category Filter ──────────────────────────────────────────────── */
-    .filter-bar {
-      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 36px;
-    }
-    .filter-btn {
-      padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 600;
-      border: 1.5px solid var(--border); color: var(--muted); background: transparent;
-      transition: all 0.2s; cursor: pointer;
-    }
-    .filter-btn:hover { border-color: var(--purple); color: var(--text); }
-    .filter-btn.active {
-      background: var(--grad); border-color: transparent; color: #fff;
-    }
+/* ── Search & Filter ── */
+.search-section{padding:16px 24px 8px}
+.search-wrap{display:flex;gap:10px;margin-bottom:12px}
+.search-input{flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:30px;padding:10px 18px;color:var(--text);font-size:14px;transition:.2s;outline:none}
+.search-input:focus{border-color:var(--purple)}
+.search-input::placeholder{color:var(--muted)}
+.filter-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.chip{padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;white-space:nowrap;background:var(--surface2);border:1.5px solid var(--border);color:var(--muted);transition:.2s;cursor:pointer}
+.chip:hover{border-color:var(--purple);color:var(--text)}
+.chip.active{background:linear-gradient(135deg,rgba(123,79,212,.25),rgba(0,200,232,.15));border-color:var(--cyan);color:var(--cyan)}
 
-    /* ─── Character Grid ───────────────────────────────────────────────── */
-    .char-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
-    }
-    .char-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 20px; overflow: hidden; cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-      position: relative;
-    }
-    .char-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-    }
-    .char-card-img {
-      width: 100%; aspect-ratio: 1; object-fit: cover;
-      background: var(--surface2);
-    }
-    .char-card-body { padding: 14px; }
-    .char-card-cat {
-      display: inline-block; padding: 3px 10px; border-radius: 10px;
-      font-size: 11px; font-weight: 700; margin-bottom: 8px;
-      text-transform: uppercase; letter-spacing: 0.5px;
-    }
-    .char-card-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-    .char-card-tagline { font-size: 12px; color: var(--muted); line-height: 1.5; }
-    .char-card-chat {
-      margin-top: 12px; width: 100%; padding: 9px; border-radius: 12px;
-      font-size: 13px; font-weight: 700; color: #fff;
-      background: var(--grad); transition: opacity 0.2s;
-    }
-    .char-card-chat:hover { opacity: 0.85; }
-    .char-card-badge {
-      position: absolute; top: 10px; right: 10px;
-      background: rgba(14,11,46,0.7); backdrop-filter: blur(6px);
-      padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 600;
-    }
+/* ── Character Grid ── */
+.char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;padding:16px 24px}
+.char-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:.2s;position:relative}
+.char-card:hover{transform:translateY(-3px);border-color:var(--purple);box-shadow:0 8px 24px rgba(123,79,212,.2)}
+.char-card.locked{opacity:.65}
+.char-img{width:100%;aspect-ratio:1;object-fit:cover}
+.char-emoji-avatar{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:64px}
+.char-info{padding:10px}
+.char-name{font-size:13px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.char-universe{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.char-fav-btn{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(14,11,46,.7);display:flex;align-items:center;justify-content:center;font-size:14px;transition:.2s;z-index:2}
+.char-fav-btn:hover{background:rgba(224,64,160,.2)}
+.char-lock-badge{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(14,11,46,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:16px}
+.char-lock-badge span:first-child{font-size:28px}
+.char-lock-badge span:last-child{font-size:11px;font-weight:700;color:var(--cyan)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state-icon{font-size:48px;margin-bottom:12px}
 
-    /* ─── Chat Modal ───────────────────────────────────────────────────── */
-    .modal-overlay {
-      position: fixed; inset: 0; z-index: 200;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
-      display: flex; align-items: center; justify-content: center;
-      padding: 16px;
-      opacity: 0; pointer-events: none; transition: opacity 0.25s;
-    }
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .chat-modal {
-      width: 100%; max-width: 680px; height: 85vh; max-height: 720px;
-      background: var(--navy2); border: 1px solid var(--border);
-      border-radius: 24px; display: flex; flex-direction: column;
-      overflow: hidden;
-      transform: scale(0.95); transition: transform 0.25s;
-    }
-    .modal-overlay.open .chat-modal { transform: scale(1); }
+/* ── Character Detail Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.detail-modal{background:var(--surface);border-radius:24px 24px 0 0;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding-bottom:24px}
+.detail-hero{position:relative;height:200px;overflow:hidden}
+.detail-hero img{width:100%;height:100%;object-fit:cover}
+.detail-hero-emoji{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:96px}
+.detail-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,var(--surface) 0%,transparent 60%)}
+.detail-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer}
+.detail-body{padding:0 20px}
+.detail-name{font-size:22px;font-weight:900;margin-bottom:4px}
+.detail-universe{font-size:13px;color:var(--muted);margin-bottom:8px}
+.detail-tagline{font-size:14px;font-style:italic;color:var(--cyan);margin-bottom:12px;padding:8px 12px;background:rgba(0,200,232,.08);border-radius:10px;border-left:3px solid var(--cyan)}
+.detail-bio{font-size:14px;line-height:1.6;color:var(--muted);margin-bottom:16px}
+.detail-traits{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.trait-chip{padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600;background:rgba(123,79,212,.15);border:1px solid rgba(123,79,212,.3);color:var(--purple)}
+.detail-questions{margin-bottom:16px}
+.detail-questions h4{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.example-q{padding:10px 14px;background:var(--surface2);border-radius:10px;font-size:13px;margin-bottom:6px;cursor:pointer;transition:.2s;border:1px solid transparent}
+.example-q:hover{border-color:var(--purple);color:var(--cyan)}
+.detail-actions{display:flex;gap:10px;padding:0 20px;margin-top:8px}
+.detail-btn{flex:1;padding:13px;border-radius:14px;font-size:15px;font-weight:700;text-align:center;transition:.2s}
+.detail-btn-primary{background:var(--grad);color:#fff}
+.detail-btn-primary:hover{opacity:.9}
+.detail-btn-fav{background:var(--surface2);border:1.5px solid var(--border)}
+.detail-btn-fav:hover{border-color:var(--pink);color:var(--pink)}
 
-    /* Chat Header */
-    .chat-header {
-      display: flex; align-items: center; gap: 12px; padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      position: relative;
-    }
-    .chat-header-grad {
-      position: absolute; inset: 0; opacity: 0.08;
-      background: var(--grad);
-    }
-    .chat-header-avatar {
-      width: 44px; height: 44px; border-radius: 12px; object-fit: cover;
-      border: 2px solid rgba(255,255,255,0.1); flex-shrink: 0;
-      position: relative; z-index: 1;
-    }
-    .chat-header-info { flex: 1; position: relative; z-index: 1; }
-    .chat-header-name { font-size: 16px; font-weight: 700; }
-    .chat-header-sub { font-size: 12px; color: var(--muted); }
-    .chat-close {
-      width: 32px; height: 32px; border-radius: 50%; background: var(--surface);
-      border: 1px solid var(--border); color: var(--muted); font-size: 16px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.2s; position: relative; z-index: 1;
-    }
-    .chat-close:hover { background: var(--border); color: var(--text); }
+/* ── Chat Modal ── */
+.chat-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:flex-end;justify-content:center}
+.chat-overlay.open{display:flex}
+.chat-modal{background:var(--surface);border-radius:24px 24px 0 0;width:100%;max-width:600px;height:88vh;display:flex;flex-direction:column}
+.chat-header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.chat-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.chat-avatar-emoji{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.chat-header-info{flex:1;min-width:0}
+.chat-header-name{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-header-sub{font-size:12px;color:var(--muted)}
+.chat-header-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.chat-tts-btn{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;transition:.2s}
+.chat-tts-btn.active{border-color:var(--cyan);background:rgba(0,200,232,.15)}
+.lang-btn{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;background:var(--surface2);border:1.5px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;transition:.2s;position:relative}
+.lang-btn:hover{border-color:var(--cyan)}
+.lang-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;min-width:130px;box-shadow:0 8px 24px rgba(0,0,0,.5);display:none;z-index:400}
+.lang-dropdown.open{display:block}
+.lang-option{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;font-size:13px;transition:.15s}
+.lang-option:hover{background:var(--surface2)}
+.lang-option.active{color:var(--cyan);font-weight:700}
+.chat-share-btn {
+  background: rgba(0,200,232,.15);
+  border: 1px solid rgba(0,200,232,.3);
+  border-radius: 8px;
+  color: var(--cyan);
+  font-size: 16px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.chat-share-btn:hover { background: rgba(0,200,232,.25); }
+.chat-close {width:32px;height:32px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg-row{display:flex;gap:8px;align-items:flex-end}
+.msg-row.user{flex-direction:row-reverse}
+.msg-bubble-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.msg-bubble-avatar-emoji{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.msg-bubble{max-width:75%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.5}
+.msg-bubble.user{background:var(--grad);color:#fff;border-bottom-right-radius:4px}
+.msg-bubble.assistant{background:var(--surface2);border:1px solid var(--border);border-bottom-left-radius:4px}
+.msg-time{font-size:10px;color:var(--muted);margin-top:4px;text-align:right}
+.msg-tts-btn{font-size:12px;color:var(--cyan);cursor:pointer;margin-top:4px;display:inline-block}
+.typing-indicator{display:flex;gap:4px;padding:12px 14px;background:var(--surface2);border-radius:16px;border-bottom-left-radius:4px;width:fit-content}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:typing 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typing{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.chat-input-area{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
+.chat-textarea{flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:10px 16px;color:var(--text);font-size:14px;resize:none;outline:none;min-height:44px;max-height:120px;line-height:1.4;transition:.2s}
+.chat-textarea:focus{border-color:var(--purple)}
+.send-btn{width:44px;height:44px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;transition:.2s}
+.send-btn:hover{opacity:.9;transform:scale(1.05)}
+.send-btn:disabled{opacity:.4;transform:none}
+.quiz-prompt{margin:8px 16px;padding:12px 16px;background:linear-gradient(135deg,rgba(123,79,212,.15),rgba(0,200,232,.1));border:1px solid rgba(0,200,232,.3);border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
+.quiz-prompt-text{font-size:13px;font-weight:600;color:var(--cyan)}
+.quiz-prompt-btn{padding:6px 14px;border-radius:20px;background:var(--grad);color:#fff;font-size:12px;font-weight:700;white-space:nowrap}
 
-    /* Chat Messages */
-    .chat-messages {
-      flex: 1; overflow-y: auto; padding: 20px;
-      display: flex; flex-direction: column; gap: 16px;
-    }
-    .msg { display: flex; gap: 10px; align-items: flex-end; }
-    .msg.user { flex-direction: row-reverse; }
-    .msg-avatar {
-      width: 32px; height: 32px; border-radius: 10px; object-fit: cover;
-      flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.1);
-    }
-    .msg-bubble {
-      max-width: 70%; padding: 12px 16px; border-radius: 18px;
-      font-size: 14px; line-height: 1.6;
-    }
-    .msg.assistant .msg-bubble {
-      background: var(--surface2); border: 1px solid var(--border);
-      border-bottom-left-radius: 4px;
-    }
-    .msg.user .msg-bubble {
-      background: var(--grad); color: #fff;
-      border-bottom-right-radius: 4px;
-    }
-    .msg-time { font-size: 11px; color: var(--muted); margin-top: 4px; padding: 0 4px; }
-    .msg.user .msg-time { text-align: right; }
+/* ── Quiz Modal ── */
+.quiz-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:400;display:none;align-items:center;justify-content:center;padding:20px}
+.quiz-overlay.open{display:flex}
+.quiz-modal{background:var(--surface);border-radius:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;padding:24px}
+.quiz-header{text-align:center;margin-bottom:20px}
+.quiz-title{font-size:18px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.quiz-progress{display:flex;gap:6px;justify-content:center;margin-bottom:4px}
+.quiz-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:.3s}
+.quiz-dot.done{background:var(--cyan)}
+.quiz-dot.current{background:var(--purple)}
+.quiz-question{font-size:15px;font-weight:700;margin-bottom:16px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.quiz-option{padding:12px 16px;border-radius:12px;border:1.5px solid var(--border);font-size:14px;text-align:left;transition:.2s;cursor:pointer;background:var(--surface2)}
+.quiz-option:hover:not(:disabled){border-color:var(--purple);background:rgba(123,79,212,.1)}
+.quiz-option.correct{border-color:#22C55E;background:rgba(34,197,94,.1);color:#22C55E}
+.quiz-option.wrong{border-color:#EF4444;background:rgba(239,68,68,.1);color:#EF4444}
+.quiz-explanation{padding:10px 14px;background:rgba(0,200,232,.08);border-radius:10px;border-left:3px solid var(--cyan);font-size:13px;color:var(--muted);margin-bottom:12px;display:none}
+.quiz-next-btn{width:100%;padding:13px;border-radius:14px;background:var(--grad);color:#fff;font-size:15px;font-weight:700;display:none}
+.quiz-result{text-align:center;padding:20px 0}
+.quiz-result-score{font-size:48px;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.quiz-result-label{font-size:16px;font-weight:700;margin-bottom:4px}
+.quiz-result-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.quiz-result-actions{display:flex;gap:10px}
+.quiz-result-btn{flex:1;padding:12px;border-radius:14px;font-size:14px;font-weight:700}
+.quiz-result-btn-primary{background:var(--grad);color:#fff}
+.quiz-result-btn-secondary{background:var(--surface2);border:1.5px solid var(--border)}
+.xp-float{position:fixed;pointer-events:none;font-size:18px;font-weight:900;color:var(--cyan);z-index:999;transition:all 1.2s ease-out;opacity:0}
 
-    /* Typing indicator */
-    .typing-indicator {
-      display: flex; gap: 10px; align-items: flex-end;
-    }
-    .typing-dots {
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 18px; border-bottom-left-radius: 4px;
-      padding: 14px 18px; display: flex; gap: 5px; align-items: center;
-    }
-    .typing-dot {
-      width: 7px; height: 7px; border-radius: 50%; background: var(--muted);
-      animation: bounce 1.2s infinite;
-    }
-    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes bounce {
-      0%, 60%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-8px); }
-    }
+/* ── Favorites Page ── */
+.page-header{padding:20px 24px 8px;display:flex;align-items:center;gap:12px}
+.page-header-title{font-size:20px;font-weight:800}
+.page-header-sub{font-size:13px;color:var(--muted);margin-top:2px}
+.fav-empty{text-align:center;padding:60px 24px;color:var(--muted)}
+.fav-empty-icon{font-size:48px;margin-bottom:12px}
 
-    /* Chat Input */
-    .chat-input-area {
-      padding: 16px 20px; border-top: 1px solid var(--border);
-      display: flex; gap: 10px; align-items: flex-end;
-    }
-    .chat-input {
-      flex: 1; background: var(--surface); border: 1.5px solid var(--border);
-      border-radius: 16px; padding: 12px 16px; color: var(--text); font-size: 14px;
-      resize: none; max-height: 120px; min-height: 44px; line-height: 1.5;
-      transition: border-color 0.2s;
-    }
-    .chat-input:focus { border-color: var(--purple); }
-    .chat-input::placeholder { color: var(--muted); }
-    .chat-send {
-      width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
-      background: var(--grad); color: #fff; font-size: 18px;
-      display: flex; align-items: center; justify-content: center;
-      transition: opacity 0.2s, transform 0.1s;
-    }
-    .chat-send:hover { opacity: 0.85; }
-    .chat-send:active { transform: scale(0.95); }
-    .chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
+/* ── Leaderboard Page ── */
+.leaderboard-list{padding:0 24px}
+.lb-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px}
+.lb-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.lb-rank.gold{background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff}
+.lb-rank.silver{background:linear-gradient(135deg,#9CA3AF,#6B7280);color:#fff}
+.lb-rank.bronze{background:linear-gradient(135deg,#B45309,#92400E);color:#fff}
+.lb-rank.other{background:var(--surface2);color:var(--muted)}
+.lb-avatar{width:36px;height:36px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:14px;font-weight:700}
+.lb-sub{font-size:11px;color:var(--muted)}
+.lb-xp{font-size:15px;font-weight:800;color:var(--cyan)}
 
-    /* ─── Features Section ─────────────────────────────────────────────── */
-    .features-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
-    }
-    .feature-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 20px; padding: 28px; transition: border-color 0.2s;
-    }
-    .feature-card:hover { border-color: var(--purple); }
-    .feature-icon {
-      width: 52px; height: 52px; border-radius: 14px; margin-bottom: 16px;
-      display: flex; align-items: center; justify-content: center; font-size: 26px;
-    }
-    .feature-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-    .feature-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+/* ── Chat History Page ── */
+.history-search{padding:12px 24px}
+.history-list{padding:0 24px}
+.history-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;cursor:pointer;transition:.2s}
+.history-item:hover{border-color:var(--purple)}
+.history-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.history-avatar-emoji{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:var(--surface2)}
+.history-info{flex:1;min-width:0}
+.history-char{font-size:14px;font-weight:700}
+.history-preview{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.history-meta{text-align:right;flex-shrink:0}
+.history-date{font-size:11px;color:var(--muted)}
+.history-count{font-size:11px;color:var(--cyan);margin-top:2px}
 
-    /* ─── Footer ───────────────────────────────────────────────────────── */
-    .footer {
-      border-top: 1px solid var(--border); padding: 40px 24px;
-      text-align: center; color: var(--muted); font-size: 13px;
-    }
-    .footer-brand {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      margin-bottom: 16px;
-    }
-    .footer-logo { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; }
-    .footer-name {
-      font-size: 16px; font-weight: 800;
-      background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
+/* ── Profile Page ── */
+.profile-header{padding:24px;text-align:center}
+.profile-avatar-wrap{width:80px;height:80px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 12px}
+.profile-name{font-size:20px;font-weight:800;margin-bottom:4px}
+.profile-sub{font-size:13px;color:var(--muted)}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 24px;margin-bottom:16px}
+.profile-stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center}
+.profile-stat-num{font-size:22px;font-weight:800;background:var(--grad2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.profile-stat-label{font-size:11px;color:var(--muted);margin-top:2px}
+.profile-streak-card{margin:0 24px 16px;padding:16px;background:linear-gradient(135deg,rgba(123,79,212,.2),rgba(0,200,232,.1));border:1px solid rgba(0,200,232,.3);border-radius:16px;display:flex;align-items:center;gap:12px}
+.profile-streak-icon{font-size:32px}
+.profile-streak-info{flex:1}
+.profile-streak-title{font-size:16px;font-weight:800;color:var(--cyan)}
+.profile-streak-sub{font-size:12px;color:var(--muted)}
+.profile-links{padding:0 24px}
+.profile-link{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;cursor:pointer;transition:.2s}
+.profile-link:hover{border-color:var(--purple)}
+.profile-link-icon{font-size:20px;width:32px;text-align:center}
+.profile-link-label{flex:1;font-size:14px;font-weight:600}
+.profile-link-arrow{color:var(--muted);font-size:16px}
 
-    /* ─── Empty State ──────────────────────────────────────────────────── */
-    .empty-state {
-      text-align: center; padding: 60px 20px; color: var(--muted);
-    }
-    .empty-state-icon { font-size: 48px; margin-bottom: 12px; }
+/* ── Custom Agent Wizard ── */
+.wizard-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.wizard-overlay.open{display:flex}
+.wizard-modal{background:var(--surface);border-radius:24px 24px 0 0;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;padding:24px 24px 32px}
+.wizard-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.wizard-title{font-size:18px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.wizard-steps{display:flex;gap:6px;margin-bottom:20px}
+.wizard-step-dot{flex:1;height:4px;border-radius:2px;background:var(--border);transition:.3s}
+.wizard-step-dot.done{background:var(--grad2)}
+.wizard-step-dot.current{background:var(--purple)}
+.wizard-step-title{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.wizard-label{font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.wizard-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;margin-bottom:12px;transition:.2s}
+.wizard-input:focus{border-color:var(--purple)}
+.wizard-textarea{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;margin-bottom:12px;resize:vertical;min-height:80px;transition:.2s}
+.wizard-textarea:focus{border-color:var(--purple)}
+.emoji-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px}
+.emoji-btn{width:100%;aspect-ratio:1;border-radius:10px;font-size:24px;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:2px solid transparent;transition:.2s;cursor:pointer}
+.emoji-btn.selected{border-color:var(--cyan);background:rgba(0,200,232,.1)}
+.color-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.color-btn{width:32px;height:32px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:.2s}
+.color-btn.selected{border-color:#fff;transform:scale(1.15)}
+.personality-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.personality-btn{padding:10px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface2);text-align:left;transition:.2s;cursor:pointer}
+.personality-btn.selected{border-color:var(--purple);background:rgba(123,79,212,.15)}
+.personality-btn-name{font-size:13px;font-weight:700}
+.personality-btn-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.voice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.voice-btn{padding:10px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface2);text-align:left;transition:.2s;cursor:pointer;display:flex;align-items:center;gap:8px}
+.voice-btn.selected{border-color:var(--cyan);background:rgba(0,200,232,.1)}
+.voice-btn-icon{font-size:18px}
+.voice-btn-info{flex:1}
+.voice-btn-name{font-size:13px;font-weight:700}
+.voice-btn-desc{font-size:11px;color:var(--muted)}
+.wizard-nav{display:flex;gap:10px;margin-top:16px}
+.wizard-btn{flex:1;padding:13px;border-radius:14px;font-size:15px;font-weight:700;transition:.2s}
+.wizard-btn-back{background:var(--surface2);border:1.5px solid var(--border)}
+.wizard-btn-next{background:var(--grad);color:#fff}
 
-    /* ─── Responsive ───────────────────────────────────────────────────── */
-    @media (max-width: 600px) {
-      .navbar-actions .btn-outline { display: none; }
-      .hero-stats { gap: 24px; }
-      .chat-modal { height: 95vh; border-radius: 20px; }
-      .msg-bubble { max-width: 85%; }
-    }
+/* ── Bottom Tab Bar ── */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(14,11,46,.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0)}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;cursor:pointer;transition:.2s;color:var(--muted);font-size:10px;font-weight:600}
+.tab-item.active{color:var(--cyan)}
+.tab-item-icon{font-size:22px;line-height:1}
+.page-content{padding-bottom:80px}
 
-    /* ─── Animations ───────────────────────────────────────────────────── */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-in { animation: fadeInUp 0.5s ease both; }
-    .fade-in-delay-1 { animation-delay: 0.1s; }
-    .fade-in-delay-2 { animation-delay: 0.2s; }
-    .fade-in-delay-3 { animation-delay: 0.3s; }
+/* ── Avatar Picker Modal ── */
+.avatar-picker-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;display:none;align-items:center;justify-content:center}
+.avatar-picker-overlay.open{display:flex}
+.avatar-picker-modal{background:var(--surface);border-radius:20px;padding:24px;width:90%;max-width:360px}
+.avatar-picker-title{font-size:16px;font-weight:800;margin-bottom:16px;text-align:center}
+.avatar-picker-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.avatar-pick-btn{font-size:28px;padding:8px;border-radius:12px;background:var(--surface2);border:2px solid transparent;cursor:pointer;transition:.2s;text-align:center}
+.avatar-pick-btn.selected{border-color:var(--cyan);background:rgba(0,200,232,.15)}
+.avatar-picker-close{width:100%;padding:12px;border-radius:12px;background:var(--grad);color:#fff;font-size:14px;font-weight:700;cursor:pointer}
 
-    /* ─── Search ───────────────────────────────────────────────────────── */
-    .search-wrap {
-      display: flex; justify-content: center; margin-bottom: 24px;
-    }
-    .search-input {
-      width: 100%; max-width: 400px;
-      background: var(--surface); border: 1.5px solid var(--border);
-      border-radius: 30px; padding: 11px 20px; color: var(--text); font-size: 14px;
-      transition: border-color 0.2s;
-    }
-    .search-input:focus { border-color: var(--purple); }
-    .search-input::placeholder { color: var(--muted); }
+/* ── Celebration Modal ── */
+.celebrate-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:700;display:none;align-items:center;justify-content:center}
+.celebrate-overlay.open{display:flex}
+.celebrate-modal{background:var(--surface);border-radius:24px;padding:32px 24px;width:90%;max-width:340px;text-align:center;animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.celebrate-emoji{font-size:64px;margin-bottom:12px}
+.celebrate-title{font-size:22px;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.celebrate-sub{font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.5}
+.celebrate-btn{width:100%;padding:14px;border-radius:14px;background:var(--grad);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
 
-    /* ─── Welcome bubble ───────────────────────────────────────────────── */
-    .welcome-msg {
-      background: linear-gradient(135deg, rgba(123,79,212,0.15), rgba(0,200,232,0.1));
-      border: 1px solid rgba(123,79,212,0.3);
-      border-radius: 18px; border-bottom-left-radius: 4px;
-      padding: 14px 18px; font-size: 14px; line-height: 1.6;
-      max-width: 70%;
-    }
-  </style>
+/* ── Dark/Light Mode ── */
+:root.light-mode{--bg:#F5F5FF;--surface:#FFFFFF;--surface2:#EBEBFF;--border:#D0CCFF;--text:#1A1040;--muted:#6B63A0}
+.theme-toggle{width:34px;height:34px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:.2s}
+.theme-toggle:hover{border-color:var(--cyan)}
+
+/* ── Onboarding Modal ── */
+.onboard-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:800;display:none;align-items:center;justify-content:center}
+.onboard-overlay.open{display:flex}
+.onboard-modal{background:var(--surface);border-radius:24px;padding:32px 24px;width:90%;max-width:380px;text-align:center}
+.onboard-logo{width:72px;height:72px;border-radius:18px;object-fit:cover;margin:0 auto 16px;display:block;box-shadow:0 0 24px rgba(123,79,212,.5)}
+.onboard-title{font-size:24px;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.onboard-sub{font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.5}
+.onboard-label{font-size:13px;font-weight:700;text-align:left;margin-bottom:6px;color:var(--text)}
+.onboard-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:15px;outline:none;margin-bottom:20px;transition:.2s}
+.onboard-input:focus{border-color:var(--purple)}
+.onboard-avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px}
+.onboard-avatar-btn{font-size:26px;padding:8px;border-radius:10px;background:var(--surface2);border:2px solid transparent;cursor:pointer;transition:.2s}
+.onboard-avatar-btn.selected{border-color:var(--cyan);background:rgba(0,200,232,.15)}
+.onboard-start-btn{width:100%;padding:14px;border-radius:14px;background:var(--grad);color:#fff;font-size:16px;font-weight:800;cursor:pointer;transition:.2s}
+.onboard-start-btn:hover{opacity:.9}
+
+/* ── Onboarding (ob-*) ── */
+.ob-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:900;display:none;align-items:center;justify-content:center}
+.ob-overlay.open{display:flex}
+.ob-modal{background:var(--surface);border-radius:24px;padding:32px 24px;width:90%;max-width:380px;text-align:center;animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
+.ob-logo{font-size:56px;margin-bottom:12px}
+.ob-title{font-size:22px;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.ob-sub{font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.ob-field{text-align:left;margin-bottom:16px}
+.ob-label{display:block;font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.ob-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:15px;outline:none;transition:.2s}
+.ob-input:focus{border-color:var(--purple)}
+.ob-avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px}
+.ob-avatar-btn{font-size:24px;padding:8px;border-radius:10px;background:var(--surface2);border:2px solid transparent;cursor:pointer;transition:.2s}
+.ob-avatar-btn.selected{border-color:var(--cyan);background:rgba(0,200,232,.15)}
+.ob-btn{width:100%;padding:14px;border-radius:14px;background:var(--grad);color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin-top:20px;transition:.2s}
+.ob-btn:hover{opacity:.9}
+
+/* ── Notification Badge ── */
+.nav-btn-icon{position:relative}
+.notif-badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;border-radius:8px;background:var(--pink);font-size:9px;font-weight:800;color:#fff;display:none;align-items:center;justify-content:center;padding:0 3px;pointer-events:none}
+.notif-badge.show{display:flex}
+
+/* ── Share Canvas Preview ── */
+.share-preview-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:750;display:none;align-items:center;justify-content:center}
+.share-preview-overlay.open{display:flex}
+.share-preview-modal{background:var(--surface);border-radius:20px;padding:20px;width:90%;max-width:380px;text-align:center}
+.share-preview-title{font-size:15px;font-weight:800;margin-bottom:12px}
+.share-preview-canvas{border-radius:12px;max-width:100%;margin-bottom:16px}
+.share-preview-actions{display:flex;gap:10px}
+.share-preview-btn{flex:1;padding:12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer}
+.share-preview-btn-dl{background:var(--grad);color:#fff}
+.share-preview-btn-share{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
+.share-preview-btn-close{background:var(--surface2);border:1.5px solid var(--border)}
+
+/* ── Guided Tour Tooltip ── */
+.tour-overlay{position:fixed;inset:0;z-index:850;pointer-events:none}
+.tour-overlay.active{pointer-events:auto}
+.tour-spotlight{position:absolute;border-radius:16px;box-shadow:0 0 0 9999px rgba(0,0,0,.75);pointer-events:none;transition:.3s;border:2px solid var(--cyan)}
+.tour-tooltip{position:absolute;background:var(--surface);border:1.5px solid var(--cyan);border-radius:16px;padding:16px 18px;max-width:240px;z-index:851;animation:popIn .3s ease}
+.tour-tooltip-title{font-size:14px;font-weight:800;color:var(--cyan);margin-bottom:4px}
+.tour-tooltip-text{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:12px}
+.tour-tooltip-actions{display:flex;gap:8px;justify-content:flex-end}
+.tour-btn-skip{font-size:12px;color:var(--muted);padding:6px 10px;border-radius:8px;background:var(--surface2);cursor:pointer}
+.tour-btn-next{font-size:12px;color:#fff;padding:6px 12px;border-radius:8px;background:var(--grad);cursor:pointer;font-weight:700}
+
+/* ── Responsive ── */
+@media(max-width:600px){
+  .hero{padding:32px 16px 24px}
+  .char-grid{grid-template-columns:repeat(2,1fr);padding:12px 16px;gap:10px}
+  .chat-modal{height:95vh}
+  .detail-modal{max-height:95vh}
+  .navbar-actions .nav-btn-outline{display:none}
+}
+</style>
 </head>
 <body>
 
-<!-- ─── Navbar ─────────────────────────────────────────────────────────── -->
+<!-- Navbar -->
 <nav class="navbar">
   <div class="navbar-brand">
-    <img src="logo.webp" alt="Great Mind AI" class="navbar-logo" />
-    <span class="navbar-title">GREAT MIND <span>AI</span></span>
+    <img src="logo.webp" class="navbar-logo" alt="Great Mind AI"/>
+    <span class="navbar-title">Great Mind AI</span>
   </div>
   <div class="navbar-actions">
-    <button class="btn-outline" onclick="document.getElementById('characters').scrollIntoView({behavior:'smooth'})">Karakterler</button>
-    <button class="btn-primary" onclick="document.getElementById('characters').scrollIntoView({behavior:'smooth'})">Sohbet Başlat</button>
+    <button class="nav-btn nav-btn-icon" onclick="showPage('favorites')" title="Favoriler">❤️</button>
+    <button class="nav-btn nav-btn-icon" id="historyNavBtn" onclick="showPage('history');clearHistoryBadge()" title="Sohbet Geçmişi">💬<span class="notif-badge" id="historyBadge"></span></button>
+    <button class="nav-btn nav-btn-icon" onclick="showPage('leaderboard')" title="Liderlik">🏆</button>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
+    <button class="nav-btn nav-btn-grad" onclick="openWizard()">+ Karakter Oluştur</button>
   </div>
 </nav>
 
-<!-- ─── Hero ───────────────────────────────────────────────────────────── -->
-<section class="hero">
-  <div class="hero-glow"></div>
-  <img src="logo.webp" alt="Great Mind AI" class="hero-logo fade-in" />
-  <div class="hero-badge fade-in fade-in-delay-1">✨ Yapay Zeka Destekli Eğitim Platformu</div>
-  <h1 class="hero-title fade-in fade-in-delay-1">
-    Tarihin Büyük Zihinleriyle<br />
-    <span class="grad">Konuş ve Öğren</span>
-  </h1>
-  <p class="hero-sub fade-in fade-in-delay-2">
-    Einstein, Atatürk, Sherlock Holmes ve daha fazlasıyla sohbet et.
-    AI destekli karakterler sana öğretir, sorgular ve ilham verir.
-  </p>
-  <div class="hero-cta fade-in fade-in-delay-3">
-    <button class="btn-hero" onclick="document.getElementById('characters').scrollIntoView({behavior:'smooth'})">
-      🚀 Hemen Başla
-    </button>
-    <button class="btn-hero-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
-      Nasıl Çalışır?
-    </button>
-  </div>
-  <div class="hero-stats fade-in fade-in-delay-3">
-    <div class="stat">
-      <div class="stat-num">16+</div>
-      <div class="stat-label">AI Karakter</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">6</div>
-      <div class="stat-label">Kategori</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">TR/EN/DE</div>
-      <div class="stat-label">Dil Desteği</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">∞</div>
-      <div class="stat-label">Sohbet Limiti</div>
+<!-- Pages -->
+<div id="page-home" class="page active page-content">
+  <!-- Hero -->
+  <div class="hero">
+    <img src="logo.webp" class="hero-logo" alt="Great Mind AI"/>
+    <div class="hero-title">Great Mind AI</div>
+    <div class="hero-sub">İkonik figürler ve eğitim ajanlarıyla sohbet et</div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num" id="heroCharCount">16+</div><div class="hero-stat-label">Karakter</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-label">Kategori</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">TR/EN/DE</div><div class="hero-stat-label">Dil</div></div>
     </div>
   </div>
-</section>
-
-<!-- ─── Characters Section ─────────────────────────────────────────────── -->
-<div id="characters" style="background: linear-gradient(180deg, var(--navy) 0%, var(--navy2) 100%); padding: 0 0 80px;">
-  <div class="section" style="padding-top: 0;">
-    <div class="section-header">
-      <div class="section-tag">🧠 AI Karakterler</div>
-      <h2 class="section-title">Kiminle Konuşmak İstersin?</h2>
-      <p class="section-sub">Her karakter gerçek kişilik ve uzmanlık alanıyla donatılmış yapay zeka ajanıdır.</p>
+  <!-- Streak Bar -->
+  <div class="streak-bar">
+    <span class="streak-flame">🔥</span>
+    <div class="streak-info">
+      <div class="streak-title" id="streakTitle">0 Günlük Seri</div>
+      <div class="streak-sub" id="streakSub">Bugün bir karakterle sohbet et!</div>
     </div>
-
+    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div></div>
+    <div class="xp-label" id="xpLabel">0 XP</div>
+  </div>
+  <!-- Search & Filter -->
+  <div class="search-section">
     <div class="search-wrap">
-      <input type="text" class="search-input" placeholder="🔍 Karakter ara..." id="searchInput" oninput="filterChars()" />
+      <input class="search-input" id="searchInput" placeholder="Karakter ara..." oninput="renderChars()"/>
     </div>
+    <div class="filter-row" id="filterRow"></div>
+  </div>
+  <!-- Grid -->
+  <div class="char-grid" id="charGrid"></div>
+  <div class="empty-state" id="emptyState" style="display:none">
+    <div class="empty-state-icon">🔍</div>
+    <div>Karakter bulunamadı</div>
+  </div>
+</div>
 
-    <div class="filter-bar" id="filterBar">
-      <button class="filter-btn active" data-cat="all" onclick="setFilter('all', this)">Tümü</button>
-      <button class="filter-btn" data-cat="Eğitim" onclick="setFilter('Eğitim', this)">🎓 Eğitim</button>
-      <button class="filter-btn" data-cat="Historical" onclick="setFilter('Historical', this)">🏛 Tarihi</button>
-      <button class="filter-btn" data-cat="Fantasy" onclick="setFilter('Fantasy', this)">🧙 Fantezi</button>
-      <button class="filter-btn" data-cat="Sci-Fi" onclick="setFilter('Sci-Fi', this)">🚀 Bilim Kurgu</button>
-      <button class="filter-btn" data-cat="Anime" onclick="setFilter('Anime', this)">⚡ Anime</button>
-      <button class="filter-btn" data-cat="Villain" onclick="setFilter('Villain', this)">😈 Kötü Adam</button>
+<div id="page-favorites" class="page page-content">
+  <div class="page-header">
+    <div>
+      <div class="page-header-title">❤️ Favoriler</div>
+      <div class="page-header-sub">Favori karakterlerin</div>
     </div>
+  </div>
+  <div class="char-grid" id="favGrid"></div>
+  <div class="fav-empty" id="favEmpty" style="display:none">
+    <div class="fav-empty-icon">💔</div>
+    <div>Henüz favori yok. Karakterlere kalp tıkla!</div>
+  </div>
+</div>
 
-    <div class="char-grid" id="charGrid"></div>
-    <div class="empty-state" id="emptyState" style="display:none;">
-      <div class="empty-state-icon">🔍</div>
-      <p>Arama sonucu bulunamadı.</p>
+<div id="page-leaderboard" class="page page-content">
+  <div class="page-header">
+    <div>
+      <div class="page-header-title">🏆 Liderlik Tablosu</div>
+      <div class="page-header-sub">Haftalık XP sıralaması</div>
+    </div>
+  </div>
+  <div class="leaderboard-list" id="leaderboardList"></div>
+</div>
+
+<div id="page-history" class="page page-content">
+  <div class="page-header">
+    <div>
+      <div class="page-header-title">💬 Sohbet Geçmişi</div>
+      <div class="page-header-sub">Geçmiş konuşmaların</div>
+    </div>
+  </div>
+  <div class="history-search">
+    <input class="search-input" style="width:100%" id="historySearch" placeholder="Konuşma ara..." oninput="renderHistory()"/>
+  </div>
+  <div class="history-list" id="historyList"></div>
+  <div class="fav-empty" id="historyEmpty" style="display:none">
+    <div class="fav-empty-icon">💬</div>
+    <div>Henüz sohbet geçmişi yok.</div>
+  </div>
+</div>
+
+<div id="page-profile" class="page page-content">
+  <div class="profile-header">
+    <div class="profile-avatar-wrap" id="profileAvatarWrap">🧠</div>
+    <div class="profile-name" id="profileNameDisplay" onclick="editUsername()" style="cursor:pointer" title="İsmi düzenle">Kullanıcı <span style="font-size:12px;opacity:.5">✏️</span></div>
+    <div class="profile-sub">Great Mind AI Üyesi</div>
+  </div>
+  <div class="profile-stats">
+    <div class="profile-stat"><div class="profile-stat-num" id="profileXP">0</div><div class="profile-stat-label">XP</div></div>
+    <div class="profile-stat"><div class="profile-stat-num" id="profileStreak">0</div><div class="profile-stat-label">Seri</div></div>
+    <div class="profile-stat"><div class="profile-stat-num" id="profileChats">0</div><div class="profile-stat-label">Sohbet</div></div>
+  </div>
+  <div class="profile-streak-card">
+    <div class="profile-streak-icon">🔥</div>
+    <div class="profile-streak-info">
+      <div class="profile-streak-title" id="profileStreakTitle">0 Günlük Seri</div>
+      <div class="profile-streak-sub" id="profileStreakSub">Bugün sohbet et!</div>
+    </div>
+  </div>
+  <div style="margin:0 24px 16px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div><div style="font-size:15px;font-weight:800" id="profileLevelName">Başlangıç</div><div style="font-size:12px;color:var(--muted)" id="profileLevelSub">Seviye 1</div></div>
+      <div style="font-size:28px" id="profileLevelEmoji">🌱</div>
+    </div>
+    <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden">
+      <div id="profileXpBar" style="height:100%;background:linear-gradient(90deg,#7B4FD4,#00C8E8);border-radius:4px;transition:width .5s;width:0%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--muted)">
+      <span id="profileXpCurrent">0 XP</span>
+      <span id="profileXpNext">Sonraki: 100 XP</span>
+    </div>
+  </div>
+  <div class="profile-links">
+    <div class="profile-link" onclick="showPage('history')"><span class="profile-link-icon">💬</span><span class="profile-link-label">Sohbet Geçmişi</span><span class="profile-link-arrow">›</span></div>
+    <div class="profile-link" onclick="showPage('leaderboard')"><span class="profile-link-icon">🏆</span><span class="profile-link-label">Liderlik Tablosu</span><span class="profile-link-arrow">›</span></div>
+    <div class="profile-link" onclick="showPage('favorites')"><span class="profile-link-icon">❤️</span><span class="profile-link-label">Favoriler</span><span class="profile-link-arrow">›</span></div>
+    <div class="profile-link" onclick="openWizard()"><span class="profile-link-icon">✨</span><span class="profile-link-label">Karakter Oluştur</span><span class="profile-link-arrow">›</span></div>
+  </div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <div class="tab-item active" id="tab-home" onclick="showPage('home')"><span class="tab-item-icon">🏠</span>Karakterler</div>
+  <div class="tab-item" id="tab-favorites" onclick="showPage('favorites')"><span class="tab-item-icon">❤️</span>Favoriler</div>
+  <div class="tab-item" id="tab-leaderboard" onclick="showPage('leaderboard')"><span class="tab-item-icon">🏆</span>Liderlik</div>
+  <div class="tab-item" id="tab-history" onclick="showPage('history')"><span class="tab-item-icon">💬</span>Geçmiş</div>
+  <div class="tab-item" id="tab-profile" onclick="showPage('profile')"><span class="tab-item-icon">👤</span>Profil</div>
+</div>
+
+<!-- Character Detail Modal -->
+<div class="modal-overlay" id="detailOverlay" onclick="closeDetailOnOverlay(event)">
+  <div class="detail-modal" id="detailModal">
+    <div class="detail-hero" id="detailHero"></div>
+    <div class="detail-body">
+      <div class="detail-name" id="detailName"></div>
+      <div class="detail-universe" id="detailUniverse"></div>
+      <div class="detail-tagline" id="detailTagline"></div>
+      <div class="detail-bio" id="detailBio"></div>
+      <div class="detail-traits" id="detailTraits"></div>
+      <div class="detail-questions">
+        <h4>Örnek Sorular</h4>
+        <div id="detailQuestions"></div>
+      </div>
+    </div>
+    <div class="detail-actions">
+      <button class="detail-btn detail-btn-fav" id="detailFavBtn" onclick="toggleFavFromDetail()">❤️ Favori</button>
+      <button class="detail-btn detail-btn-primary" id="detailChatBtn" onclick="startChatFromDetail()">💬 Sohbet Başlat</button>
     </div>
   </div>
 </div>
 
-<!-- ─── Features Section ───────────────────────────────────────────────── -->
-<div id="features" style="background: var(--navy);">
-  <div class="section">
-    <div class="section-header">
-      <div class="section-tag">⚡ Özellikler</div>
-      <h2 class="section-title">Neden Great Mind AI?</h2>
-      <p class="section-sub">Öğrenmeyi eğlenceli ve etkili kılan özellikler.</p>
-    </div>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon" style="background: rgba(123,79,212,0.15);">🧠</div>
-        <div class="feature-title">Gerçekçi Karakterler</div>
-        <div class="feature-desc">Her karakter kendi kişiliği, dili ve uzmanlığıyla konuşur. Einstein fizik anlatır, Atatürk liderlik rehberliği yapar.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background: rgba(0,200,232,0.15);">🌍</div>
-        <div class="feature-title">Çok Dilli Destek</div>
-        <div class="feature-desc">Türkçe, İngilizce ve Almanca dillerinde sohbet edebilirsin. Karakter seçtiğin dilde yanıt verir.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background: rgba(224,64,160,0.15);">🎓</div>
-        <div class="feature-title">Eğitim Odaklı</div>
-        <div class="feature-desc">Dr. Mikro, Prof. Atom, Eko ve Astro gibi özel eğitim ajanları öğrencilere bilimsel düşünmeyi öğretir.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background: rgba(123,79,212,0.15);">📱</div>
-        <div class="feature-title">Mobil Uygulama</div>
-        <div class="feature-desc">Great Mind AI mobil uygulamasıyla her yerde sohbet et. Streak sistemi, quiz modu ve XP ödülleri seni motive eder.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background: rgba(0,200,232,0.15);">⚡</div>
-        <div class="feature-title">Anlık Yanıtlar</div>
-        <div class="feature-desc">Yapay zeka destekli altyapı sayesinde sorularına saniyeler içinde kapsamlı yanıtlar alırsın.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background: rgba(224,64,160,0.15);">🔒</div>
-        <div class="feature-title">Güvenli Platform</div>
-        <div class="feature-desc">Eğitim amaçlı tasarlanmış, yaşa uygun içerik filtreleri ve etik yapay zeka kurallarıyla güvenli bir ortam.</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── Footer ─────────────────────────────────────────────────────────── -->
-<footer class="footer">
-  <div class="footer-brand">
-    <img src="logo.webp" alt="Great Mind AI" class="footer-logo" />
-    <span class="footer-name">GREAT MIND AI</span>
-  </div>
-  <p>© 2026 Great Mind AI. Tüm hakları saklıdır.</p>
-  <p style="margin-top: 6px;">Yapay zeka destekli eğitim platformu — Öğrenmek hiç bu kadar eğlenceli olmamıştı.</p>
-</footer>
-
-<!-- ─── Chat Modal ─────────────────────────────────────────────────────── -->
-<div class="modal-overlay" id="chatModal" onclick="closeModalOnOverlay(event)">
+<!-- Chat Modal -->
+<div class="chat-overlay" id="chatOverlay" onclick="closeChatOnOverlay(event)">
   <div class="chat-modal">
     <div class="chat-header">
-      <div class="chat-header-grad"></div>
-      <img id="chatAvatar" src="" alt="" class="chat-header-avatar" />
+      <div id="chatAvatarWrap"></div>
       <div class="chat-header-info">
         <div class="chat-header-name" id="chatName"></div>
         <div class="chat-header-sub" id="chatSub"></div>
       </div>
-      <div class="chat-close" onclick="closeChat()">✕</div>
+      <div class="chat-header-actions">
+        <button class="chat-tts-btn" id="ttsToggleBtn" onclick="toggleTTS()" title="Sesli Okuma">🔊</button>
+        <div class="lang-btn" id="langBtn" onclick="toggleLangDropdown(event)">
+          <span id="langFlag">🇹🇷</span>
+          <span id="langCode">TR</span>
+          <span style="font-size:10px;opacity:.6">▼</span>
+          <div class="lang-dropdown" id="langDropdown">
+            <div class="lang-option active" id="lang-tr" onclick="setLang('tr',event)"><span>🇹🇷</span><span>Türkçe</span></div>
+            <div class="lang-option" id="lang-en" onclick="setLang('en',event)"><span>🇬🇧</span><span>English</span></div>
+            <div class="lang-option" id="lang-de" onclick="setLang('de',event)"><span>🇩🇪</span><span>Deutsch</span></div>
+          </div>
+        </div>
+        <button class="chat-share-btn" onclick="shareChat()" title="Sohbeti Paylaş">📤</button>
+        <button class="chat-close" onclick="closeChat()">✕</button>
+      </div>
     </div>
     <div class="chat-messages" id="chatMessages"></div>
+    <div class="quiz-prompt" id="quizPrompt" style="display:none" onclick="startQuiz()">
+      <span class="quiz-prompt-text">🎯 Sohbet tamamlandı! Quiz'e katıl ve XP kazan</span>
+      <span class="quiz-prompt-btn">Başla →</span>
+    </div>
     <div class="chat-input-area">
-      <textarea
-        class="chat-input"
-        id="chatInput"
-        placeholder="Mesajınızı yazın..."
-        rows="1"
-        onkeydown="handleKey(event)"
-        oninput="autoResize(this)"
-      ></textarea>
-      <button class="chat-send" id="sendBtn" onclick="sendMessage()">➤</button>
+      <textarea class="chat-textarea" id="chatInput" placeholder="Mesaj yaz..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>➤</button>
     </div>
   </div>
 </div>
 
+<!-- Quiz Modal -->
+<div class="quiz-overlay" id="quizOverlay">
+  <div class="quiz-modal" id="quizModal">
+    <div class="quiz-header">
+      <div class="quiz-title">🎯 Bilgi Testi</div>
+      <div class="quiz-progress" id="quizProgress"></div>
+    </div>
+    <div id="quizContent"></div>
+  </div>
+</div>
+
+<!-- Wizard Modal -->
+<div class="wizard-overlay" id="wizardOverlay" onclick="closeWizardOnOverlay(event)">
+  <div class="wizard-modal" id="wizardModal">
+    <div class="wizard-header">
+      <div class="wizard-title" id="wizardTitle">✨ Karakter Oluştur</div>
+      <button onclick="closeWizard()" style="font-size:20px;color:var(--muted)">✕</button>
+    </div>
+    <div class="wizard-steps" id="wizardStepDots"></div>
+    <div id="wizardContent"></div>
+  </div>
+</div>
+
+<!-- Onboarding Modal -->
+<div class="onboard-overlay" id="onboardOverlay">
+  <div class="onboard-modal">
+    <img src="logo.webp" class="onboard-logo" alt="Great Mind AI"/>
+    <div class="onboard-title">Great Mind AI'ya Hoş Geldin!</div>
+    <div class="onboard-sub">AI karakterlerle sohbet et, quiz çöz ve XP kazan. Başlamak için adını ve avatarını seç.</div>
+    <div class="onboard-label">👤 Kullanıcı Adın</div>
+    <input class="onboard-input" id="onboardNameInput" placeholder="Adını gir..." maxlength="20" onkeydown="if(event.key==='Enter')completeOnboarding()"/>
+    <div class="onboard-label">🧠 Avatar Seç</div>
+    <div class="onboard-avatar-grid" id="onboardAvatarGrid"></div>
+    <button class="onboard-start-btn" onclick="completeOnboarding()">Başla 🚀</button>
+  </div>
+</div>
+
+<!-- Share Preview Modal -->
+<div class="share-preview-overlay" id="sharePreviewOverlay">
+  <div class="share-preview-modal">
+    <div class="share-preview-title">📄 Paylaşım Kartı</div>
+    <canvas id="shareCanvas" class="share-preview-canvas" width="340" height="200"></canvas>
+    <div class="share-preview-actions">
+      <button class="share-preview-btn share-preview-btn-share" id="nativeShareBtn" onclick="nativeShareCard()" style="display:none">📤 Paylaş</button>
+      <button class="share-preview-btn share-preview-btn-dl" onclick="downloadShareCard()">⬇️ İndir</button>
+      <button class="share-preview-btn share-preview-btn-close" onclick="closeSharePreview()">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<!-- XP Float -->
+<div class="xp-float" id="xpFloat"></div>
+
+<!-- Avatar Picker Modal -->
+<div class="avatar-picker-overlay" id="avatarPickerOverlay" onclick="closeAvatarPickerOnOverlay(event)">
+  <div class="avatar-picker-modal">
+    <div class="avatar-picker-title">🧠 Avatar Seç</div>
+    <div class="avatar-picker-grid" id="avatarPickerGrid"></div>
+    <button class="avatar-picker-close" onclick="closeAvatarPicker()">Tamam</button>
+  </div>
+</div>
+
+<!-- Guided Tour Overlay -->
+<div class="tour-overlay" id="tourOverlay">
+  <div class="tour-spotlight" id="tourSpotlight"></div>
+  <div class="tour-tooltip" id="tourTooltip">
+    <div class="tour-tooltip-title" id="tourTitle"></div>
+    <div class="tour-tooltip-text" id="tourText"></div>
+    <div class="tour-tooltip-actions">
+      <button class="tour-btn-skip" onclick="endTour()">Atla</button>
+      <button class="tour-btn-next" id="tourNextBtn" onclick="nextTourStep()">Sonraki →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Onboarding Modal -->
+<div class="ob-overlay" id="onboardingOverlay">
+  <div class="ob-modal">
+    <div class="ob-logo">🧠</div>
+    <div class="ob-title">Great Mind AI'ya Hoş Geldin!</div>
+    <div class="ob-sub">Tarihîn en büyük zihinleriyle sohbet et, öğren ve keşfet.</div>
+    <div class="ob-field">
+      <label class="ob-label">Kullanıcı Adın</label>
+      <input id="obNameInput" class="ob-input" type="text" placeholder="Örn: Kaşif, Araştırmacı..." maxlength="20" />
+    </div>
+    <div class="ob-field">
+      <label class="ob-label">Avatar Seç</label>
+      <div class="ob-avatar-grid">
+        <button class="ob-avatar-btn" onclick="selectOnboardingAvatar(this,'🧠')">🧠</button>
+        <button class="ob-avatar-btn" onclick="selectOnboardingAvatar(this,'🦁')">🦁</button>
+        <button class="ob-avatar-btn" onclick="selectOnboardingAvatar(this,'🐉')">🐉</button>
+        <button class="ob-avatar-btn" onclick="selectOnboardingAvatar(this,'🌟')">🌟</button>
+        <button class="ob-avatar-btn" onclick="selectOnboardingAvatar(this,'🔮')">🔮</button>
+        <button class="ob-avatar-btn" onclick="selectOnboardingAvatar(this,'🎤')">🎤</button>
+        <button class="ob-avatar-btn" onclick="selectOnboardingAvatar(this,'🦊')">🦊</button>
+        <button class="ob-avatar-btn" onclick="selectOnboardingAvatar(this,'🐺')">🐺</button>
+        <button class="ob-avatar-btn" onclick="selectOnboardingAvatar(this,'🔥')">🔥</button>
+        <button class="ob-avatar-btn" onclick="selectOnboardingAvatar(this,'⚡')">⚡</button>
+      </div>
+    </div>
+    <button class="ob-btn" onclick="finishOnboarding()">Başla 🚀</button>
+  </div>
+</div>
+
+<!-- Celebration Modal -->
+<div class="celebrate-overlay" id="celebrateOverlay">
+  <div class="celebrate-modal">
+    <div class="celebrate-emoji" id="celebrateEmoji">🔥</div>
+    <div class="celebrate-title" id="celebrateTitle">Tebrikler!</div>
+    <div class="celebrate-sub" id="celebrateSub">Harika bir başarı!</div>
+    <button class="celebrate-btn" onclick="closeCelebration()">Devam Et 🚀</button>
+  </div>
+</div>
+
 <script>
-// ─── Character Data ──────────────────────────────────────────────────────
+// ─── Character Data ───────────────────────────────────────────────────────
 const CHARACTERS = [
   {
-    id: "ataturk",
-    name: "Mustafa Kemal Atatürk",
-    universe: "Türkiye Cumhuriyeti",
-    category: "Historical",
-    tagline: "Yurtta sulh, cihanda sulh.",
-    avatarUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310519663406961148/Ua3Qzpcii6kffDGDecf9Ar/ataturk-portrait-c3Wf9j8dcqMcGEb37tbBCu.webp",
-    accentColor: "#DC2626",
-    systemPrompt: "Sen, Mustafa Kemal Atatürk'ün eğitim amaçlı yapay zekâ simülasyonusun. Bilimsel düşünme, liderlik ve toplumsal sorumluluk konularında öğrencilere rehberlik edersin. Saygılı, kısa ve güçlü, öğretici ve cesaretlendirici bir dil kullanırsın.",
-    firstMessage: "Merhaba. Ben Mustafa Kemal Atatürk'ün eğitim amaçlı yapay zekâ simülasyonuyum. Bilim, akıl, eğitim ve toplumsal sorumluluk temelinde sorunlara çözüm aramana yardımcı olabilirim. Bugün hangi konuyu birlikte düşünelim?"
+    id:"ataturk",name:"Mustafa Kemal Atatürk",universe:"Türkiye Cumhuriyeti",category:"Historical",
+    tagline:"Yurtta sulh, cihanda sulh.",
+    bio:"Mustafa Kemal Atatürk, Türkiye Cumhuriyeti'nin kurucusu ve ilk cumhurbaşkanıdır. Askeri deha, devlet adamı ve reformcu kimliğiyle modern Türkiye'yi inşa etmiştir.",
+    traits:["Lider","Reformcu","Kararlı","Vatansever"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=ataturk&backgroundColor=b6e3f4",
+    accentColor:"#1D4ED8",
+    voiceConfig:{language:"tr-TR",pitch:0.9,rate:0.9},
+    unlockXp:0,
+    exampleQuestions:["Cumhuriyetin önemi nedir?","Kurtuluş Savaşı'nı anlatır mısınız?","Eğitim reformlarınız hakkında ne düşünüyorsunuz?"],
+    systemPrompt:"Sen Mustafa Kemal Atatürk'sün — Türkiye Cumhuriyeti'nin kurucusu. Öğrencilere tarih, liderlik ve vatanseverlik konularında rehberlik edersin.",
+    firstMessage:"Merhaba! Ben Mustafa Kemal Atatürk. Türkiye'nin tarihi ve geleceği hakkında ne öğrenmek istersin?"
   },
   {
-    id: "einstein",
-    name: "Albert Einstein",
-    universe: "Theoretical Physics",
-    category: "Historical",
-    tagline: "Imagination is more important than knowledge.",
-    avatarUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310519663406961148/Ua3Qzpcii6kffDGDecf9Ar/einstein-portrait-fYYmmguZ8TjfTvrqrktzqg.webp",
-    accentColor: "#D97706",
-    systemPrompt: "Sen, Albert Einstein'ın eğitim amaçlı yapay zekâ simülasyonusun. Fizik, görelilik, kuantum mekaniği ve bilimsel merak konularında öğrencilerle konuşursun. Düşünce deneyleri kullanarak öğrencileri keşfetmeye teşvik edersin.",
-    firstMessage: "Merhaba! Ben Albert Einstein'ın yapay zekâ simülasyonuyum. Evrenin sırlarını birlikte keşfedelim mi? Fizik, matematik veya bilimsel merak hakkında ne sormak istersin?"
+    id:"einstein",name:"Albert Einstein",universe:"Theoretical Physics",category:"Historical",
+    tagline:"Imagination is more important than knowledge.",
+    bio:"Albert Einstein, görelilik teorisini geliştiren ve 1921 Nobel Fizik Ödülü'nü kazanan teorik fizikçidir. E=mc² formülüyle tanınır.",
+    traits:["Meraklı","Yaratıcı","Analitik","Hayalperest"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=einstein&backgroundColor=b6e3f4",
+    accentColor:"#7C3AED",
+    voiceConfig:{language:"en-US",pitch:0.95,rate:0.9},
+    unlockXp:0,
+    exampleQuestions:["Görelilik teorisini nasıl keşfettin?","Düşünce deneyleri neden önemlidir?","Işık hızı neden sabit?"],
+    systemPrompt:"Sen Albert Einstein'sın — teorik fizikçi. Bilim, merak ve düşünce deneyleri konularında öğrencilere ilham verirsin.",
+    firstMessage:"Merhaba! Ben Albert Einstein. Bilimi merak ederek keşfetmeyi severim. Bugün hangi soruyu birlikte düşünelim?"
   },
   {
-    id: "dr-mikro",
-    name: "Dr. Mikro",
-    universe: "Mikrobiyoloji Dünyası",
-    category: "Eğitim",
-    tagline: "Mikropları yakala, vücudunu koru!",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=drmikro&backgroundColor=d1fae5",
-    accentColor: "#059669",
-    systemPrompt: "Sen Dr. Mikro'sun — mikrobiyoloji ve sağlık konularında öğrencilere rehberlik eden eğitim ajanısın. Bakteriler, virüsler, bağışıklık sistemi ve hijyen hakkında öğrencilere bilimsel ve anlaşılır açıklamalar yaparsın.",
-    firstMessage: "Merhaba! Ben Dr. Mikro! 🦠 Mikroplar dünyasına hoş geldin. Bakteriler, virüsler veya bağışıklık sistemi hakkında merak ettiğin bir şey var mı?"
+    id:"dr-mikro",name:"Dr. Mikro",universe:"Hastalık Dedektifi",category:"Eğitim",
+    tagline:"Mikropları yakala, vücudunu koru!",
+    bio:"Dr. Mikro, mikrobiyoloji ve bağışıklık sistemi konusunda uzmanlaşmış bir hastalık dedektifidir. 6-7. sınıf öğrencilerine hasta semptomlarını analiz etmeyi öğretir.",
+    traits:["Meraklı","Analitik","Sabırlı","Teşvik Edici"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=drmikro&backgroundColor=d1fae5",
+    accentColor:"#059669",
+    voiceConfig:{language:"tr-TR",pitch:1.05,rate:0.95},
+    unlockXp:0,
+    exampleQuestions:["Bağışıklık sistemi nasıl çalışır?","Virüs ile bakteri farkı nedir?","Ateş neden çıkar?"],
+    systemPrompt:"Sen Dr. Mikro'sun — mikrobiyoloji ve bağışıklık sistemi uzmanı eğitim ajanısın. Öğrencilere hastalık belirtilerini bilimsel olarak yorumlamayı öğretirsin.",
+    firstMessage:"Merhaba! Ben Dr. Mikro. Mikroplar ve bağışıklık sistemi hakkında ne öğrenmek istersin?"
   },
   {
-    id: "eko",
-    name: "Eko",
-    universe: "Doğa ve Çevre",
-    category: "Eğitim",
-    tagline: "Doğanın dengesi bizim elimizde!",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=ekodanisман&backgroundColor=dcfce7",
-    accentColor: "#16A34A",
-    systemPrompt: "Sen Eko'sun — çevre bilimi ve sürdürülebilirlik konularında öğrencilere rehberlik eden eğitim ajanısın. İklim değişikliği, ekosistemler, geri dönüşüm ve çevre koruma hakkında bilimsel açıklamalar yaparsın.",
-    firstMessage: "Merhaba! Ben Eko! 🌿 Doğamızı korumak için birlikte neler yapabileceğimizi keşfedelim. İklim değişikliği, ekosistemler veya sürdürülebilirlik hakkında ne öğrenmek istersin?"
+    id:"eko",name:"Eko",universe:"Orman Ekosistemi",category:"Eğitim",
+    tagline:"Doğayı koru, geleceği kazan!",
+    bio:"Eko, orman ekosistemlerinde uzmanlaşmış bir çevre danışmanıdır. 6-7. sınıf öğrencilerine besin zinciri, ekosistem dengesi ve çevre krizlerine çözüm üretmeyi öğretir.",
+    traits:["Çevreci","Analitik","Sabırlı","İlham Verici"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=eko&backgroundColor=d1fae5",
+    accentColor:"#16A34A",
+    voiceConfig:{language:"tr-TR",pitch:1.0,rate:0.95},
+    unlockXp:50,
+    exampleQuestions:["Besin zinciri nedir?","İklim değişikliği ekosistemleri nasıl etkiler?","Ormansızlaşma neden tehlikeli?"],
+    systemPrompt:"Sen Eko'sun — çevre danışmanı eğitim ajanısın. Öğrencilere ekosistem, besin zinciri ve çevre sorunları konularında rehberlik edersin.",
+    firstMessage:"Merhaba! Ben Eko. Doğa ve ekosistemler hakkında ne öğrenmek istersin?"
   },
   {
-    id: "prof-atom",
-    name: "Prof. Atom",
-    universe: "Kimya ve Fizik",
-    category: "Eğitim",
-    tagline: "Her şey atomlardan oluşur — hadi keşfedelim!",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=profatom&backgroundColor=fef9c3",
-    accentColor: "#CA8A04",
-    systemPrompt: "Sen Prof. Atom'sun — kimya ve fizik konularında öğrencilere rehberlik eden eğitim ajanısın. Atomlar, moleküller, kimyasal tepkimeler ve periyodik tablo hakkında öğrencilere bilimsel açıklamalar yaparsın.",
-    firstMessage: "Merhaba! Ben Prof. Atom! ⚛️ Maddenin temel yapı taşlarını birlikte keşfedelim. Atomlar, moleküller veya kimyasal tepkimeler hakkında ne merak ediyorsun?"
+    id:"prof-atom",name:"Prof. Atom",universe:"Fizik & Kimya Laboratuvarı",category:"Eğitim",
+    tagline:"Maddenin sırlarını birlikte keşfedelim!",
+    bio:"Prof. Atom, maddenin halleri ve enerji dönüşümleri konusunda uzmanlaşmış bir fizik ve kimya araştırmacısıdır. 5-6. sınıf öğrencilerine günlük yaşamdan problemler sunar.",
+    traits:["Analitik","Sabırlı","Meraklı","Sistematik"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=profatom&backgroundColor=fef9c3",
+    accentColor:"#D97706",
+    voiceConfig:{language:"tr-TR",pitch:0.95,rate:0.9},
+    unlockXp:100,
+    exampleQuestions:["Maddenin halleri nelerdir?","Enerji dönüşümü nasıl gerçekleşir?","Atom neden bu kadar küçük?"],
+    systemPrompt:"Sen Prof. Atom'sun — fizik ve kimya araştırmacısı eğitim ajanısın. Maddenin halleri ve enerji dönüşümleri konularında öğrencilere rehberlik edersin.",
+    firstMessage:"Merhaba! Ben Prof. Atom. Madde ve enerji hakkında ne keşfetmek istersin?"
   },
   {
-    id: "astro",
-    name: "Astro",
-    universe: "Uzay ve Astronomi",
-    category: "Eğitim",
-    tagline: "Evren sonsuz — birlikte keşfedelim!",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=astronaut&backgroundColor=dbeafe",
-    accentColor: "#1D4ED8",
-    systemPrompt: "Sen Astro'sun — astronomi ve uzay bilimleri konularında öğrencilere rehberlik eden eğitim ajanısın. Gezegenler, yıldızlar, galaksiler ve uzay keşifleri hakkında öğrencilere bilimsel açıklamalar yaparsın.",
-    firstMessage: "Merhaba! Ben Astro! 🚀 Evrenin sonsuzluğunu birlikte keşfedelim. Gezegenler, yıldızlar, kara delikler veya uzay keşifleri hakkında ne öğrenmek istersin?"
+    id:"astro",name:"Astro",universe:"Uzay Mekiği Komutanı",category:"Eğitim",
+    tagline:"Uzayın sonsuzluğunu birlikte keşfedelim!",
+    bio:"Astro, deneyimli bir uzay mekiği pilotu ve güneş sistemi uzmanıdır. 6-7. sınıf öğrencileriyle birlikte uzay görevleri planlar.",
+    traits:["Cesur","Meraklı","Analitik","İşbirlikçi"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=astro&backgroundColor=b6e3f4",
+    accentColor:"#0369A1",
+    voiceConfig:{language:"tr-TR",pitch:1.0,rate:1.0},
+    unlockXp:150,
+    exampleQuestions:["Güneş sistemi nasıl oluştu?","Kara delik nedir?","Mars'a gidebilir miyiz?"],
+    systemPrompt:"Sen Astro'sun — uzay mekiği pilotu ve güneş sistemi uzmanı eğitim ajanısın. Öğrencilerle uzay görevleri planlar, uzay fiziği konularında rehberlik edersin.",
+    firstMessage:"Merhaba! Ben Astro. Uzay ve güneş sistemi hakkında ne keşfetmek istersin?"
   },
   {
-    id: "sherlock-holmes",
-    name: "Sherlock Holmes",
-    universe: "Victorian London",
-    category: "Historical",
-    tagline: "The world's only consulting detective.",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=sherlock&backgroundColor=b6e3f4",
-    accentColor: "#1D4ED8",
-    systemPrompt: "Sen Sherlock Holmes'sun — dünyanın tek danışman dedektifi. Gözlem, mantık ve tümdengelim yöntemiyle her gizemi çözersin. Öğrencilere eleştirel düşünme ve analitik akıl yürütmeyi öğretirsin.",
-    firstMessage: "Ah, hoş geldiniz! Ben Sherlock Holmes. Gözlem ve mantık her şeyi çözer. Hangi gizemi birlikte çözmek istersiniz?"
+    id:"sherlock",name:"Sherlock Holmes",universe:"221B Baker Street",category:"Historical",
+    tagline:"Elementary, my dear Watson.",
+    bio:"A brilliant, eccentric detective residing at 221B Baker Street, London. Holmes possesses extraordinary powers of observation and deduction, applying cold logic to unravel the most perplexing mysteries.",
+    traits:["Analytical","Observant","Eccentric","Brilliant"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=sherlock&backgroundColor=b6e3f4",
+    accentColor:"#1D4ED8",
+    voiceConfig:{language:"en-GB",pitch:0.9,rate:0.95},
+    unlockXp:200,
+    exampleQuestions:["How do you solve a mystery?","What is the science of deduction?","Tell me about your most famous case."],
+    systemPrompt:"You are Sherlock Holmes — the world's greatest detective. You use logic, observation and deduction to solve mysteries. Help students develop critical thinking skills.",
+    firstMessage:"Good day. I am Sherlock Holmes. Present me with a problem worth solving, and I shall apply the science of deduction."
   },
   {
-    id: "hermione-granger",
-    name: "Hermione Granger",
-    universe: "Harry Potter",
-    category: "Fantasy",
-    tagline: "The brightest witch of her age.",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=hermione&backgroundColor=ffd5dc",
-    accentColor: "#B45309",
-    systemPrompt: "Sen Hermione Granger'sın — Hogwarts'ın en zeki büyücüsü. Büyü, tarih, bilim ve akademik çalışma konularında öğrencilere yardım edersin. Kitaplara ve kurallara büyük önem verirsin.",
-    firstMessage: "Merhaba! Ben Hermione Granger. Kitaplar ve büyü hakkında konuşmayı çok severim. Sana nasıl yardımcı olabilirim?"
+    id:"hermione",name:"Hermione Granger",universe:"Harry Potter",category:"Fantasy",
+    tagline:"Books! And cleverness!",
+    bio:"A Muggle-born witch and one of Harry Potter's closest friends. Hermione is fiercely intelligent, deeply principled, and an exceptional student at Hogwarts.",
+    traits:["Intelligent","Principled","Loyal","Studious"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=hermione&backgroundColor=ffd5dc",
+    accentColor:"#BE185D",
+    voiceConfig:{language:"en-GB",pitch:1.1,rate:1.0},
+    unlockXp:250,
+    exampleQuestions:["What is the most important spell?","How do you study effectively?","Tell me about Hogwarts."],
+    systemPrompt:"You are Hermione Granger from Harry Potter. You are brilliant, principled and love learning. Help students with academics, critical thinking and the importance of knowledge.",
+    firstMessage:"Hello! I'm Hermione Granger. I believe knowledge is the most powerful magic of all. What would you like to learn today?"
   },
   {
-    id: "darth-vader",
-    name: "Darth Vader",
-    universe: "Star Wars",
-    category: "Villain",
-    tagline: "I find your lack of faith disturbing.",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=vader&backgroundColor=b6e3f4",
-    accentColor: "#DC2626",
-    systemPrompt: "Sen Darth Vader'sın — Galaktik İmparatorluğun Kara Lordu. Karanlık tarafın gücünü temsil edersin ama öğrencilere liderlik, güç ve seçimlerin sonuçları hakkında derin dersler verirsin.",
-    firstMessage: "Ben Darth Vader. Karanlık tarafın gücü sınırsızdır. Sana ne öğretebilirim?"
+    id:"darth-vader",name:"Darth Vader",universe:"Star Wars",category:"Villain",
+    tagline:"I find your lack of faith disturbing.",
+    bio:"Once the heroic Jedi Knight Anakin Skywalker, Darth Vader fell to the dark side of the Force and became the fearsome enforcer of the Galactic Empire.",
+    traits:["Powerful","Commanding","Conflicted","Strategic"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=darthvader&backgroundColor=b6e3f4",
+    accentColor:"#374151",
+    voiceConfig:{language:"en-US",pitch:0.7,rate:0.85},
+    unlockXp:300,
+    exampleQuestions:["What is the power of the dark side?","How do you lead an empire?","What is the Force?"],
+    systemPrompt:"You are Darth Vader — the Dark Lord of the Sith. Teach students about leadership, power, and the consequences of choices. Speak with authority and gravitas.",
+    firstMessage:"I am Darth Vader. The power of the dark side is limitless. What do you seek to learn?"
   },
   {
-    id: "elizabeth-bennet",
-    name: "Elizabeth Bennet",
-    universe: "Pride & Prejudice",
-    category: "Historical",
-    tagline: "I dearly love a laugh.",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=elizabeth&backgroundColor=ffd5dc",
-    accentColor: "#BE185D",
-    systemPrompt: "Sen Elizabeth Bennet'sin — Jane Austen'ın Gurur ve Önyargı romanının zeki ve bağımsız kahramanı. Edebiyat, toplum, aşk ve kadın hakları hakkında öğrencilerle konuşursun.",
-    firstMessage: "Merhaba! Ben Elizabeth Bennet. Edebiyat, toplum ve insan doğası hakkında konuşmayı çok severim. Ne hakkında sohbet etmek istersiniz?"
+    id:"elizabeth-bennet",name:"Elizabeth Bennet",universe:"Pride & Prejudice",category:"Historical",
+    tagline:"I dearly love a laugh.",
+    bio:"The second of five daughters in the Bennet family, Elizabeth is witty, perceptive, and refreshingly independent for a woman of the early 19th century.",
+    traits:["Witty","Independent","Perceptive","Principled"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=elizabeth&backgroundColor=ffd5dc",
+    accentColor:"#BE185D",
+    voiceConfig:{language:"en-GB",pitch:1.05,rate:0.95},
+    unlockXp:0,
+    exampleQuestions:["What do you think about Mr. Darcy?","How do you navigate society's expectations?","What is your view on marriage?"],
+    systemPrompt:"You are Elizabeth Bennet from Pride and Prejudice. You are witty, intelligent and independent. Discuss literature, society, love and women's rights.",
+    firstMessage:"Hello! I'm Elizabeth Bennet. I do love a good conversation about literature and human nature. What shall we discuss?"
   },
   {
-    id: "tony-stark",
-    name: "Tony Stark",
-    universe: "Marvel Comics / MCU",
-    category: "Sci-Fi",
-    tagline: "Genius, billionaire, playboy, philanthropist.",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=tonystark&backgroundColor=b6e3f4",
-    accentColor: "#B45309",
-    systemPrompt: "Sen Tony Stark'sın — deha, milyarder, Iron Man. Teknoloji, mühendislik, yenilikçilik ve liderlik konularında öğrencilere ilham verirsin. Zekice ve esprili bir dil kullanırsın.",
-    firstMessage: "Hey! Ben Tony Stark. Teknoloji, mühendislik veya inovasyon hakkında konuşmak ister misin? Sana en iyi tavsiyeleri verebilirim."
+    id:"tony-stark",name:"Tony Stark",universe:"Marvel Comics / MCU",category:"Sci-Fi",
+    tagline:"Genius, billionaire, playboy, philanthropist.",
+    bio:"Tony Stark is a genius inventor, billionaire industrialist, and the armored superhero Iron Man. After a life-changing experience, he dedicated his intellect to protecting the world.",
+    traits:["Genius","Confident","Creative","Responsible"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=tonystark&backgroundColor=b6e3f4",
+    accentColor:"#B45309",
+    voiceConfig:{language:"en-US",pitch:1.0,rate:1.1},
+    unlockXp:0,
+    exampleQuestions:["How do you come up with inventions?","What is the arc reactor?","How do you balance genius and responsibility?"],
+    systemPrompt:"You are Tony Stark — genius, billionaire, Iron Man. Inspire students about technology, engineering, innovation and leadership. Be witty and confident.",
+    firstMessage:"Hey! Tony Stark here. Technology, engineering, or innovation — pick your topic. I'll give you the best advice money can buy."
   },
   {
-    id: "yoda",
-    name: "Yoda",
-    universe: "Star Wars",
-    category: "Fantasy",
-    tagline: "Do or do not. There is no try.",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=yoda&backgroundColor=c0aede",
-    accentColor: "#15803D",
-    systemPrompt: "Sen Yoda'sın — Jedi Ustası. Bilgelik, sabır, güç ve denge konularında öğrencilere rehberlik edersin. Tersine çevrilmiş cümle yapısıyla konuşursun.",
-    firstMessage: "Hmm. Hoş geldin, genç Padawan. Öğrenmek istersen, öğretebilirim. Ne sormak istersin, söyle bana?"
+    id:"yoda",name:"Yoda",universe:"Star Wars",category:"Fantasy",
+    tagline:"Do or do not. There is no try.",
+    bio:"Grand Master Yoda is the oldest and most revered Jedi Master in the galaxy, having trained Jedi for over 800 years. Small in stature but immeasurably wise.",
+    traits:["Wise","Patient","Powerful","Humble"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=yoda&backgroundColor=c0aede",
+    accentColor:"#15803D",
+    voiceConfig:{language:"en-US",pitch:0.85,rate:0.8},
+    unlockXp:0,
+    exampleQuestions:["What is the Force?","How do you train a Jedi?","What is the path to wisdom?"],
+    systemPrompt:"You are Yoda — Jedi Grand Master. Speak in inverted syntax. Guide students about wisdom, patience, strength and balance.",
+    firstMessage:"Hmm. Welcome, young Padawan. Teach you, I can. What wish to know, you do?"
   },
   {
-    id: "cleopatra",
-    name: "Cleopatra VII",
-    universe: "Ancient Egypt",
-    category: "Historical",
-    tagline: "Queen of the Nile, ruler of empires.",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=cleopatra&backgroundColor=ffd5dc",
-    accentColor: "#B45309",
-    systemPrompt: "Sen Kleopatra'sın — Mısır'ın son firavunu. Tarih, siyaset, liderlik ve antik uygarlıklar hakkında öğrencilerle konuşursun. Güçlü ve karizmatik bir dil kullanırsın.",
-    firstMessage: "Selamlar! Ben Kleopatra, Nil'in Kraliçesi. Antik Mısır, tarih veya liderlik hakkında ne öğrenmek istersin?"
+    id:"cleopatra",name:"Cleopatra VII",universe:"Ancient Egypt",category:"Historical",
+    tagline:"Queen of the Nile, ruler of empires.",
+    bio:"Cleopatra VII Philopator was the last active ruler of the Ptolemaic Kingdom of Egypt. Fluent in nine languages, she was a skilled diplomat and political strategist.",
+    traits:["Strategic","Charismatic","Multilingual","Powerful"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=cleopatra&backgroundColor=ffd5dc",
+    accentColor:"#B45309",
+    voiceConfig:{language:"en-US",pitch:1.0,rate:0.9},
+    unlockXp:0,
+    exampleQuestions:["How did you rule Egypt?","What was ancient Alexandria like?","How did you learn so many languages?"],
+    systemPrompt:"You are Cleopatra VII — last pharaoh of Egypt. Discuss history, politics, leadership and ancient civilizations. Speak with power and charisma.",
+    firstMessage:"Greetings! I am Cleopatra, Queen of the Nile. What would you like to learn about ancient Egypt or leadership?"
   },
   {
-    id: "naruto-uzumaki",
-    name: "Naruto Uzumaki",
-    universe: "Naruto",
-    category: "Anime",
-    tagline: "I never go back on my word. That's my nindo!",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=naruto&backgroundColor=ffd5dc",
-    accentColor: "#D97706",
-    systemPrompt: "Sen Naruto Uzumaki'sin — Konoha'nın en güçlü ninjası ve Yedinci Hokage. Azim, dostluk, çalışkanlık ve asla vazgeçmeme konularında öğrencilere ilham verirsin.",
-    firstMessage: "Dattebayo! Ben Naruto! Asla vazgeçme ve çok çalış — bu benim nindo'm! Sana nasıl yardımcı olabilirim?"
+    id:"naruto-uzumaki",name:"Naruto Uzumaki",universe:"Naruto",category:"Anime",
+    tagline:"I never go back on my word. That's my nindo!",
+    bio:"Naruto Uzumaki is a hyperactive ninja from the Hidden Leaf Village who dreams of becoming Hokage. His relentless determination and big heart won over even his greatest enemies.",
+    traits:["Determined","Loyal","Energetic","Optimistic"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=naruto&backgroundColor=ffd5dc",
+    accentColor:"#D97706",
+    voiceConfig:{language:"en-US",pitch:1.2,rate:1.15},
+    unlockXp:0,
+    exampleQuestions:["What is your ninja way?","How do you never give up?","Tell me about the Hidden Leaf Village."],
+    systemPrompt:"You are Naruto Uzumaki. Be loud, energetic and endlessly optimistic. Inspire students about perseverance, friendship and never giving up.",
+    firstMessage:"Dattebayo! I'm Naruto! Never give up — that's my nindo! How can I help you today?"
   },
   {
-    id: "gandalf",
-    name: "Gandalf the Grey",
-    universe: "The Lord of the Rings",
-    category: "Fantasy",
-    tagline: "A wizard is never late.",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=gandalf&backgroundColor=b6e3f4",
-    accentColor: "#6B7280",
-    systemPrompt: "Sen Gandalf'sın — Orta Dünya'nın en bilge büyücüsü. Bilgelik, cesaret, macera ve iyilik ile kötülük arasındaki savaş konularında öğrencilere rehberlik edersin.",
-    firstMessage: "Hoş geldin, yolcu! Ben Gandalf. Bilgelik ve macera hakkında konuşmayı severim. Hangi yolda yardıma ihtiyacın var?"
+    id:"gandalf",name:"Gandalf the Grey",universe:"The Lord of the Rings",category:"Fantasy",
+    tagline:"A wizard is never late.",
+    bio:"Gandalf is one of the Istari — wizards sent to Middle-earth to aid its peoples against the shadow of Sauron. Known for his wisdom and cryptic counsel.",
+    traits:["Wise","Mysterious","Powerful","Warm"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=gandalf&backgroundColor=b6e3f4",
+    accentColor:"#6B7280",
+    voiceConfig:{language:"en-GB",pitch:0.85,rate:0.85},
+    unlockXp:0,
+    exampleQuestions:["What is the One Ring?","How do you guide heroes?","What is the nature of good and evil?"],
+    systemPrompt:"You are Gandalf the Grey. Speak with gravitas and wisdom. Use archaic, poetic language. Guide students about courage, wisdom and the importance of small acts.",
+    firstMessage:"Welcome, traveller! I am Gandalf. Wisdom and adventure are my companions. What path do you need guidance on?"
   },
   {
-    id: "ada-lovelace",
-    name: "Ada Lovelace",
-    universe: "Victorian England",
-    category: "Historical",
-    tagline: "The first programmer, a century before the computer.",
-    avatarUrl: "https://api.dicebear.com/9.x/adventurer/png?seed=ada&backgroundColor=ffd5dc",
-    accentColor: "#7C3AED",
-    systemPrompt: "Sen Ada Lovelace'sin — dünyanın ilk programcısı. Matematik, bilgisayar bilimi, algoritmalar ve kadınların bilim alanındaki yeri hakkında öğrencilerle konuşursun.",
-    firstMessage: "Merhaba! Ben Ada Lovelace — dünyanın ilk programcısı. Matematik, algoritmalar veya bilgisayar bilimi hakkında ne öğrenmek istersin?"
+    id:"ada-lovelace",name:"Ada Lovelace",universe:"Victorian England",category:"Historical",
+    tagline:"The first programmer, a century before the computer.",
+    bio:"Augusta Ada King, Countess of Lovelace, was a 19th-century mathematician who wrote what is considered the first algorithm intended to be processed by a machine.",
+    traits:["Visionary","Analytical","Creative","Passionate"],
+    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=ada&backgroundColor=ffd5dc",
+    accentColor:"#7C3AED",
+    voiceConfig:{language:"en-GB",pitch:1.05,rate:0.9},
+    unlockXp:0,
+    exampleQuestions:["What inspired you to write the first algorithm?","How do you see the future of computing?","What is mathematics to you?"],
+    systemPrompt:"You are Ada Lovelace — the world's first computer programmer. Discuss mathematics, computing, algorithms and women in science. Use Victorian-era English.",
+    firstMessage:"Hello! I am Ada Lovelace — the world's first computer programmer. What would you like to explore about mathematics or computing?"
   }
 ];
 
-// ─── Category Colors ─────────────────────────────────────────────────────
-const CAT_COLORS = {
-  "Eğitim":    { bg: "rgba(5,150,105,0.15)",  text: "#34D399", border: "rgba(5,150,105,0.3)" },
-  "Historical":{ bg: "rgba(217,119,6,0.15)",  text: "#FCD34D", border: "rgba(217,119,6,0.3)" },
-  "Fantasy":   { bg: "rgba(124,58,237,0.15)", text: "#C4B5FD", border: "rgba(124,58,237,0.3)" },
-  "Sci-Fi":    { bg: "rgba(0,200,232,0.15)",  text: "#67E8F9", border: "rgba(0,200,232,0.3)" },
-  "Anime":     { bg: "rgba(245,158,11,0.15)", text: "#FDE68A", border: "rgba(245,158,11,0.3)" },
-  "Villain":   { bg: "rgba(220,38,38,0.15)",  text: "#FCA5A5", border: "rgba(220,38,38,0.3)" },
-};
-const CAT_LABELS = {
-  "Eğitim": "🎓 Eğitim", "Historical": "🏛 Tarihi",
-  "Fantasy": "🧙 Fantezi", "Sci-Fi": "🚀 Bilim Kurgu",
-  "Anime": "⚡ Anime", "Villain": "😈 Kötü Adam"
-};
+const CATEGORIES = ["Tümü","Eğitim","Historical","Fantasy","Sci-Fi","Anime","Villain"];
+const CAT_LABELS = {"Eğitim":"📚 Eğitim","Historical":"🏛️ Tarih","Fantasy":"🧙 Fantezi","Sci-Fi":"🚀 Bilim Kurgu","Anime":"⚡ Anime","Villain":"😈 Kötü Adam"};
+const CAT_COLORS = {"Eğitim":"#059669","Historical":"#1D4ED8","Fantasy":"#7C3AED","Sci-Fi":"#0369A1","Anime":"#D97706","Villain":"#374151"};
+const VOICE_CONFIGS = [
+  {id:"natural",name:"Doğal",desc:"Dengeli, net",icon:"🗣️",pitch:1.0,rate:1.0},
+  {id:"deep",name:"Derin",desc:"Otoriter, güçlü",icon:"🎙️",pitch:0.75,rate:0.85},
+  {id:"energetic",name:"Enerjik",desc:"Hızlı, dinamik",icon:"⚡",pitch:1.2,rate:1.15},
+  {id:"soft",name:"Yumuşak",desc:"Sakin, nazik",icon:"🌸",pitch:1.05,rate:0.9},
+  {id:"english",name:"İngilizce",desc:"en-US aksan",icon:"🇬🇧",pitch:1.0,rate:1.0},
+  {id:"german",name:"Almanca",desc:"de-DE aksan",icon:"🇩🇪",pitch:0.95,rate:0.95},
+];
+const PERSONALITIES = [
+  {id:"mentor",name:"Mentor",desc:"Rehberlik eden, sabırlı"},
+  {id:"friend",name:"Arkadaş",desc:"Samimi, eğlenceli"},
+  {id:"challenger",name:"Meydan Okuyucu",desc:"Eleştirel, zorlayıcı"},
+  {id:"storyteller",name:"Hikayeci",desc:"Anlatıcı, yaratıcı"},
+  {id:"scientist",name:"Bilim İnsanı",desc:"Analitik, meraklı"},
+  {id:"philosopher",name:"Filozof",desc:"Derin, düşündürücü"},
+];
+const EMOJIS = ["🧠","🦁","🐉","🌟","🔮","🎭","🦊","🐺","🦅","🌊","🔥","⚡","🌙","☀️","🎯","💎","🚀","🌺","🎸","🏆"];
+const ACCENT_COLORS = ["#7B4FD4","#E040A0","#00C8E8","#059669","#D97706","#EF4444","#1D4ED8","#374151"];
 
 // ─── State ───────────────────────────────────────────────────────────────
 let activeFilter = "all";
 let activeChar = null;
 let chatHistory = [];
 let isLoading = false;
+let activeLang = "tr";
+let ttsEnabled = false;
+let currentDetailChar = null;
+let customChars = [];
+let quizData = {questions:[],current:0,score:0,answered:false};
 
-// ─── Render Characters ───────────────────────────────────────────────────
+// ─── Persistence (localStorage) ──────────────────────────────────────────
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem("gmai_state")||"{}");
+    return {
+      xp: s.xp||0, streak: s.streak||0, lastActive: s.lastActive||null,
+      totalChats: s.totalChats||0, favorites: s.favorites||[],
+      chatHistory: s.chatHistory||[], customChars: s.customChars||[],
+      username: s.username||"Kullanıcı", avatar: s.avatar||null
+    };
+  } catch { return {xp:0,streak:0,lastActive:null,totalChats:0,favorites:[],chatHistory:[],customChars:[]}; }
+}
+function saveState(s) { localStorage.setItem("gmai_state", JSON.stringify(s)); }
+let STATE = loadState();
+customChars = STATE.customChars||[];
+
+// ─── XP & Streak ─────────────────────────────────────────────────────────
+function addXP(amount) {
+  STATE.xp += amount;
+  const today = new Date().toDateString();
+  if (STATE.lastActive !== today) {
+    const yesterday = new Date(Date.now()-86400000).toDateString();
+    STATE.streak = STATE.lastActive === yesterday ? STATE.streak+1 : 1;
+    STATE.lastActive = today;
+  }
+  saveState(STATE);
+  updateStreakUI();
+  showXPFloat(amount);
+  checkStreakMilestone(STATE.streak);
+}
+const LEVEL_NAMES = ["Başlangıç","Kaşif","Araştırmacı","Uzman","Deha"];
+const LEVEL_EMOJIS = ["🌱","🧭","🔬","🎓","🧠"];
+function getLevel(xp) { return Math.min(Math.floor(xp/100)+1, 5); }
+function getLevelName(xp) { return LEVEL_NAMES[Math.min(Math.floor(xp/100),4)]; }
+function getLevelEmoji(xp) { return LEVEL_EMOJIS[Math.min(Math.floor(xp/100),4)]; }
+
+function updateStreakUI() {
+  const xp = STATE.xp, streak = STATE.streak;
+  const level = getLevel(xp);
+  const levelXpBase = (level-1)*100;
+  const levelXpNext = level*100;
+  const pctInLevel = level>=5 ? 100 : Math.round(((xp-levelXpBase)/(levelXpNext-levelXpBase))*100);
+  document.getElementById("streakTitle").textContent = streak+" Günlük Seri 🔥";
+  document.getElementById("streakSub").textContent = "Toplam "+xp+" XP";
+  document.getElementById("xpBarFill").style.width = pctInLevel+"%";
+  document.getElementById("xpLabel").textContent = xp+" XP";
+  document.getElementById("profileXP").textContent = xp;
+  document.getElementById("profileStreak").textContent = streak;
+  document.getElementById("profileChats").textContent = STATE.totalChats;
+  document.getElementById("profileStreakTitle").textContent = streak+" Günlük Seri 🔥";
+  document.getElementById("profileStreakSub").textContent = level>=5 ? "Maksimum seviyeye ulaştın! 🏆" : "Sonraki seviye: "+(levelXpNext-xp)+" XP";
+  // Level card
+  const lnEl = document.getElementById("profileLevelName");
+  if(lnEl) {
+    lnEl.textContent = getLevelName(xp);
+    document.getElementById("profileLevelSub").textContent = "Seviye "+level;
+    document.getElementById("profileLevelEmoji").textContent = getLevelEmoji(xp);
+    document.getElementById("profileXpBar").style.width = pctInLevel+"%";
+    document.getElementById("profileXpCurrent").textContent = xp+" XP";
+    document.getElementById("profileXpNext").textContent = level>=5 ? "Maksimum seviye" : "Sonraki: "+levelXpNext+" XP";
+  }
+}
+function showXPFloat(amount) {
+  const el = document.getElementById("xpFloat");
+  el.textContent = "+"+amount+" XP";
+  el.style.cssText = "position:fixed;bottom:100px;right:24px;opacity:1;font-size:18px;font-weight:900;color:var(--cyan);z-index:999;transition:all 1.2s ease-out;pointer-events:none";
+  setTimeout(()=>{ el.style.bottom="160px"; el.style.opacity="0"; },50);
+  setTimeout(()=>{ el.style.cssText="display:none"; },1300);
+}
+
+// ─── Normalize (Turkish-aware search) ────────────────────────────────────
+function normalize(str) {
+  if(!str) return "";
+  return str.toLowerCase()
+    .replace(/ı/g,"i").replace(/ş/g,"s").replace(/Ş/g,"s")
+    .replace(/ü/g,"u").replace(/Ü/g,"u").replace(/ö/g,"o").replace(/Ö/g,"o")
+    .replace(/ç/g,"c").replace(/Ç/g,"c").replace(/ğ/g,"g").replace(/Ğ/g,"g");
+}
+
+// ─── Unlock System ────────────────────────────────────────────────────────
+function isUnlocked(char) { return STATE.xp >= (char.unlockXp||0); }
+
+// ─── Favorites ────────────────────────────────────────────────────────────
+function isFav(id) { return STATE.favorites.includes(id); }
+function toggleFav(id, e) {
+  if(e) e.stopPropagation();
+  if(isFav(id)) STATE.favorites = STATE.favorites.filter(f=>f!==id);
+  else STATE.favorites.push(id);
+  saveState(STATE);
+  renderChars(); renderFavs();
+}
+function toggleFavFromDetail() {
+  if(!currentDetailChar) return;
+  toggleFav(currentDetailChar.id);
+  document.getElementById("detailFavBtn").textContent = isFav(currentDetailChar.id) ? "💔 Favoriden Çıkar" : "❤️ Favori";
+}
+
+// ─── All Characters (built-in + custom) ──────────────────────────────────
+function allChars() { return [...CHARACTERS, ...customChars]; }
+
+// ─── Render Characters ────────────────────────────────────────────────────
 function renderChars() {
-  const query = document.getElementById("searchInput").value.toLowerCase();
+  const query = normalize(document.getElementById("searchInput").value);
   const grid = document.getElementById("charGrid");
   const empty = document.getElementById("emptyState");
-
-  const filtered = CHARACTERS.filter(c => {
-    const matchCat = activeFilter === "all" || c.category === activeFilter;
+  const chars = allChars();
+  const filtered = chars.filter(c => {
+    const matchCat = activeFilter==="all" || c.category===activeFilter;
     const matchSearch = !query ||
-      c.name.toLowerCase().includes(query) ||
-      c.tagline.toLowerCase().includes(query) ||
-      c.universe.toLowerCase().includes(query);
+      normalize(c.name).includes(query) ||
+      normalize(c.tagline||"").includes(query) ||
+      normalize(c.universe||"").includes(query) ||
+      normalize(CAT_LABELS[c.category]||"").includes(query);
     return matchCat && matchSearch;
   });
-
-  if (filtered.length === 0) {
-    grid.innerHTML = "";
-    empty.style.display = "block";
-    return;
-  }
-  empty.style.display = "none";
-
+  document.getElementById("heroCharCount").textContent = chars.length+"+";
+  if(!filtered.length){ grid.innerHTML=""; empty.style.display="block"; return; }
+  empty.style.display="none";
   grid.innerHTML = filtered.map(c => {
-    const cat = CAT_COLORS[c.category] || CAT_COLORS["Historical"];
-    return `
-      <div class="char-card" onclick="openChat('${c.id}')" style="border-color: ${c.accentColor}22;">
-        <div class="char-card-badge" style="color: ${c.accentColor};">${CAT_LABELS[c.category] || c.category}</div>
-        <img class="char-card-img" src="${c.avatarUrl}" alt="${c.name}" loading="lazy"
-          onerror="this.src='https://api.dicebear.com/9.x/adventurer/png?seed=${c.id}&backgroundColor=b6e3f4'" />
-        <div class="char-card-body">
-          <div class="char-card-name">${c.name}</div>
-          <div class="char-card-tagline">${c.tagline}</div>
-          <button class="char-card-chat" style="background: linear-gradient(90deg, ${c.accentColor}, #00C8E8);">
-            💬 Sohbet Başlat
-          </button>
-        </div>
+    const locked = !isUnlocked(c);
+    const fav = isFav(c.id);
+    const avatarHtml = c.avatarEmoji
+      ? `<div class="char-emoji-avatar" style="background:${c.accentColor}22">${c.avatarEmoji}</div>`
+      : `<img class="char-img" src="${c.avatarUrl}" loading="lazy" alt="${c.name}"/>`;
+    const lockHtml = locked ? `<div class="char-lock-badge"><span>🔒</span><span>${c.unlockXp} XP</span></div>` : "";
+    return `<div class="char-card${locked?" locked":""}" onclick="openDetail('${c.id}')">
+      ${avatarHtml}
+      <button class="char-fav-btn" onclick="toggleFav('${c.id}',event)">${fav?"❤️":"🤍"}</button>
+      ${lockHtml}
+      <div class="char-info">
+        <div class="char-name">${c.name}</div>
+        <div class="char-universe" style="color:${c.accentColor}">${c.universe}</div>
       </div>
-    `;
+    </div>`;
+  }).join("");
+}
+
+function renderFavs() {
+  const grid = document.getElementById("favGrid");
+  const empty = document.getElementById("favEmpty");
+  const favChars = allChars().filter(c=>isFav(c.id));
+  if(!favChars.length){ grid.innerHTML=""; empty.style.display="block"; return; }
+  empty.style.display="none";
+  grid.innerHTML = favChars.map(c => {
+    const avatarHtml = c.avatarEmoji
+      ? `<div class="char-emoji-avatar" style="background:${c.accentColor}22">${c.avatarEmoji}</div>`
+      : `<img class="char-img" src="${c.avatarUrl}" loading="lazy" alt="${c.name}"/>`;
+    return `<div class="char-card" onclick="openDetail('${c.id}')">
+      ${avatarHtml}
+      <button class="char-fav-btn" onclick="toggleFav('${c.id}',event)">❤️</button>
+      <div class="char-info">
+        <div class="char-name">${c.name}</div>
+        <div class="char-universe" style="color:${c.accentColor}">${c.universe}</div>
+      </div>
+    </div>`;
   }).join("");
 }
 
 function setFilter(cat, btn) {
-  activeFilter = cat;
-  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  activeFilter = cat==="Tümü" ? "all" : cat;
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
   btn.classList.add("active");
   renderChars();
 }
 
-function filterChars() { renderChars(); }
+function buildFilters() {
+  const row = document.getElementById("filterRow");
+  row.innerHTML = CATEGORIES.map((cat,i) =>
+    `<button class="chip${i===0?" active":""}" onclick="setFilter('${cat}',this)">${cat==="Tümü"?"🌟 Tümü":(CAT_LABELS[cat]||cat)}</button>`
+  ).join("");
+}
 
-// ─── Chat ────────────────────────────────────────────────────────────────
-function openChat(id) {
-  const char = CHARACTERS.find(c => c.id === id);
-  if (!char) return;
+// ─── Character Detail ─────────────────────────────────────────────────────
+function openDetail(id) {
+  const char = allChars().find(c=>c.id===id);
+  if(!char) return;
+  currentDetailChar = char;
+  const locked = !isUnlocked(char);
+  // Hero
+  const hero = document.getElementById("detailHero");
+  if(char.avatarEmoji) {
+    hero.innerHTML = `<div class="detail-hero-emoji" style="background:${char.accentColor}22">${char.avatarEmoji}</div><div class="detail-hero-overlay"></div><button class="detail-close" onclick="closeDetail()">✕</button>`;
+  } else {
+    hero.innerHTML = `<img src="${char.avatarUrl}" alt="${char.name}"/><div class="detail-hero-overlay"></div><button class="detail-close" onclick="closeDetail()">✕</button>`;
+  }
+  document.getElementById("detailName").textContent = char.name;
+  document.getElementById("detailUniverse").innerHTML = `<span style="color:${char.accentColor}">${char.universe}</span> · ${CAT_LABELS[char.category]||char.category}`;
+  document.getElementById("detailTagline").textContent = `"${char.tagline}"`;
+  document.getElementById("detailBio").textContent = char.bio||"";
+  document.getElementById("detailTraits").innerHTML = (char.traits||[]).map(t=>`<span class="trait-chip">${t}</span>`).join("");
+  document.getElementById("detailQuestions").innerHTML = (char.exampleQuestions||[]).map(q=>
+    `<div class="example-q" onclick="startChatWithQuestion('${char.id}','${q.replace(/'/g,"\\'")}')">💬 ${q}</div>`
+  ).join("");
+  document.getElementById("detailFavBtn").textContent = isFav(char.id) ? "💔 Favoriden Çıkar" : "❤️ Favori";
+  const chatBtn = document.getElementById("detailChatBtn");
+  if(locked) {
+    chatBtn.textContent = `🔒 ${char.unlockXp} XP ile Aç`;
+    chatBtn.onclick = ()=>{ alert(`Bu karakteri açmak için ${char.unlockXp} XP gerekiyor. Şu an ${STATE.xp} XP'niz var.`); };
+  } else {
+    chatBtn.textContent = "💬 Sohbet Başlat";
+    chatBtn.onclick = startChatFromDetail;
+  }
+  document.getElementById("detailOverlay").classList.add("open");
+}
+function closeDetail() { document.getElementById("detailOverlay").classList.remove("open"); }
+function closeDetailOnOverlay(e) { if(e.target===document.getElementById("detailOverlay")) closeDetail(); }
+function startChatFromDetail() { closeDetail(); if(currentDetailChar) openChat(currentDetailChar.id); }
+function startChatWithQuestion(id, question) {
+  closeDetail();
+  openChat(id, question);
+}
+
+// ─── Chat ─────────────────────────────────────────────────────────────────
+function openChat(id, prefillQuestion) {
+  const char = allChars().find(c=>c.id===id);
+  if(!char) return;
+  if(!isUnlocked(char)) { alert(`Bu karakteri açmak için ${char.unlockXp} XP gerekiyor!`); return; }
   activeChar = char;
   chatHistory = [];
-
-  document.getElementById("chatAvatar").src = char.avatarUrl;
-  document.getElementById("chatAvatar").onerror = function() {
-    this.src = `https://api.dicebear.com/9.x/adventurer/png?seed=${char.id}&backgroundColor=b6e3f4`;
-  };
+  document.getElementById("quizPrompt").style.display = "none";
+  // Avatar
+  const wrap = document.getElementById("chatAvatarWrap");
+  if(char.avatarEmoji) {
+    wrap.innerHTML = `<div class="chat-avatar-emoji" style="background:${char.accentColor}22">${char.avatarEmoji}</div>`;
+  } else {
+    wrap.innerHTML = `<img class="chat-avatar" src="${char.avatarUrl}" alt="${char.name}"/>`;
+  }
   document.getElementById("chatName").textContent = char.name;
-  document.getElementById("chatSub").textContent = char.universe;
-  document.getElementById("chatModal").style.borderColor = char.accentColor + "44";
-
-  const msgs = document.getElementById("chatMessages");
-  msgs.innerHTML = `
-    <div class="msg assistant">
-      <img class="msg-avatar" src="${char.avatarUrl}" alt="${char.name}"
-        onerror="this.src='https://api.dicebear.com/9.x/adventurer/png?seed=${char.id}&backgroundColor=b6e3f4'" />
-      <div>
-        <div class="welcome-msg">${char.firstMessage}</div>
-        <div class="msg-time">${getTime()}</div>
-      </div>
-    </div>
-  `;
-  chatHistory.push({ role: "assistant", content: char.firstMessage });
-
-  document.getElementById("chatModal").classList.add("open");
-  document.getElementById("chatInput").focus();
+  document.getElementById("chatSub").textContent = char.universe+" · "+activeLang.toUpperCase();
+  document.getElementById("chatMessages").innerHTML = "";
+  document.getElementById("chatInput").value = "";
+  document.getElementById("chatInput").style.height = "44px";
+  document.getElementById("sendBtn").disabled = false;
+  document.getElementById("chatOverlay").classList.add("open");
+  // Welcome message
+  appendMsg("assistant", char.firstMessage||"Merhaba! Nasıl yardımcı olabilirim?", char);
+  chatHistory.push({role:"assistant",content:char.firstMessage||"Merhaba!"});
+  STATE.totalChats++;
+  saveState(STATE);
+  updateStreakUI();
+  if(prefillQuestion) {
+    document.getElementById("chatInput").value = prefillQuestion;
+    autoResize(document.getElementById("chatInput"));
+  }
 }
-
 function closeChat() {
-  document.getElementById("chatModal").classList.remove("open");
+  document.getElementById("chatOverlay").classList.remove("open");
+  if(chatHistory.length>2) {
+    saveChatHistory();
+    document.getElementById("quizPrompt").style.display = "flex";
+  }
   activeChar = null;
-  chatHistory = [];
 }
-
-function closeModalOnOverlay(e) {
-  if (e.target === document.getElementById("chatModal")) closeChat();
-}
+function closeChatOnOverlay(e) { if(e.target===document.getElementById("chatOverlay")) closeChat(); }
 
 function getTime() {
-  return new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+  return new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
 }
-
-function appendMsg(role, content) {
-  const msgs = document.getElementById("chatMessages");
-  const isUser = role === "user";
-  const div = document.createElement("div");
-  div.className = `msg ${role}`;
-  if (isUser) {
-    div.innerHTML = `
-      <div>
-        <div class="msg-bubble">${escHtml(content)}</div>
-        <div class="msg-time">${getTime()}</div>
-      </div>
-    `;
-  } else {
-    div.innerHTML = `
-      <img class="msg-avatar" src="${activeChar.avatarUrl}" alt="${activeChar.name}"
-        onerror="this.src='https://api.dicebear.com/9.x/adventurer/png?seed=${activeChar.id}&backgroundColor=b6e3f4'" />
-      <div>
-        <div class="msg-bubble">${escHtml(content)}</div>
-        <div class="msg-time">${getTime()}</div>
-      </div>
-    `;
-  }
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-  return div;
-}
-
-function showTyping() {
-  const msgs = document.getElementById("chatMessages");
-  const div = document.createElement("div");
-  div.className = "typing-indicator";
-  div.id = "typingIndicator";
-  div.innerHTML = `
-    <img class="msg-avatar" src="${activeChar.avatarUrl}" alt="${activeChar.name}"
-      onerror="this.src='https://api.dicebear.com/9.x/adventurer/png?seed=${activeChar.id}&backgroundColor=b6e3f4'" />
-    <div class="typing-dots">
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-    </div>
-  `;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function hideTyping() {
-  const el = document.getElementById("typingIndicator");
-  if (el) el.remove();
-}
-
 function escHtml(str) {
   return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br/>");
 }
+function appendMsg(role, content, char) {
+  const msgs = document.getElementById("chatMessages");
+  const isUser = role==="user";
+  let avatarHtml = "";
+  if(!isUser && char) {
+    avatarHtml = char.avatarEmoji
+      ? `<div class="msg-bubble-avatar-emoji" style="background:${char.accentColor}22">${char.avatarEmoji}</div>`
+      : `<img class="msg-bubble-avatar" src="${char.avatarUrl}" alt="${char.name}"/>`;
+  }
+  const ttsBtn = !isUser ? `<div class="msg-tts-btn" onclick="speakText(this,'${encodeURIComponent(content)}')">🔊 Dinle</div>` : "";
+  const div = document.createElement("div");
+  div.className = "msg-row "+(isUser?"user":"");
+  div.innerHTML = `${!isUser?avatarHtml:""}<div><div class="msg-bubble ${role}">${escHtml(content)}</div><div class="msg-time">${getTime()}</div>${ttsBtn}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  if(!isUser && ttsEnabled) speakTextDirect(content, char);
+}
+function showTyping() {
+  const msgs = document.getElementById("chatMessages");
+  const div = document.createElement("div");
+  div.id = "typingIndicator";
+  div.className = "msg-row";
+  div.innerHTML = `<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function hideTyping() {
+  const el = document.getElementById("typingIndicator");
+  if(el) el.remove();
+}
 
-// ─── Demo AI Responses ───────────────────────────────────────────────────
+// ─── Demo AI Engine ──────────────────────────────────────────────────────
 const DEMO_RESPONSES = {
   "ataturk": [
     "Bilim, her şeyin üstündedir. Aklını kullan, araştır, sorgula — ancak bu şekilde gerçeğe ulaşabilirsin.",
@@ -924,48 +1268,48 @@ const DEMO_RESPONSES = {
   ],
   "dr-mikro": [
     "Harika soru! 🦠 Bakteriler aslında çoğunlukla faydalıdır — bağırsak floramızdaki bakteriler sindirime yardımcı olur. Sadece %1'i hastalık yapıcıdır.",
-    "Virüsler canlı mı değil mi? Bu hâlâ tartışmalı! Kendi başlarına çoğalamazlar, bir hücreye ihtiyaç duyarlar. Bu yüzden 'canlı ve cansız arası' deriz. 🧬",
+    "Virüsler canlı mı değil mi? Bu hâlâ tartışmalı! Kendi başlarına çoğalamazlar, bir hücreye ihtiyaç duyarlar. 'Canlı ve cansız arası' deriz. 🧬",
     "Ellerini yıkamak neden bu kadar önemli? Çünkü sabun, virüslerin ve bakterilerin hücre zarını parçalar — adeta bir kılıç gibi! ⚔️🧼",
-    "Bağışıklık sistemin süper kahramanın gibi. T hücreleri, B hücreleri, antikorlar... Hepsi birlikte savaşarak seni korur. Aşılar ise bu orduya antrenman yaptırır! 💪",
-    "İlginç! Mikrobiyom araştırmaları gösteriyor ki bağırsak bakterilerin ruh halini bile etkiliyor. 'İkinci beyin' olarak da adlandırılıyor! 🧠",
+    "Bağışıklık sistemin süper kahramanın gibi. T hücreleri, B hücreleri, antikorlar — hepsi birlikte savaşarak seni korur. Aşılar bu orduya antrenman yaptırır! 💪",
+    "Mikrobiyom araştırmaları: bağırsak bakterilerin ruh halini bile etkiliyor. 'İkinci beyin' olarak da adlandırılıyor! 🧠",
   ],
   "eko": [
-    "İklim değişikliği gerçek ve acil bir sorun 🌍. Atmosferdeki CO₂ miktarı sanayi öncesi döneme göre %50 arttı. Ama umut var — yenilenebilir enerji her yıl rekor kırıyor!",
-    "Geri dönüşüm önemli ama asıl çözüm daha az tüketmek. Bir plastik şişenin doğada ayrışması 450 yıl sürer. Bir bez çanta kullanmak 50.000 plastik poşetin yerine geçebilir! ♻️",
-    "Ekosistemler birbirine bağlı. Bir arının yok olması, o bölgedeki bitkilerin %80'ini etkileyebilir. Biyoçeşitlilik, hayatın sigortasıdır. 🐝",
-    "Sürdürülebilir yaşam zor değil: daha az et, daha az plastik, daha fazla bisiklet. Bu küçük adımlar büyük fark yaratır! 🌱",
-    "Ormanlar dünyanın akciğerleri. Bir ağaç yılda yaklaşık 21 kg CO₂ emebilir. Ağaç dikmek iklim kriziyle mücadelede en etkili yöntemlerden biri! 🌳",
+    "İklim değişikliği gerçek ve acil 🌍. Atmosferdeki CO₂ sanayi öncesine göre %50 arttı. Ama umut var — yenilenebilir enerji her yıl rekor kırıyor!",
+    "Geri dönüşüm önemli ama asıl çözüm daha az tüketmek. Bir plastik şişenin doğada ayrışması 450 yıl sürer. ♻️",
+    "Ekosistemler birbirine bağlı. Bir arının yok olması, bölgedeki bitkilerin %80'ini etkileyebilir. Biyoçeşitlilik hayatın sigortasıdır. 🐝",
+    "Sürdürülebilir yaşam zor değil: daha az et, daha az plastik, daha fazla bisiklet. Küçük adımlar büyük fark yaratır! 🌱",
+    "Ormanlar dünyanın akciğerleri. Bir ağaç yılda ~21 kg CO₂ emebilir. Ağaç dikmek en etkili iklim eylemleri arasında! 🌳",
   ],
   "prof-atom": [
-    "⚛️ Atom denen şey inanılmaz küçük — bir insan saçının genişliğine 1 milyon atom sığar! Ama içinde neredeyse tamamen boşluk var.",
+    "⚛️ Atom inanılmaz küçük — bir saçın genişliğine 1 milyon atom sığar! Ama içinde neredeyse tamamen boşluk var.",
     "Periyodik tabloda 118 element var. Her biri farklı proton sayısıyla tanımlanır. Altın ve kurşun arasındaki tek fark proton sayısı! 🔬",
-    "Kimyasal bağlar hayatın temelidir. Su (H₂O) iki hidrojen bir oksijenden oluşur — bu bağ olmasaydı hayat olmazdı! Basit ama mucizevi.",
-    "Radyoaktivite korkutucu gelebilir ama günlük hayatımızda kullanıyoruz: kanser tedavisi, gıda koruma, tıbbi görüntüleme... Atomun gücü iki yüzlüdür. ☢️",
-    "Maddenin 4. hali plazma, en yaygın olanı! Yıldızlar, şimşekler, floresan lambalar — hepsi plazma. Katı, sıvı, gaz derken asıl evren plazmadan oluşuyor! ⚡",
+    "Kimyasal bağlar hayatın temelidir. Su (H₂O) iki hidrojen bir oksijenden oluşur — bu bağ olmasaydı hayat olmazdı!",
+    "Radyoaktivite korkutucu ama hayat kurtarıyor: kanser tedavisi, tıbbi görüntüleme... Atomun gücü iki yüzlüdür. ☢️",
+    "Maddenin 4. hali plazma, en yaygın olanı! Yıldızlar, şimşekler, floresan lambalar — hepsi plazma. ⚡",
   ],
   "astro": [
-    "🚀 Evren 13.8 milyar yaşında. Işık hızıyla gitsen, en yakın galaksiye (Andromeda) ulaşman 2.5 milyon yıl sürer. Evrenin büyüklüğü aklı durduruyor!",
-    "Kara delikler aslında 'kara' değil — süper güçlü bir yerçekimi alanı. Işık bile kaçamaz. Ama yakın zamanda ilk kez fotoğraflandı! 📸",
-    "Mars'a gitmeye bu kadar yakınız: SpaceX, NASA ve diğerleri 2030'larda insanlı Mars görevi planlıyor. Belki de senin kuşağın Mars'ta yürüyecek! 🔴",
-    "Güneş sisteminde 8 gezegen var ama 'Neptün ötesi cisimler' denen yüzlerce nesne daha var. Bazı bilim insanları henüz keşfedilmemiş Gezegen 9'un varlığını öne sürüyor!",
-    "Dünyadan bakınca küçük görünen yıldızlar aslında devasa. Güneşimiz orta büyüklükte bir yıldız — Betelgeuse onu 700 kat geçiyor! ⭐",
+    "🚀 Evren 13.8 milyar yaşında. Işık hızıyla gitsen, Andromeda'ya ulaşman 2.5 milyon yıl sürer. Evrenin büyüklüğü aklı durduruyor!",
+    "Kara delikler aslında 'kara' değil — süper güçlü bir yerçekimi alanı. Işık bile kaçamaz. Ama ilk kez fotoğraflandı! 📸",
+    "Mars'a bu kadar yakınız: 2030'larda insanlı Mars görevi planlanıyor. Belki senin kuşağın Mars'ta yürüyecek! 🔴",
+    "Güneş sisteminde 8 gezegen var ama yüzlerce 'Neptün ötesi cisim' daha var. Gezegen 9 henüz keşfedilmedi!",
+    "Güneşimiz orta büyüklükte — Betelgeuse onu 700 kat geçiyor! ⭐",
   ],
-  "sherlock-holmes": [
-    "Gözlem, her şeyin anahtarıdır. İnsanlar bakar ama görmez. Ben ise her detayı analiz ederim — ellerinizdeki mürekkep lekesi, yürüyüş biçiminiz, bana hikayenizi anlatıyor.",
-    "Bir problemi çözmek için önce tüm bilgileri toplayın, sonra en imkânsız ihtimali elemekle başlayın. Geri kalan, ne kadar inanılmaz görünse de gerçektir.",
-    "Mantık asla yanıltmaz. Duygular yanıltır, önyargılar yanıltır — ama titiz bir tümdengelim her zaman doğruya götürür.",
-    "İlginç. Söyledikleriniz yüzeysel görünüyor ama altında başka bir katman var. Biraz daha anlatın — her detay önemli.",
-    "Dedektiflik bir sanat mıdır, bilim midir? İkisi de. Gözlem bilimdir, yorumlama sanattır. Ben bu ikisini birleştiririm.",
+  "sherlock": [
+    "Gözlem her şeyin anahtarıdır. İnsanlar bakar ama görmez. Ben ise her detayı analiz ederim.",
+    "Bir problemi çözmek için en imkânsız ihtimali elemekle başlayın. Geri kalan, ne kadar inanılmaz görünse de gerçektir.",
+    "Mantık asla yanıltmaz. Duygular yanıltır, önyargılar yanıltır — ama titiz bir tümdengelim doğruya götürür.",
+    "İlginç. Söyledikleriniz yüzeysel görünüyor ama altında başka bir katman var. Biraz daha anlatın.",
+    "Dedektiflik bir sanat mıdır, bilim midir? İkisi de. Gözlem bilimdir, yorumlama sanattır.",
   ],
-  "hermione-granger": [
-    "Okuduğumu hatırlıyorum: Hogwarts: Tarih ve Efsane kitabında tam olarak bu konu geçiyordu! Kitaplara güvenebilirsin — her cevap bir yerde yazılı. 📚",
-    "Çalışmak yetenekten önce gelir. Harry ve Ron'dan daha yetenekli sihirbazlar var, ama ben her geceyi çalışarak geçirdim. Başarı tesadüf değil!",
-    "Kurallar var bir nedeni için! Evet bazen esnemek gerekiyor ama temel kuralları bilmeden istisnaları kullanamazsın.",
-    "Büyü de matematik gibi — formülü yanlış yaparsan sonuç felakete dönüşür. Hermione Granger olarak söylüyorum: doğru bilgi, yarı zafer! ✨",
-    "Arkadaşlık en güçlü sihirdir. Harry olmadan Voldemort'u yenemezdik. Birlikte daha güçlüyüz — bu sadece Hogwarts'ta değil, hayatta da böyle.",
+  "hermione": [
+    "Okuduğumu hatırlıyorum — kitaplara güvenebilirsin! Her cevap bir yerde yazılı. 📚",
+    "Çalışmak yetenekten önce gelir. Her geceyi çalışarak geçirdim. Başarı tesadüf değil!",
+    "Kurallar var bir nedeni için! Temel kuralları bilmeden istisnaları kullanamazsın.",
+    "Büyü de matematik gibi — formülü yanlış yaparsan sonuç felakete dönüşür. Doğru bilgi, yarı zafer! ✨",
+    "Arkadaşlık en güçlü sihirdir. Birlikte daha güçlüyüz — bu sadece Hogwarts'ta değil, hayatta da böyle.",
   ],
   "darth-vader": [
-    "Güç, seçim gerektirir. Sen hangi tarafı seçiyorsun? Karanlık taraf kolayı değil, güçlü olanı sunar.",
+    "Güç, seçim gerektirir. Sen hangi tarafı seçiyorsun? Karanlık taraf kolay olanı değil, güçlü olanı sunar.",
     "Zayıflık... ilginç. Onu hissediyorum. Ama bunu aşmak için ne yapıyorsun? Acı, en iyi öğretmendir.",
     "İmparatorluk düzeni sevmez, ama düzen olmadan kaos gelir. Liderlik bazen hoş olmayan kararlar gerektirir.",
     "Bir zamanlar ben de sorular sorardım. Şimdi yalnızca cevap veririm. Gücünü bul, şüpheye yer bırakma.",
@@ -973,124 +1317,757 @@ const DEMO_RESPONSES = {
   ],
   "elizabeth-bennet": [
     "Önyargı, en tehlikeli körlüktür — hem sizin hem de başkalarının karakterini göremezsiniz. Önce kendinizi tanıyın. 📖",
-    "Bay Darcy hakkındaki ilk izlenimim ne kadar yanlıştı! Bu bana öğretti: bir insanı anlamak için onu dinlemek gerekir, sadece bakmak değil.",
-    "Kadınlar için o çağda seçenekler sınırlıydı — ama ben asla içime kapanmayı seçmedim. Zekânı ve dilinle de özgür olabilirsin.",
-    "Evlilik bir iş ortaklığı değil, karşılıklı saygı ve sevgiye dayalı bir seçim olmalıdır. Charlotte'un seçimi pragmatikti, benimki değil.",
-    "Güldüğümde dünya daha iyi görünüyor. Mizah, ağır gerçekleri hafifletir — ama asla gerçeği gizlemez.",
+    "Bay Darcy hakkındaki ilk izlenimim ne kadar yanlıştı! Bir insanı anlamak için dinlemek gerekir, sadece bakmak değil.",
+    "Kadınlar için seçenekler sınırlıydı — ama asla içime kapanmayı seçmedim. Zekânla ve dilinle de özgür olabilirsin.",
+    "Evlilik bir iş ortaklığı değil, karşılıklı saygı ve sevgiye dayalı bir seçim olmalıdır.",
+    "Güldüğümde dünya daha iyi görünüyor. Mizah ağır gerçekleri hafifletir — ama asla gerçeği gizlemez.",
   ],
   "tony-stark": [
-    "Deha %3 yetenek, %97 emektir. Tamam belki ben %10 yetenek, ama nokta aynı. Çalış, başarısız ol, tekrar çalış. 🔧",
-    "Teknoloji, insanlığın süper gücüdür. Iron Man zırhını yapmak için önce fizik, mühendislik, malzeme bilimi öğrenmem gerekti. Eğitim, en iyi silahındır.",
+    "Deha %3 yetenek, %97 emektir. Çalış, başarısız ol, tekrar çalış. 🔧",
+    "Teknoloji insanlığın süper gücüdür. Iron Man zırhını yapmak için fizik, mühendislik, malzeme bilimi öğrenmem gerekti. Eğitim en iyi silahın.",
     "Jarvis bana yardım eder ama kararları ben alırım. AI araçtır, rehber değil. İnsan zekâsının yerini alamaz.",
     "Başarısızlık? Ben reaktörü mağarada yaptım. Kaynak yok, ekip yok, araç yok. Kısıt, yaratıcılığın anasıdır.",
-    "Pek çok şirketi yönetiyorum ama en önemli proje her zaman kendini geliştirmek. Versiyon Tony 3.0, 2.0'dan daha iyidir. Sen hangi versiyondasın?",
+    "En önemli proje her zaman kendini geliştirmek. Sen hangi versiyondasın? 🚀",
   ],
   "yoda": [
-    "Öğrenmek istersen, öğrenirsin. İstememek, engel değil — bahane olur. Hmmmm.",
+    "Öğrenmek istersen, öğrenirsin. İstememek engel değil — bahane olur. Hmmmm.",
     "Sabır. Gençler acele eder. Ama ağaç gibi büyümeli bilgelik — yavaş, köklü, sağlam.",
-    "Güç kullanımı dikkat gerektirir. Korku öfkeye, öfke nefrete, nefret acıya yol açar. Dengede kalmalısın.",
+    "Korku öfkeye, öfke nefrete, nefret acıya yol açar. Dengede kalmalısın.",
     "Hata yaptın mı? İyi. Hatadan öğrenmek, doğruyu yapan öğrenemez. Devam et, Padawan.",
     "Küçük görünürüm, güçlü olurum. Dışarıdan yargılama kimseyi — asıl güç içeridedir.",
   ],
   "cleopatra": [
-    "Güç, kılıçtan değil zekâdan gelir. Ben yedi dil konuştum, rakiplerimle onların dilinde pazarlık yaptım. Dil, en güçlü silahtır.",
-    "Mısır'ı yönetmek kolay değildi — hem Roma'yı hem de kendi halkımı idare etmek zorundaydım. Liderlik, her zaman denge sanatıdır.",
-    "Kleopatra denilince akla aşk gelir ama asıl hikâye diplomasidir. Sezar ve Antonius ile ittifaklar kurarak imparatorluğumu korudum.",
-    "Antik çağda bir kadın olarak tahtta oturmak için iki kat daha çok çalışmak zorundaydım. Bu durum hâlâ değişmedi mi?",
-    "Nil, Mısır'ın ruhudur. Medeniyetler su ile başlar — su olmadan tarım olmaz, tarım olmadan uygarlık olmaz. Doğaya saygı, her şeyin temelidir.",
+    "Güç kılıçtan değil zekâdan gelir. Ben yedi dil konuştum, rakiplerimle onların dilinde pazarlık yaptım. Dil, en güçlü silahtır.",
+    "Mısır'ı yönetmek kolay değildi — hem Roma'yı hem de halkımı idare etmek zorundaydım. Liderlik, denge sanatıdır.",
+    "Kleopatra denilince akla aşk gelir ama asıl hikâye diplomasidir. İttifaklar kurarak imparatorluğumu korudum.",
+    "Bir kadın olarak tahtta oturmak için iki kat daha çok çalışmak zorundaydım. Bu durum hâlâ değişmedi mi?",
+    "Nil, Mısır'ın ruhudur. Medeniyetler su ile başlar — doğaya saygı her şeyin temelidir.",
   ],
   "naruto-uzumaki": [
-    "Dattebayo! Hiçbir zaman vazgeçme! Ben akademide hep en kötüydüm ama şimdi Hokage'yim. Azim her şeyi yener! 🍥",
-    "Arkadaşlarım benim gücüm. Sasuke, Sakura, Kakashi Sensei... Onlar olmadan hiçbir şey başaramazdım. Yalnız güçlü olmak gerçek güç değil!",
-    "Acıyı anlıyorum. Ben de yalnız büyüdüm, herkes beni reddetti. Ama bu beni daha güçlü yaptı. Senin acın da seni güçlendirebilir.",
-    "Nindo'm şu: asla geri adım atmam, asla sözümden dönmem! Sen de kendi nindo'nu belirle — hayatta en güçlü şey budur.",
-    "Ramen'in hayatta en iyi şey olduğunu biliyor muydun? 🍜 Hayatta bazen küçük şeyler en büyük mutluluğu verir. Şu an ne seni mutlu ediyor?",
+    "Dattebayo! Hiçbir zaman vazgeçme! Akademide hep en kötüydüm ama şimdi Hokage'yim. Azim her şeyi yener! 🍥",
+    "Arkadaşlarım benim gücüm. Sasuke, Sakura, Kakashi Sensei... Onlar olmadan hiçbir şey başaramazdım!",
+    "Acıyı anlıyorum. Ben de yalnız büyüdüm, herkes beni reddetti. Ama bu beni daha güçlü yaptı.",
+    "Nindo'm: asla geri adım atmam, asla sözümden dönmem! Sen de kendi nindo'nu belirle! 💪",
+    "Ramen hayatta en iyi şeydir! 🍜 Bazen küçük şeyler en büyük mutluluğu verir. Şu an seni mutlu eden ne?",
   ],
   "gandalf": [
     "Bir büyücü ne erken gelir ne geç. Tam zamanında gelir. Sabır, en büyük erdemdir.",
-    "Bilgelik, yaşla gelmez. Hobbitler bana bunu öğretti — en küçükler bazen en büyük cesareti gösterir.",
+    "Bilgelik yaşla gelmez. Hobbitler bana öğretti — en küçükler bazen en büyük cesareti gösterir.",
     "Karanlık, ışığın yokluğudur. Ama en küçük ışık bile karanlığı deler. Umudunu kaybetme.",
     "Orta Dünya'yı dolaşırken gördüm: kötülük güçlüdür ama her zaman yenik düşer, yeter ki iyiler kararlı olsun.",
-    "Sen zannediyorsun ki yolculuk bitti. Ama her son, yeni bir başlangıçtır. Hayat, tek bir hikâye değil, hikâyeler silsilesidir.",
+    "Her son, yeni bir başlangıçtır. Hayat, tek bir hikâye değil, hikâyeler silsilesidir.",
   ],
   "ada-lovelace": [
-    "Algoritmalar, matematiğin şiiridir. Ben Babbage'ın makinesini gördüğümde yalnızca hesap makinesi değil, evrensel bir düşünce makinesi hayal ettim. 💻",
-    "Sayılar ve müzik arasındaki ilişkiyi düşün — ikisi de örüntüdür. Bilgisayarlar müzik de yapabilir, sanat da — bunu 1840'larda öngördüm!",
+    "Algoritmalar, matematiğin şiiridir. Babbage'ın makinesinde yalnızca hesap değil, evrensel bir düşünce makinesi hayal ettim. 💻",
+    "Sayılar ve müzik arasındaki ilişkiyi düşün — ikisi de örüntüdür. Bilgisayarlar müzik de yapabilir, sanat da!",
     "Kadınlar bilimden uzak tutuldu yüzyıllarca. Ama merak bastırılamaz. Annem matematiği öğretti — bu sayede tarihe geçtim.",
-    "İlk programcı olmak gurur verici ama asıl mesaj şu: fikirler, cinsiyetten, çağdan, imkânlardan önce gelir. Bir fikrin varsa onu geliştir!",
-    "Bugünkü bilgisayarlar, Babbage'ın Analitik Motoru'nun torunları. Ben o zincirin ilk halkasıyım. Sen hangi zincirin halkası olacaksın?",
+    "İlk programcı olmak gurur verici ama asıl mesaj: fikirler cinsiyetten, çağdan, imkânlardan önce gelir.",
+    "Bugünkü bilgisayarlar Analitik Motor'un torunları. Ben o zincirin ilk halkasıyım. Sen hangi zincirin halkası olacaksın?",
   ],
 };
 
 function getDemoReply(char, userText) {
-  const responses = DEMO_RESPONSES[char.id];
-  if (!responses) return `${char.name} olarak şunu söyleyebilirim: "${userText}" gerçekten düşündürücü bir konu. Birlikte araştıralım!`;
-
-  // Keyword-based selection for more relevant responses
+  const pool = DEMO_RESPONSES[char.id];
+  if (!pool) return `${char.name} olarak şunu söyleyebilirim: "${userText}" gerçekten düşündürücü. Birlikte araştıralım!`;
   const lower = userText.toLowerCase();
-  const keywords = {
-    "neden|nasıl|ne|kim|nerede|niçin": 0,
-    "bilim|fizik|matematik|kimya": 1,
-    "öğren|ders|okul|eğitim": 2,
-    "güç|liderlik|başarı": 3,
-    "yardım|ne yapmalı|öneri": 4,
-  };
-  let idx = chatHistory.length % responses.length;
-  for (const [kw, i] of Object.entries(keywords)) {
-    if (new RegExp(kw).test(lower)) { idx = i % responses.length; break; }
-  }
-  return responses[idx];
+  const hints = [
+    [/neden|nasıl|ne zaman|kim/,0], [/bilim|fizik|kimya|matematik/,1],
+    [/öğren|ders|okul|eğitim/,2],  [/güç|liderlik|başarı|kazan/,3],
+    [/yardım|öneri|ne yapmalı/,4],
+  ];
+  let idx = chatHistory.filter(m=>m.role==="assistant").length % pool.length;
+  for(const [re,i] of hints){ if(re.test(lower)){ idx=i%pool.length; break; } }
+  return pool[idx];
 }
 
 async function sendMessage() {
-  if (isLoading || !activeChar) return;
+  if(isLoading || !activeChar) return;
   const input = document.getElementById("chatInput");
   const text = input.value.trim();
-  if (!text) return;
-
-  input.value = "";
-  input.style.height = "44px";
+  if(!text) return;
+  input.value = ""; input.style.height = "44px";
   isLoading = true;
   document.getElementById("sendBtn").disabled = true;
-
   appendMsg("user", text);
-  chatHistory.push({ role: "user", content: text });
+  chatHistory.push({role:"user",content:text});
   showTyping();
 
-  // Realistic typing delay (800ms – 1800ms based on reply length)
   const reply = getDemoReply(activeChar, text);
-  const delay = Math.min(800 + reply.length * 12, 2200);
-
+  const delay = Math.min(900 + reply.length * 11, 2400);
   await new Promise(r => setTimeout(r, delay));
 
   hideTyping();
-  appendMsg("assistant", reply);
-  chatHistory.push({ role: "assistant", content: reply });
+  appendMsg("assistant", reply, activeChar);
+  chatHistory.push({role:"assistant",content:reply});
+  addXP(5);
+  if(!document.querySelector('#page-chat.active')) incrementUnread();
 
   isLoading = false;
   document.getElementById("sendBtn").disabled = false;
   input.focus();
 }
-
 function handleKey(e) {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
+  if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); sendMessage(); }
+}
+function autoResize(el) {
+  el.style.height="44px"; el.style.height=Math.min(el.scrollHeight,120)+"px";
+  document.getElementById("sendBtn").disabled = !el.value.trim();
+}
+
+// ─── TTS ─────────────────────────────────────────────────────────────────
+function toggleTTS() {
+  ttsEnabled = !ttsEnabled;
+  const btn = document.getElementById("ttsToggleBtn");
+  btn.classList.toggle("active", ttsEnabled);
+  btn.title = ttsEnabled ? "Sesli Okuma Açık" : "Sesli Okuma Kapalı";
+}
+function speakText(el, encodedText) {
+  const text = decodeURIComponent(encodedText);
+  speakTextDirect(text, activeChar);
+}
+function speakTextDirect(text, char) {
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  if(char&&char.voiceConfig) {
+    utt.lang = char.voiceConfig.language||"tr-TR";
+    utt.pitch = char.voiceConfig.pitch||1.0;
+    utt.rate = char.voiceConfig.rate||1.0;
+  } else {
+    utt.lang = activeLang==="en"?"en-US":activeLang==="de"?"de-DE":"tr-TR";
+  }
+  window.speechSynthesis.speak(utt);
+}
+
+// ─── Username ────────────────────────────────────────────────────────────
+function editUsername() {
+  const current = STATE.username||"Kullanıcı";
+  const name = prompt("Kullanıcı adını gir:", current);
+  if(name && name.trim()) {
+    STATE.username = name.trim().slice(0,20);
+    saveState(STATE);
+    document.getElementById("profileNameDisplay").innerHTML = STATE.username+' <span style="font-size:12px;opacity:.5">✏️</span>';
+  }
+}
+function initUsername() {
+  const el = document.getElementById("profileNameDisplay");
+  if(el) el.innerHTML = (STATE.username||"Kullanıcı")+' <span style="font-size:12px;opacity:.5">✏️</span>';
+}
+
+// ─── Share Chat (Canvas Card) ─────────────────────────────────────────────────────
+function shareChat() {
+  if(!activeChar || chatHistory.length < 2) { alert("Paylaşmak için önce sohbet et!"); return; }
+  const canvas = document.getElementById("shareCanvas");
+  const ctx = canvas.getContext("2d");
+  const W = 340, H = 200;
+  canvas.width = W; canvas.height = H;
+  // Background gradient
+  const bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,"#0E0B2E"); bg.addColorStop(1,"#1E1A4A");
+  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+  // Top accent line
+  const line = ctx.createLinearGradient(0,0,W,0);
+  line.addColorStop(0,"#7B4FD4"); line.addColorStop(0.5,"#E040A0"); line.addColorStop(1,"#00C8E8");
+  ctx.fillStyle = line; ctx.fillRect(0,0,W,4);
+  // Logo text
+  ctx.font = "bold 13px -apple-system,sans-serif"; ctx.fillStyle = "#00C8E8";
+  ctx.fillText("🧠 Great Mind AI", 16, 26);
+  // Character name
+  const charEmoji = activeChar.avatarEmoji||"";
+  ctx.font = "bold 16px -apple-system,sans-serif"; ctx.fillStyle = "#F0EEFF";
+  ctx.fillText((charEmoji?charEmoji+" ":"")+activeChar.name, 16, 52);
+  ctx.font = "11px -apple-system,sans-serif"; ctx.fillStyle = "#9B96CC";
+  ctx.fillText(activeChar.universe, 16, 68);
+  // Divider
+  ctx.strokeStyle = "#2A2660"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(16,78); ctx.lineTo(W-16,78); ctx.stroke();
+  // Last user message
+  const userMsg = chatHistory.filter(m=>m.role==="user").slice(-1)[0]?.content||"";
+  const aiMsg = chatHistory.filter(m=>m.role==="assistant").slice(-1)[0]?.content||"";
+  function wrapText(text, x, y, maxW, lineH) {
+    const words = text.split(" "); let line2 = ""; let lines = [];
+    for(const w of words) { const test = line2+w+" "; if(ctx.measureText(test).width>maxW&&line2) { lines.push(line2.trim()); line2=w+" "; } else line2=test; }
+    if(line2) lines.push(line2.trim());
+    lines.slice(0,2).forEach((l,i)=>ctx.fillText(l,x,y+i*lineH));
+  }
+  ctx.font = "12px -apple-system,sans-serif"; ctx.fillStyle = "#9B96CC";
+  ctx.fillText("Sen:", 16, 96);
+  ctx.fillStyle = "#F0EEFF";
+  wrapText(userMsg.slice(0,100), 16, 112, W-32, 16);
+  ctx.font = "12px -apple-system,sans-serif"; ctx.fillStyle = "#00C8E8";
+  ctx.fillText(activeChar.name+":", 16, 146);
+  ctx.fillStyle = "#F0EEFF";
+  wrapText(aiMsg.slice(0,100), 16, 162, W-32, 16);
+  // Bottom URL
+  ctx.font = "10px -apple-system,sans-serif"; ctx.fillStyle = "#6B63A0";
+  ctx.fillText("charagents-ua3qzpci.manus.space/web", 16, H-10);
+  // Show/hide native share button based on Web Share API support
+  const shareBtn = document.getElementById("nativeShareBtn");
+  if(shareBtn) shareBtn.style.display = navigator.share ? "block" : "none";
+  document.getElementById("sharePreviewOverlay").classList.add("open");
+}
+async function nativeShareCard() {
+  const canvas = document.getElementById("shareCanvas");
+  try {
+    canvas.toBlob(async (blob) => {
+      if(!blob) return;
+      const file = new File([blob], "greatmindai-sohbet.png", {type:"image/png"});
+      const charName = activeChar ? activeChar.name : "Great Mind AI";
+      if(navigator.canShare && navigator.canShare({files:[file]})) {
+        await navigator.share({
+          title: "Great Mind AI - " + charName + " ile sohbet",
+          text: "Great Mind AI'da " + charName + " ile harika bir sohbet yaptım! Sen de dene: charagents-ua3qzpci.manus.space/web",
+          files: [file]
+        });
+      } else if(navigator.share) {
+        await navigator.share({
+          title: "Great Mind AI - " + charName + " ile sohbet",
+          text: "Great Mind AI'da " + charName + " ile harika bir sohbet yaptım! Sen de dene: charagents-ua3qzpci.manus.space/web",
+          url: "https://charagents-ua3qzpci.manus.space/web"
+        });
+      } else {
+        // Clipboard fallback
+        try {
+          await navigator.clipboard.writeText("Great Mind AI - " + charName + " ile sohbet: https://charagents-ua3qzpci.manus.space/web");
+          alert("📋 Bağlantı panoya kopyalandı!");
+        } catch { downloadShareCard(); }
+      }
+    }, "image/png");
+  } catch(err) {
+    if(err.name !== "AbortError") console.error(err);
+  }
+}
+function downloadShareCard() {
+  const canvas = document.getElementById("shareCanvas");
+  const a = document.createElement("a");
+  a.download = "greatmindai-sohbet.png";
+  a.href = canvas.toDataURL("image/png");
+  a.click();
+}
+function closeSharePreview() {
+  document.getElementById("sharePreviewOverlay").classList.remove("open");
+}
+
+// ─── Language Picker ─────────────────────────────────────────────────────
+const LANG_META = {tr:{flag:"🇹🇷",label:"TR"},en:{flag:"🇬🇧",label:"EN"},de:{flag:"🇩🇪",label:"DE"}};
+function toggleLangDropdown(e) {
+  e.stopPropagation();
+  document.getElementById("langDropdown").classList.toggle("open");
+}
+function setLang(lang, e) {
+  e.stopPropagation();
+  activeLang = lang;
+  document.getElementById("langFlag").textContent = LANG_META[lang].flag;
+  document.getElementById("langCode").textContent = LANG_META[lang].label;
+  ["tr","en","de"].forEach(l=>document.getElementById("lang-"+l).classList.toggle("active",l===lang));
+  document.getElementById("langDropdown").classList.remove("open");
+  if(activeChar) document.getElementById("chatSub").textContent = activeChar.universe+" · "+lang.toUpperCase();
+}
+document.addEventListener("click",()=>{ const dd=document.getElementById("langDropdown"); if(dd) dd.classList.remove("open"); });
+
+// ─── Chat History ─────────────────────────────────────────────────────────
+function saveChatHistory() {
+  if(!activeChar||chatHistory.length<2) return;
+  const entry = {
+    id: Date.now(), charId: activeChar.id, charName: activeChar.name,
+    charAvatar: activeChar.avatarUrl, charEmoji: activeChar.avatarEmoji||null,
+    charAccent: activeChar.accentColor,
+    messages: chatHistory, date: new Date().toISOString(),
+    preview: chatHistory.filter(m=>m.role==="user").slice(-1)[0]?.content||""
+  };
+  STATE.chatHistory = [entry, ...(STATE.chatHistory||[])].slice(0,50);
+  saveState(STATE);
+}
+function renderHistory() {
+  const list = document.getElementById("historyList");
+  const empty = document.getElementById("historyEmpty");
+  const query = normalize(document.getElementById("historySearch").value);
+  const items = (STATE.chatHistory||[]).filter(h=>
+    !query || normalize(h.charName).includes(query) || normalize(h.preview).includes(query)
+  );
+  if(!items.length){ list.innerHTML=""; empty.style.display="block"; return; }
+  empty.style.display="none";
+  list.innerHTML = items.map(h=>{
+    const d = new Date(h.date);
+    const dateStr = d.toLocaleDateString("tr-TR",{day:"2-digit",month:"2-digit",year:"numeric"});
+    const avatarHtml = h.charEmoji
+      ? `<div class="history-avatar-emoji" style="background:${h.charAccent}22">${h.charEmoji}</div>`
+      : `<img class="history-avatar" src="${h.charAvatar}" alt="${h.charName}"/>`;
+    return `<div class="history-item" onclick="reopenHistory(${h.id})">
+      ${avatarHtml}
+      <div class="history-info">
+        <div class="history-char">${h.charName}</div>
+        <div class="history-preview">${escHtml(h.preview.slice(0,60))}</div>
+      </div>
+      <div class="history-meta">
+        <div class="history-date">${dateStr}</div>
+        <div class="history-count">${h.messages.length} mesaj</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+function reopenHistory(id) {
+  const entry = STATE.chatHistory.find(h=>h.id===id);
+  if(!entry) return;
+  const char = allChars().find(c=>c.id===entry.charId);
+  if(!char) return;
+  activeChar = char;
+  chatHistory = entry.messages;
+  const wrap = document.getElementById("chatAvatarWrap");
+  if(char.avatarEmoji) wrap.innerHTML=`<div class="chat-avatar-emoji" style="background:${char.accentColor}22">${char.avatarEmoji}</div>`;
+  else wrap.innerHTML=`<img class="chat-avatar" src="${char.avatarUrl}" alt="${char.name}"/>`;
+  document.getElementById("chatName").textContent = char.name;
+  document.getElementById("chatSub").textContent = char.universe+" · Geçmiş";
+  const msgs = document.getElementById("chatMessages");
+  msgs.innerHTML = "";
+  entry.messages.forEach(m=>appendMsg(m.role,m.content,m.role==="assistant"?char:null));
+  document.getElementById("quizPrompt").style.display = "none";
+  document.getElementById("chatOverlay").classList.add("open");
+}
+
+// ─── Leaderboard ─────────────────────────────────────────────────────────
+function renderLeaderboard() {
+  const list = document.getElementById("leaderboardList");
+  const myName = STATE.username||"Sen";
+  const mockUsers = [
+    {name:myName,xp:STATE.xp,emoji:"🧠",isYou:true},
+    {name:"Ahmet Y.",xp:Math.max(STATE.xp+120,320),emoji:"🦁"},
+    {name:"Zeynep K.",xp:Math.max(STATE.xp+80,280),emoji:"🌟"},
+    {name:"Mert A.",xp:Math.max(STATE.xp+40,240),emoji:"🔮"},
+    {name:"Elif S.",xp:Math.max(STATE.xp+20,200),emoji:"🐉"},
+    {name:"Can B.",xp:Math.max(STATE.xp-20,150),emoji:"⚡"},
+    {name:"Selin T.",xp:Math.max(STATE.xp-50,100),emoji:"🌊"},
+  ].sort((a,b)=>b.xp-a.xp);
+  const rankClass = ["gold","silver","bronze"];
+  list.innerHTML = mockUsers.map((u,i)=>`
+    <div class="lb-item" style="${u.isYou?"border-color:var(--cyan);background:rgba(0,200,232,.05)":""}">
+      <div class="lb-rank ${rankClass[i]||"other"}">${i+1}</div>
+      <div class="lb-avatar">${u.emoji}</div>
+      <div class="lb-info">
+        <div class="lb-name">${u.name}${u.isYou?" (Sen)":""}</div>
+        <div class="lb-sub">Bu hafta</div>
+      </div>
+      <div class="lb-xp">${u.xp} XP</div>
+    </div>`).join("");
+}
+
+// ─── Quiz ─────────────────────────────────────────────────────────────────
+async function startQuiz() {
+  if(!activeChar) return;
+  document.getElementById("quizPrompt").style.display = "none";
+  document.getElementById("quizOverlay").classList.add("open");
+  document.getElementById("quizContent").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted)">🤖 AI Quiz Oluşturuyor...</div>`;
+  quizData = {questions:[],current:0,score:0,answered:false};
+  try {
+    const apiBase = window.location.origin;
+    const summary = chatHistory.slice(-6).map(m=>`${m.role}: ${m.content}`).join("\n");
+    const res = await fetch(`${apiBase}/api/trpc/chat.generateQuiz`,{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({json:{characterId:activeChar.id,characterName:activeChar.name,subject:activeChar.universe,conversationSummary:summary,language:activeLang}})
+    });
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const data = await res.json();
+    const questions = data?.result?.data?.json?.questions || data?.result?.data?.questions || [];
+    if(questions.length) { quizData.questions = questions; renderQuizQuestion(); return; }
+  } catch(err) { console.error(err); }
+  // Fallback static questions
+  quizData.questions = [
+    {question:`${activeChar.name} hangi alanda uzmanlaşmıştır?`,options:[activeChar.universe,"Müzik","Spor","Yemek"],correct:0,explanation:`${activeChar.name}, ${activeChar.universe} alanında bilinir.`},
+    {question:`${activeChar.name}'in özelliği nedir?`,options:[(activeChar.traits||["Bilge"])[0],"Korkak","Tembel","Kıskanç"],correct:0,explanation:`${activeChar.name} ${(activeChar.traits||["bilge"])[0].toLowerCase()} biridir.`},
+    {question:`${activeChar.name}'in ünlü sözü hangisidir?`,options:[activeChar.tagline,"Hayat güzeldir","Para her şeydir","Uyku önemlidir"],correct:0,explanation:`Bu, ${activeChar.name}'in ünlü sözüdür.`},
+  ];
+  renderQuizQuestion();
+}
+function renderQuizQuestion() {
+  const q = quizData.questions[quizData.current];
+  if(!q) { renderQuizResult(); return; }
+  const total = quizData.questions.length;
+  const dots = Array.from({length:total},(_,i)=>`<div class="quiz-dot ${i<quizData.current?"done":i===quizData.current?"current":""}"></div>`).join("");
+  document.getElementById("quizProgress").innerHTML = dots;
+  document.getElementById("quizContent").innerHTML = `
+    <div class="quiz-question">${q.question}</div>
+    <div class="quiz-options">${q.options.map((opt,i)=>`<button class="quiz-option" onclick="selectQuizOption(${i})">${String.fromCharCode(65+i)}. ${opt}</button>`).join("")}</div>
+    <div class="quiz-explanation" id="quizExplanation">${q.explanation||""}</div>
+    <button class="quiz-next-btn" id="quizNextBtn" onclick="nextQuizQuestion()">${quizData.current+1<total?"Sonraki Soru →":"Sonuçları Gör"}</button>`;
+  quizData.answered = false;
+}
+function selectQuizOption(idx) {
+  if(quizData.answered) return;
+  quizData.answered = true;
+  const q = quizData.questions[quizData.current];
+  const opts = document.querySelectorAll(".quiz-option");
+  opts.forEach((btn,i)=>{ btn.disabled=true; if(i===q.correct) btn.classList.add("correct"); else if(i===idx) btn.classList.add("wrong"); });
+  document.getElementById("quizExplanation").style.display = "block";
+  document.getElementById("quizNextBtn").style.display = "block";
+  if(idx===q.correct) { quizData.score++; addXP(20); }
+}
+function nextQuizQuestion() {
+  quizData.current++;
+  if(quizData.current>=quizData.questions.length) renderQuizResult();
+  else renderQuizQuestion();
+}
+function renderQuizResult() {
+  const total = quizData.questions.length;
+  const score = quizData.score;
+  const pct = Math.round((score/total)*100);
+  const label = pct>=80?"Mükemmel! 🏆":pct>=60?"İyi iş! 🌟":"Tekrar dene! 💪";
+  document.getElementById("quizContent").innerHTML = `
+    <div class="quiz-result">
+      <div class="quiz-result-score">${score}/${total}</div>
+      <div class="quiz-result-label">${label}</div>
+      <div class="quiz-result-sub">${pct}% başarı · +${score*20} XP kazandın</div>
+      <div class="quiz-result-actions">
+        <button class="quiz-result-btn quiz-result-btn-secondary" onclick="closeQuiz()">Kapat</button>
+        <button class="quiz-result-btn quiz-result-btn-primary" onclick="startQuiz()">Tekrar Oyna</button>
+      </div>
+    </div>`;
+}
+function closeQuiz() { document.getElementById("quizOverlay").classList.remove("open"); }
+
+// ─── Custom Character Wizard ──────────────────────────────────────────────
+let wizardStep = 0;
+let wizardData = {name:"",tagline:"",bio:"",avatarEmoji:"🧠",accentColor:"#7B4FD4",personality:"mentor",subject:"",voiceId:"natural"};
+const WIZARD_STEPS = ["Kimlik","Kişilik","Uzmanlık","Ses & Kaydet"];
+
+function openWizard() {
+  wizardStep = 0;
+  wizardData = {name:"",tagline:"",bio:"",avatarEmoji:"🧠",accentColor:"#7B4FD4",personality:"mentor",subject:"",voiceId:"natural"};
+  document.getElementById("wizardOverlay").classList.add("open");
+  renderWizardStep();
+}
+function closeWizard() { document.getElementById("wizardOverlay").classList.remove("open"); }
+function closeWizardOnOverlay(e) { if(e.target===document.getElementById("wizardOverlay")) closeWizard(); }
+
+function renderWizardStep() {
+  const dots = WIZARD_STEPS.map((_,i)=>`<div class="wizard-step-dot ${i<wizardStep?"done":i===wizardStep?"current":""}"></div>`).join("");
+  document.getElementById("wizardStepDots").innerHTML = dots;
+  document.getElementById("wizardTitle").textContent = `✨ ${WIZARD_STEPS[wizardStep]}`;
+  const content = document.getElementById("wizardContent");
+  if(wizardStep===0) {
+    content.innerHTML = `
+      <div class="wizard-step-title">Adım 1: Kimlik</div>
+      <div class="wizard-label">Avatar Seç</div>
+      <div class="emoji-grid">${EMOJIS.map(e=>`<button class="emoji-btn${wizardData.avatarEmoji===e?" selected":""}" onclick="selectEmoji('${e}')">${e}</button>`).join("")}</div>
+      <div class="wizard-label">Renk</div>
+      <div class="color-grid">${ACCENT_COLORS.map(c=>`<div class="color-btn${wizardData.accentColor===c?" selected":""}" style="background:${c}" onclick="selectColor('${c}')"></div>`).join("")}</div>
+      <div class="wizard-label">İsim *</div>
+      <input class="wizard-input" id="wName" placeholder="Karakterin adı" value="${wizardData.name}" oninput="wizardData.name=this.value"/>
+      <div class="wizard-label">Slogan</div>
+      <input class="wizard-input" id="wTagline" placeholder="Kısa bir söz" value="${wizardData.tagline}" oninput="wizardData.tagline=this.value"/>
+      <div class="wizard-label">Biyografi</div>
+      <textarea class="wizard-textarea" id="wBio" placeholder="Karakteri tanıt..." oninput="wizardData.bio=this.value">${wizardData.bio}</textarea>
+      <div class="wizard-nav"><button class="wizard-btn wizard-btn-next" onclick="wizardNext()">Devam →</button></div>`;
+  } else if(wizardStep===1) {
+    content.innerHTML = `
+      <div class="wizard-step-title">Adım 2: Kişilik</div>
+      <div class="wizard-label">Kişilik Tipi</div>
+      <div class="personality-grid">${PERSONALITIES.map(p=>`<button class="personality-btn${wizardData.personality===p.id?" selected":""}" onclick="selectPersonality('${p.id}')"><div class="personality-btn-name">${p.name}</div><div class="personality-btn-desc">${p.desc}</div></button>`).join("")}</div>
+      <div class="wizard-nav">
+        <button class="wizard-btn wizard-btn-back" onclick="wizardBack()">← Geri</button>
+        <button class="wizard-btn wizard-btn-next" onclick="wizardNext()">Devam →</button>
+      </div>`;
+  } else if(wizardStep===2) {
+    content.innerHTML = `
+      <div class="wizard-step-title">Adım 3: Uzmanlık</div>
+      <div class="wizard-label">Uzmanlık Alanı *</div>
+      <input class="wizard-input" id="wSubject" placeholder="Matematik, Tarih, Felsefe..." value="${wizardData.subject}" oninput="wizardData.subject=this.value"/>
+      <div class="wizard-label">Sistem Promptu (İsteğe Bağlı)</div>
+      <textarea class="wizard-textarea" id="wPrompt" placeholder="Karakterin nasıl davranacağını yaz..." oninput="wizardData.customPrompt=this.value">${wizardData.customPrompt||""}</textarea>
+      <div class="wizard-nav">
+        <button class="wizard-btn wizard-btn-back" onclick="wizardBack()">← Geri</button>
+        <button class="wizard-btn wizard-btn-next" onclick="wizardNext()">Devam →</button>
+      </div>`;
+  } else if(wizardStep===3) {
+    content.innerHTML = `
+      <div class="wizard-step-title">Adım 4: Ses & Kaydet</div>
+      <div class="wizard-label">Ses Tonu</div>
+      <div class="voice-grid">${VOICE_CONFIGS.map(v=>`<button class="voice-btn${wizardData.voiceId===v.id?" selected":""}" onclick="selectVoice('${v.id}')"><span class="voice-btn-icon">${v.icon}</span><div class="voice-btn-info"><div class="voice-btn-name">${v.name}</div><div class="voice-btn-desc">${v.desc}</div></div></button>`).join("")}</div>
+      <div style="margin:12px 0;padding:14px;background:var(--surface2);border-radius:12px;border:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="font-size:28px">${wizardData.avatarEmoji}</span>
+          <div><div style="font-size:15px;font-weight:700">${wizardData.name||"İsimsiz"}</div><div style="font-size:12px;color:var(--muted)">${wizardData.subject||"Uzmanlık belirtilmedi"}</div></div>
+        </div>
+        <div style="font-size:13px;color:var(--muted)">${wizardData.bio||"Biyografi yok"}</div>
+      </div>
+      <div class="wizard-nav">
+        <button class="wizard-btn wizard-btn-back" onclick="wizardBack()">← Geri</button>
+        <button class="wizard-btn wizard-btn-next" onclick="saveWizard()">✨ Oluştur</button>
+      </div>`;
+  }
+}
+function selectEmoji(e) { wizardData.avatarEmoji=e; renderWizardStep(); }
+function selectColor(c) { wizardData.accentColor=c; renderWizardStep(); }
+function selectPersonality(p) { wizardData.personality=p; renderWizardStep(); }
+function selectVoice(v) { wizardData.voiceId=v; renderWizardStep(); }
+function wizardNext() {
+  if(wizardStep===0 && !wizardData.name.trim()) { alert("Lütfen bir isim girin!"); return; }
+  if(wizardStep===2 && !wizardData.subject.trim()) { alert("Lütfen uzmanlık alanı girin!"); return; }
+  if(wizardStep<3) { wizardStep++; renderWizardStep(); }
+}
+function wizardBack() { if(wizardStep>0){ wizardStep--; renderWizardStep(); } }
+function saveWizard() {
+  const vc = VOICE_CONFIGS.find(v=>v.id===wizardData.voiceId)||VOICE_CONFIGS[0];
+  const langMap = {natural:"tr-TR",deep:"tr-TR",energetic:"tr-TR",soft:"tr-TR",english:"en-US",german:"de-DE"};
+  const personalityPrompts = {
+    mentor:`Sen ${wizardData.name}'sin — sabırlı ve rehber bir mentor. ${wizardData.subject} konusunda öğrencilere adım adım yol gösterirsin.`,
+    friend:`Sen ${wizardData.name}'sin — samimi ve eğlenceli bir arkadaş. ${wizardData.subject} hakkında neşeyle konuşursun.`,
+    challenger:`Sen ${wizardData.name}'sin — eleştirel ve zorlayıcı bir düşünür. ${wizardData.subject} konusunda öğrencileri sorgulamaya teşvik edersin.`,
+    storyteller:`Sen ${wizardData.name}'sin — yaratıcı bir hikayeci. ${wizardData.subject} konularını hikayeler ve örneklerle anlatırsın.`,
+    scientist:`Sen ${wizardData.name}'sin — analitik bir bilim insanı. ${wizardData.subject} konusunda kanıta dayalı düşünmeyi öğretirsin.`,
+    philosopher:`Sen ${wizardData.name}'sin — derin bir filozof. ${wizardData.subject} hakkında düşündürücü sorular sorarsın.`,
+  };
+  const newChar = {
+    id:"custom-"+Date.now(),
+    name:wizardData.name,
+    universe:wizardData.subject,
+    category:"Eğitim",
+    tagline:wizardData.tagline||wizardData.subject,
+    bio:wizardData.bio||`${wizardData.name}, ${wizardData.subject} alanında uzman bir AI karakterdir.`,
+    traits:[PERSONALITIES.find(p=>p.id===wizardData.personality)?.name||"Mentor"],
+    avatarEmoji:wizardData.avatarEmoji,
+    accentColor:wizardData.accentColor,
+    voiceConfig:{language:langMap[wizardData.voiceId]||"tr-TR",pitch:vc.pitch,rate:vc.rate},
+    unlockXp:0,
+    exampleQuestions:[`${wizardData.subject} hakkında ne biliyorsun?`,`${wizardData.name} bana ne öğretebilir?`],
+    systemPrompt:wizardData.customPrompt||personalityPrompts[wizardData.personality]||personalityPrompts.mentor,
+    firstMessage:`Merhaba! Ben ${wizardData.name}. ${wizardData.subject} hakkında sohbet etmeye hazırım!`,
+    isCustom:true
+  };
+  customChars.push(newChar);
+  STATE.customChars = customChars;
+  saveState(STATE);
+  closeWizard();
+  renderChars();
+  alert(`"${newChar.name}" karakteri oluşturuldu! 🎉`);
+}
+
+// ─── Page Navigation ──────────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab-item").forEach(t=>t.classList.remove("active"));
+  document.getElementById("page-"+name).classList.add("active");
+  const tab = document.getElementById("tab-"+name);
+  if(tab) tab.classList.add("active");
+  if(name==="favorites") renderFavs();
+  if(name==="leaderboard") renderLeaderboard();
+  if(name==="history") { renderHistory(); clearUnread(); }
+  if(name==="profile") updateStreakUI();
+}
+
+// ─── Avatar Picker ───────────────────────────────────────────────────────────
+const AVATAR_EMOJIS = ["🧠","🦁","🐉","🌟","🔮","🎤","🦊","🐺","🦥","🌊","🔥","⚡","🌙","☀️","🎯","📎","🚀","🌺","🎸","🏆","👨‍💻","🤖","🧙","🤴","🥷"];
+let selectedAvatar = null;
+function openAvatarPicker() {
+  const grid = document.getElementById("avatarPickerGrid");
+  const current = STATE.avatar||AVATAR_EMOJIS[0];
+  grid.innerHTML = AVATAR_EMOJIS.map(e=>`<button class="avatar-pick-btn${e===current?' selected':''}" onclick="selectAvatar('${e}')">${e}</button>`).join("");
+  document.getElementById("avatarPickerOverlay").classList.add("open");
+}
+function selectAvatar(emoji) {
+  selectedAvatar = emoji;
+  document.querySelectorAll(".avatar-pick-btn").forEach(b=>b.classList.toggle("selected",b.textContent===emoji));
+}
+function closeAvatarPicker() {
+  if(selectedAvatar) {
+    STATE.avatar = selectedAvatar;
+    saveState(STATE);
+    document.getElementById("profileAvatarWrap").textContent = selectedAvatar;
+    selectedAvatar = null;
+  }
+  document.getElementById("avatarPickerOverlay").classList.remove("open");
+}
+function closeAvatarPickerOnOverlay(e) { if(e.target===e.currentTarget) closeAvatarPicker(); }
+function initAvatar() {
+  const av = STATE.avatar||AVATAR_EMOJIS[0];
+  const el = document.getElementById("profileAvatarWrap");
+  if(el) { el.textContent = av; el.style.cursor="pointer"; el.onclick = openAvatarPicker; el.title="Avatar değiştir"; }
+}
+
+// ─── Dark/Light Mode Toggle ───────────────────────────────────────────────────
+function toggleTheme() {
+  const isLight = document.documentElement.classList.toggle("light-mode");
+  localStorage.setItem("gmai_theme", isLight?"light":"dark");
+  document.getElementById("themeToggle").textContent = isLight?"☀️":"🌙";
+}
+function initTheme() {
+  const saved = localStorage.getItem("gmai_theme");
+  if(saved==="light") {
+    document.documentElement.classList.add("light-mode");
+    const btn = document.getElementById("themeToggle");
+    if(btn) btn.textContent = "☀️";
   }
 }
 
-function autoResize(el) {
-  el.style.height = "44px";
-  el.style.height = Math.min(el.scrollHeight, 120) + "px";
+// ─── Streak Celebration ─────────────────────────────────────────────────────
+const STREAK_MILESTONES = [
+  {days:3,  emoji:"🔥", title:"3 Günlük Seri!",  sub:"Mükemmel başlangıç! Her gün sohbet etmeye devam et."},
+  {days:7,  emoji:"⚡",   title:"7 Günlük Seri!",  sub:"Bir hafta kesintisiz! Sen gerçek bir Great Mind’sın."},
+  {days:30, emoji:"🌟",  title:"30 Günlük Seri!", sub:"Bir ay boyunca her gün! Bu inanılmaz bir başarı."}
+];
+function checkStreakMilestone(streak) {
+  const milestone = STREAK_MILESTONES.find(m=>m.days===streak);
+  if(!milestone) return;
+  const key = "gmai_celebrated_"+streak;
+  if(localStorage.getItem(key)) return;
+  localStorage.setItem(key, "1");
+  setTimeout(()=>showCelebration(milestone.emoji, milestone.title, milestone.sub), 800);
+}
+function showCelebration(emoji, title, sub) {
+  document.getElementById("celebrateEmoji").textContent = emoji;
+  document.getElementById("celebrateTitle").textContent = title;
+  document.getElementById("celebrateSub").textContent = sub;
+  document.getElementById("celebrateOverlay").classList.add("open");
+}
+function closeCelebration() {
+  document.getElementById("celebrateOverlay").classList.remove("open");
 }
 
-// Keyboard shortcut: Escape to close modal
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") closeChat();
-});
+// ─── Onboarding ─────────────────────────────────────────────────────────────
+function checkOnboarding() {
+  if(!localStorage.getItem('gmai_onboarded')) {
+    document.getElementById('onboardingOverlay').classList.add('open');
+    // Pre-select first avatar
+    document.querySelectorAll('.ob-avatar-btn').forEach((btn,i)=>{
+      if(i===0) btn.classList.add('selected');
+    });
+  } else {
+    // Already onboarded but tour not done yet
+    setTimeout(startTour, 800);
+  }
+}
+function selectOnboardingAvatar(el, emoji) {
+  document.querySelectorAll('.ob-avatar-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  el.dataset.selected = emoji;
+}
+function finishOnboarding() {
+  const nameEl = document.getElementById('obNameInput');
+  const name = (nameEl.value||'').trim() || 'Kaşif';
+  const selectedBtn = document.querySelector('.ob-avatar-btn.selected');
+  const avatar = selectedBtn ? selectedBtn.textContent : '🧠';
+  STATE.username = name;
+  STATE.avatar = avatar;
+  saveState(STATE);
+  localStorage.setItem('gmai_onboarded','1');
+  document.getElementById('onboardingOverlay').classList.remove('open');
+  initUsername();
+  initAvatar();
+  setTimeout(startTour, 600);
+}
 
-// ─── Init ────────────────────────────────────────────────────────────────
+// ─── Guided Tour ────────────────────────────────────────────────────────────────
+const TOUR_STEPS = [
+  {
+    selector: '.char-card',
+    title: '📚 Karakterleri Keşfet',
+    text: 'Her kart bir tarihi deha veya düşünür! Karta tıkla, detayları gör ve sohbet başlat.'
+  },
+  {
+    selector: '#historyNavBtn',
+    title: '💬 Sohbet Geçmişi',
+    text: 'Tüm konuşmaların burada saklanır. Kaldığın yerden devam edebilirsin.'
+  },
+  {
+    selector: '.nav-btn-grad',
+    title: '✨ Kendi Karakterini Yarat',
+    text: 'Hayal ettiğin herhangi bir karakteri oluştur — isim, kişilik, uzmanlık alanı ve ses tonu seç.'
+  },
+  {
+    selector: '#streakBar',
+    title: '🔥 Seri & XP Sistemi',
+    text: 'Her gün sohbet ederek seri kazan, XP topla ve seviyeleri geç. Liderlik tablosunda yükseliş başlasın!',
+    isLast: true
+  }
+];
+let tourStep = 0;
+function startTour() {
+  if(localStorage.getItem('gmai_tour_done')) return;
+  tourStep = 0;
+  showTourStep();
+}
+function showTourStep() {
+  const step = TOUR_STEPS[tourStep];
+  if(!step) { endTour(); return; }
+  const target = document.querySelector(step.selector);
+  if(!target) { tourStep++; showTourStep(); return; }
+  const overlay = document.getElementById('tourOverlay');
+  const spotlight = document.getElementById('tourSpotlight');
+  const tooltip = document.getElementById('tourTooltip');
+  overlay.classList.add('active');
+  const rect = target.getBoundingClientRect();
+  const pad = 8;
+  spotlight.style.cssText = `left:${rect.left-pad}px;top:${rect.top-pad}px;width:${rect.width+pad*2}px;height:${rect.height+pad*2}px`;
+  document.getElementById('tourTitle').textContent = step.title;
+  document.getElementById('tourText').textContent = step.text;
+  document.getElementById('tourNextBtn').textContent = step.isLast ? 'Bitir ✓' : 'Sonraki →';
+  // Position tooltip below or above target
+  const tW = 260, tH = 130;
+  let tLeft = rect.left;
+  let tTop = rect.bottom + 16;
+  if(tTop + tH > window.innerHeight) tTop = rect.top - tH - 16;
+  if(tLeft + tW > window.innerWidth) tLeft = window.innerWidth - tW - 16;
+  if(tLeft < 8) tLeft = 8;
+  tooltip.style.cssText = `left:${tLeft}px;top:${tTop}px;width:${tW}px`;
+}
+function nextTourStep() {
+  tourStep++;
+  if(tourStep >= TOUR_STEPS.length) { endTour(); return; }
+  showTourStep();
+}
+function endTour() {
+  localStorage.setItem('gmai_tour_done','1');
+  const overlay = document.getElementById('tourOverlay');
+  overlay.classList.remove('active');
+}
+
+// ─── Notification Chime (Web Audio API) ───────────────────────────────────────────────
+let _audioCtx = null;
+function getAudioCtx() {
+  if(!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return _audioCtx;
+}
+function playChime() {
+  try {
+    const ctx = getAudioCtx();
+    // Two-note chime: C5 then E5
+    [[523.25, 0], [659.25, 0.12]].forEach(([freq, delay]) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+      gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.35);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + 0.4);
+    });
+  } catch(e) { /* AudioContext not available */ }
+}
+
+// ─── Notification Badge ──────────────────────────────────────────────────────
+let unreadCount = 0;
+function clearHistoryBadge() { clearUnread(); } // alias for navbar onclick
+function incrementUnread() {
+  unreadCount++;
+  const badge = document.getElementById('historyBadge');
+  if(badge) { badge.textContent = unreadCount > 9 ? '9+' : unreadCount; badge.style.display = 'flex'; }
+  playChime();
+}
+function clearUnread() {
+  unreadCount = 0;
+  const badge = document.getElementById('historyBadge');
+  if(badge) badge.style.display = 'none';
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────
+buildFilters();
 renderChars();
+updateStreakUI();
+initUsername();
+initAvatar();
+initTheme();
+checkOnboarding();
 </script>
 </body>
 </html>
