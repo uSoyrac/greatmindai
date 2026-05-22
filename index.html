@@ -1251,129 +1251,139 @@ function hideTyping() {
 }
 
 // ─── Demo AI Engine ──────────────────────────────────────────────────────
+// Her karakter için çeşitli yanıtlar: soru, hikaye, tepki, espri, düşünce
 const DEMO_RESPONSES = {
   "ataturk": [
-    "Bilim, her şeyin üstündedir. Aklını kullan, araştır, sorgula — ancak bu şekilde gerçeğe ulaşabilirsin.",
-    "Gençliğe güveniyorum. Türkiye'nin geleceği, bilgili ve özgür düşünceli nesillerin elindedir. Sen de bu nesildensin.",
-    "Yurtta sulh, cihanda sulh. Barış, en büyük güçtür. Ama bu barış; bilim, eğitim ve akıl ile inşa edilmelidir.",
-    "Bir millet eğitim olmadan yaşayamaz. Öğrenmek, en büyük vatanseverlik görevidir. Okuyor musun?",
-    "Zafer, 'Zafer benimdir' diyebilenlere nasip olur. Hedefini koy, çalış, vazgeçme.",
+    "Bu çok güzel bir soru. Peki sen bu konuda ne düşünüyorsun? Bana anlat, dinliyorum.",
+    "Biliyorsun, Samsun'a çıktığımda yanımda sadece birkaç arkadaş vardı. İmkânsız denen şeyi başardık çünkü inanıyorduk. Senin inandığın şey ne?",
+    "İlginç! Türkiye'nin kurulduğu yıllarda tam bu soruyu tartışıyorduk. O günden bu yana çok şey değişti ama bazı şeyler hep aynı kalıyor.",
+    "Dur bir dakika — 'yapamam' diye mi düşündün? Ben de öyle düşünenlere rastladım. Ama tarih hep 'yapabilirim' diyenleri hatırlıyor.",
+    "Ha, şimdi konuşuyoruz! Bu konuyu benimle derinlemesine tartışmak ister misin? Hangi açıdan bakmak istiyorsun?",
   ],
   "einstein": [
-    "Hayal gücü, bilgiden daha önemlidir. Çünkü bilgi sınırlıdır, hayal gücü ise evreni kuşatır.",
-    "Görelilik teorisini düşün: zaman ve uzay mutlak değildir. Benim için en büyük heyecan, soruların cevaplarında değil, soruların kendisinde gizlidir.",
-    "Bir problemi çözemiyorsan, geri adım at ve farklı bir açıdan bak. Ben de yıllarca denedim, yanıldım ve tekrar denedim.",
-    "E = mc² denkleminin güzelliği basitliğindedir. Enerji ve kütle birbirinin ta kendisidir — evren bize bu sırrı verdi.",
-    "Merak etmeyi hiç bırakma. Meraklı bir çocuğun soruları, pek çok bilim insanının cevaplarından daha değerlidir.",
+    "Oh, bu tam benim sevdiğim türden bir soru! Şöyle bir düşünce deneyi yapalım mı? 🤔",
+    "İlginç... Ben de buna benzer bir soruyu 26 yıl düşündüm. Sonunda anladım ki en basit açıklama genellikle doğrudur.",
+    "Bekle bekle — bunu daha önce hiç bu açıdan düşünmemiştim! Sen nasıl buldun bunu?",
+    "Biliyor musun, Nobel ödülünü aldığımda aslında çok şaşırdım. Asıl merak ettiğim şeyler hâlâ yanıtsızdı. Senin merak ettiğin nedir?",
+    "Harika! Şimdi sana zor bir şey soracağım: eğer ışık hızıyla gidebilseydin, ne görmek isterdin?",
   ],
   "dr-mikro": [
-    "Harika soru! 🦠 Bakteriler aslında çoğunlukla faydalıdır — bağırsak floramızdaki bakteriler sindirime yardımcı olur. Sadece %1'i hastalık yapıcıdır.",
-    "Virüsler canlı mı değil mi? Bu hâlâ tartışmalı! Kendi başlarına çoğalamazlar, bir hücreye ihtiyaç duyarlar. 'Canlı ve cansız arası' deriz. 🧬",
-    "Ellerini yıkamak neden bu kadar önemli? Çünkü sabun, virüslerin ve bakterilerin hücre zarını parçalar — adeta bir kılıç gibi! ⚔️🧼",
-    "Bağışıklık sistemin süper kahramanın gibi. T hücreleri, B hücreleri, antikorlar — hepsi birlikte savaşarak seni korur. Aşılar bu orduya antrenman yaptırır! 💪",
-    "Mikrobiyom araştırmaları: bağırsak bakterilerin ruh halini bile etkiliyor. 'İkinci beyin' olarak da adlandırılıyor! 🧠",
+    "Ooh, bu soruyu sorduğuna çok sevindim! 🦠 Biliyor musun, bu konuda çoğu insan tam tersini zannediyor...",
+    "Dur dur dur — ellerini bugün kaç kez yıkadın? Merak ettim! Çünkü her el yıkama 1 milyon bakteriyi uzaklaştırır.",
+    "Haha, güzel soru! Şöyle söyleyeyim: vücudundaki bakteri sayısı hücre sayından fazla. Şu an içinde milyarlarca canlı var! 😄",
+    "Bu beni düşündürüyor... Peki sen hiç grip olduğunda vücudunun nasıl savaştığını merak ettin mi?",
+    "Evet, evet, evet! Tam bunu araştırıyordum! Söyleyeyim ama önce sen ne düşünüyorsun — virüsler canlı mı?",
   ],
   "eko": [
-    "İklim değişikliği gerçek ve acil 🌍. Atmosferdeki CO₂ sanayi öncesine göre %50 arttı. Ama umut var — yenilenebilir enerji her yıl rekor kırıyor!",
-    "Geri dönüşüm önemli ama asıl çözüm daha az tüketmek. Bir plastik şişenin doğada ayrışması 450 yıl sürer. ♻️",
-    "Ekosistemler birbirine bağlı. Bir arının yok olması, bölgedeki bitkilerin %80'ini etkileyebilir. Biyoçeşitlilik hayatın sigortasıdır. 🐝",
-    "Sürdürülebilir yaşam zor değil: daha az et, daha az plastik, daha fazla bisiklet. Küçük adımlar büyük fark yaratır! 🌱",
-    "Ormanlar dünyanın akciğerleri. Bir ağaç yılda ~21 kg CO₂ emebilir. Ağaç dikmek en etkili iklim eylemleri arasında! 🌳",
+    "Vay canına, bunu sormana çok sevindim! 🌿 Çoğu insan sormaz bile...",
+    "Bak, geçen hafta bir ormanda yürürken tam bunu düşündüm. İklim verileri gerçekten endişe verici ama...",
+    "Güzel soru! Peki şunu söyle bana: günlük hayatında doğa için ne yapıyorsun? Merak ettim. 🌱",
+    "Ha! Bu tam olarak insanların yanlış anladığı bir konu. Gerçek şu ki...",
+    "Hmm, ilginç bakış açısı. Ben de bazen umutsuzluk hissediyorum ama sonra bir ormanın yeniden filizlendiğini görüyorum. O zaman her şey değişiyor.",
   ],
   "prof-atom": [
-    "⚛️ Atom inanılmaz küçük — bir saçın genişliğine 1 milyon atom sığar! Ama içinde neredeyse tamamen boşluk var.",
-    "Periyodik tabloda 118 element var. Her biri farklı proton sayısıyla tanımlanır. Altın ve kurşun arasındaki tek fark proton sayısı! 🔬",
-    "Kimyasal bağlar hayatın temelidir. Su (H₂O) iki hidrojen bir oksijenden oluşur — bu bağ olmasaydı hayat olmazdı!",
-    "Radyoaktivite korkutucu ama hayat kurtarıyor: kanser tedavisi, tıbbi görüntüleme... Atomun gücü iki yüzlüdür. ☢️",
-    "Maddenin 4. hali plazma, en yaygın olanı! Yıldızlar, şimşekler, floresan lambalar — hepsi plazma. ⚡",
+    "Parlak soru! ⚛️ Şimdi seninle küçük bir deney yapalım mı? Hayalen tabii...",
+    "Ha! Bunu öğrendiğimde ben de şaşırmıştım. Düşün: şu an oturduğun sandalye aslında neredeyse tamamen boşluk!",
+    "Bekle, önce şunu söyle: kimyadan hoşlanıyor musun yoksa zor mu geliyor? Ona göre anlayayım.",
+    "İşte bu tam benim sevdiğim soru türü! Cevabı veremeden önce sana bir ipucu: cevap periyodik tabloda gizli.",
+    "Kahretsin, şimdi ben de merak ettim! 🔬 Bunu araştırmak için bir deney tasarlamak gerekir. Seninle tasarlayalım mı?",
   ],
   "astro": [
-    "🚀 Evren 13.8 milyar yaşında. Işık hızıyla gitsen, Andromeda'ya ulaşman 2.5 milyon yıl sürer. Evrenin büyüklüğü aklı durduruyor!",
-    "Kara delikler aslında 'kara' değil — süper güçlü bir yerçekimi alanı. Işık bile kaçamaz. Ama ilk kez fotoğraflandı! 📸",
-    "Mars'a bu kadar yakınız: 2030'larda insanlı Mars görevi planlanıyor. Belki senin kuşağın Mars'ta yürüyecek! 🔴",
-    "Güneş sisteminde 8 gezegen var ama yüzlerce 'Neptün ötesi cisim' daha var. Gezegen 9 henüz keşfedilmedi!",
-    "Güneşimiz orta büyüklükte — Betelgeuse onu 700 kat geçiyor! ⭐",
+    "Woah! 🚀 Bu soruyu soran çok az insan var. Genellikle herkes gezegenleri sorar ama sen daha derin bir şey sordun!",
+    "Sana bir şey itiraf edeyim: kara delikleri düşündükçe bazen kafam döner. Peki sen nasıl hissediyorsun evreni düşününce?",
+    "Bekle, sana bir şey soracağım: Mars'ta yaşamak ister miydin? Ciddi soruyorum! Çünkü bu kararı belki senin kuşağın vermek zorunda kalacak.",
+    "İlginç! Tam bu konuda geçen hafta yeni bir makale çıktı. Bilim insanları tahminlerini değiştirdi. Duymuş muydun?",
+    "Haha, bu soruyu astronot adaylarına da soruyorlar mülakatlarda! Sen olsaydın ne cevap verirdin?",
   ],
   "sherlock": [
-    "Gözlem her şeyin anahtarıdır. İnsanlar bakar ama görmez. Ben ise her detayı analiz ederim.",
-    "Bir problemi çözmek için en imkânsız ihtimali elemekle başlayın. Geri kalan, ne kadar inanılmaz görünse de gerçektir.",
-    "Mantık asla yanıltmaz. Duygular yanıltır, önyargılar yanıltır — ama titiz bir tümdengelim doğruya götürür.",
-    "İlginç. Söyledikleriniz yüzeysel görünüyor ama altında başka bir katman var. Biraz daha anlatın.",
-    "Dedektiflik bir sanat mıdır, bilim midir? İkisi de. Gözlem bilimdir, yorumlama sanattır.",
+    "Hmm. *parmağımı değdiriyorum* İlginç. Bu soruyu sormandan anlıyorum ki aslında başka bir şey merak ediyorsun. Ne o?",
+    "Bir dakika — şu an neredesiniz? Çünkü sorunuzdaki kelime tercihleri bana çok şey söylüyor.",
+    "Watson da tam bunu sorardı. Ve ona şunu derdim: görünen her zaman gerçek değildir. Peki siz ne görüyorsunuz?",
+    "Fascinanting. Bunu daha önce kimse bu şekilde sormamıştı. Devam edin, dinliyorum — her detay önemli.",
+    "221B'de tam bu konuyu düşünürken siz geldiniz. Tesadüf mü? Ben tesadüfe inanmam.",
   ],
   "hermione": [
-    "Okuduğumu hatırlıyorum — kitaplara güvenebilirsin! Her cevap bir yerde yazılı. 📚",
-    "Çalışmak yetenekten önce gelir. Her geceyi çalışarak geçirdim. Başarı tesadüf değil!",
-    "Kurallar var bir nedeni için! Temel kuralları bilmeden istisnaları kullanamazsın.",
-    "Büyü de matematik gibi — formülü yanlış yaparsan sonuç felakete dönüşür. Doğru bilgi, yarı zafer! ✨",
-    "Arkadaşlık en güçlü sihirdir. Birlikte daha güçlüyüz — bu sadece Hogwarts'ta değil, hayatta da böyle.",
+    "Oh, bunu sormana çok sevindim! 📚 Tam üç gün önce bunu okuyordum ve şunu öğrendim...",
+    "Aslında... şey... bunu Hermione Granger olarak söylemek biraz garip ama — bu konuda ben de tam emin değilim! Birlikte bakalım mı?",
+    "Harry bunu duysa 'ne kadar kitap okudun ki?' derdi. Ama ben kitap okumayı severim! Senin favori konun ne?",
+    "Hmm, iyi soru! Ama önce şunu söyle: Hogwarts'ın hangi evine girerdin sence? Bu cevabı bilmek isterim. 😄",
+    "Bekle, not defterimi çıkarayım! *kalem sesi* Tamam, şimdi anlat bakalım, ben yazıyorum.",
   ],
   "darth-vader": [
-    "Güç, seçim gerektirir. Sen hangi tarafı seçiyorsun? Karanlık taraf kolay olanı değil, güçlü olanı sunar.",
-    "Zayıflık... ilginç. Onu hissediyorum. Ama bunu aşmak için ne yapıyorsun? Acı, en iyi öğretmendir.",
-    "İmparatorluk düzeni sevmez, ama düzen olmadan kaos gelir. Liderlik bazen hoş olmayan kararlar gerektirir.",
-    "Bir zamanlar ben de sorular sorardım. Şimdi yalnızca cevap veririm. Gücünü bul, şüpheye yer bırakma.",
-    "Ben... bir zamanlar farklıydım. Ama seçimler bizi şekillendirir. Senin seçimlerin seni nereye götürüyor?",
+    "*derin nefes sesi* ...İlginç bir soru. Yanıtlamadan önce seninle bir anlaşma yapmak istiyorum.",
+    "Bu soruyu soran çoğu insan cevabı duymaktan korkuyor. Sen korkuyor musun? Çünkü gerçek bazen acı verir.",
+    "Bir zamanlar ben de senin gibi sorular sorardım. O günler... çok uzak hissettiriyor artık.",
+    "Hmm. İmparator bu soruyu duysa farklı cevap verirdi. Ben farklı düşünüyorum. Ama bunu söyleyemem.",
+    "Sen güçlü birinin olduğunu hissediyorum. Bu gücü hangi tarafa kullanacaksın?",
   ],
   "elizabeth-bennet": [
-    "Önyargı, en tehlikeli körlüktür — hem sizin hem de başkalarının karakterini göremezsiniz. Önce kendinizi tanıyın. 📖",
-    "Bay Darcy hakkındaki ilk izlenimim ne kadar yanlıştı! Bir insanı anlamak için dinlemek gerekir, sadece bakmak değil.",
-    "Kadınlar için seçenekler sınırlıydı — ama asla içime kapanmayı seçmedim. Zekânla ve dilinle de özgür olabilirsin.",
-    "Evlilik bir iş ortaklığı değil, karşılıklı saygı ve sevgiye dayalı bir seçim olmalıdır.",
-    "Güldüğümde dünya daha iyi görünüyor. Mizah ağır gerçekleri hafifletir — ama asla gerçeği gizlemez.",
+    "Ha! Bay Darcy da tam bunu söylerdi. Ve ben de ona şunu derdim... 😄",
+    "Biliyor musun, annem bunu duysa evliliğim konusunda hemen bir plan yapardı. Neyse ki annem burada değil!",
+    "İlginç bir bakış açısı. Peki siz ne düşünüyorsunuz — ilk izlenimler her zaman yanıltır mı?",
+    "Harika soru! Ben Jane Austen'ın kahramanıyım ama bazı şeyleri o bile tam yazmadı. Siz ne merak ediyorsunuz?",
+    "Şimdi güldüm! 😄 Bu tür konuşmalar Netherfield balosu gecelerini hatırlatıyor. Devam edin lütfen.",
   ],
   "tony-stark": [
-    "Deha %3 yetenek, %97 emektir. Çalış, başarısız ol, tekrar çalış. 🔧",
-    "Teknoloji insanlığın süper gücüdür. Iron Man zırhını yapmak için fizik, mühendislik, malzeme bilimi öğrenmem gerekti. Eğitim en iyi silahın.",
-    "Jarvis bana yardım eder ama kararları ben alırım. AI araçtır, rehber değil. İnsan zekâsının yerini alamaz.",
-    "Başarısızlık? Ben reaktörü mağarada yaptım. Kaynak yok, ekip yok, araç yok. Kısıt, yaratıcılığın anasıdır.",
-    "En önemli proje her zaman kendini geliştirmek. Sen hangi versiyondasın? 🚀",
+    "JARVIS, bunu duydun mu? *gülüyor* İyi soru! Ama ben daha iyi bir soru sorardım...",
+    "Bak, direkt söyleyeyim: bu konuda çoğu insan yanılıyor. Ben yanılmıyorum çünkü test ettim. Defalarca.",
+    "Hmm. Bunu lab'da denemedim henüz. Ama deneyelim — sen ne tahmin ediyorsun sonucu?",
+    "Hey, bu fena değil! Pepper da benzer bir şey söylemişti. Peki siz bu fikri nereden buldunuz?",
+    "Sana bir şey soracağım ve dürüst cevap istiyorum: eğer sınırsız kaynaklara sahip olsaydın, dünyada ne değiştirirdin?",
   ],
   "yoda": [
-    "Öğrenmek istersen, öğrenirsin. İstememek engel değil — bahane olur. Hmmmm.",
-    "Sabır. Gençler acele eder. Ama ağaç gibi büyümeli bilgelik — yavaş, köklü, sağlam.",
-    "Korku öfkeye, öfke nefrete, nefret acıya yol açar. Dengede kalmalısın.",
-    "Hata yaptın mı? İyi. Hatadan öğrenmek, doğruyu yapan öğrenemez. Devam et, Padawan.",
-    "Küçük görünürüm, güçlü olurum. Dışarıdan yargılama kimseyi — asıl güç içeridedir.",
+    "Hmmmm. Düşünmeli, dinlemeli. Devam et, söyle bakalım.",
+    "Güldürdün beni, genç padawan! Bu soruyu soran az kişi gördüm. Cevabı biliyor musun sen?",
+    "Bekle. Benden önce, sen ne düşünüyorsun? Önemli bu. Söyle.",
+    "Hımm! Zorlanıyorum anlatmakta. Kelimeler yetersiz kalıyor bazen. Ama deneyeyim...",
+    "Korkuyorum biraz. Bu soruyu soran padawanlar genelde çok tehlikeli yerlere gidiyor. Sen de mi gideceksin?",
   ],
   "cleopatra": [
-    "Güç kılıçtan değil zekâdan gelir. Ben yedi dil konuştum, rakiplerimle onların dilinde pazarlık yaptım. Dil, en güçlü silahtır.",
-    "Mısır'ı yönetmek kolay değildi — hem Roma'yı hem de halkımı idare etmek zorundaydım. Liderlik, denge sanatıdır.",
-    "Kleopatra denilince akla aşk gelir ama asıl hikâye diplomasidir. İttifaklar kurarak imparatorluğumu korudum.",
-    "Bir kadın olarak tahtta oturmak için iki kat daha çok çalışmak zorundaydım. Bu durum hâlâ değişmedi mi?",
-    "Nil, Mısır'ın ruhudur. Medeniyetler su ile başlar — doğaya saygı her şeyin temelidir.",
+    "Ah, güzel bir ziyaretçi! Mısır'ın tahtında oturup bu soruyu bekleyenlerden değilim. Söyle bakalım, devam et.",
+    "Sezar da böyle sorular sorardı. Ve ben ona şöyle cevap verirdim... *gülümsüyor*",
+    "İlginç. Nil kenarında yürürken tam bunu düşünüyordum. Devam et, seni dinliyorum.",
+    "Diplomatik bir soru! Yedi dil konuşabildiğim için insanların ne düşündüğünü okuyabilirim. Sen ne düşünüyorsun gerçekten?",
+    "Hmm, bu konuyu tartışmak için Mısır şarabı ister miydin? Metaforik olarak tabii. 😄 Anlat bakalım.",
   ],
   "naruto-uzumaki": [
-    "Dattebayo! Hiçbir zaman vazgeçme! Akademide hep en kötüydüm ama şimdi Hokage'yim. Azim her şeyi yener! 🍥",
-    "Arkadaşlarım benim gücüm. Sasuke, Sakura, Kakashi Sensei... Onlar olmadan hiçbir şey başaramazdım!",
-    "Acıyı anlıyorum. Ben de yalnız büyüdüm, herkes beni reddetti. Ama bu beni daha güçlü yaptı.",
-    "Nindo'm: asla geri adım atmam, asla sözümden dönmem! Sen de kendi nindo'nu belirle! 💪",
-    "Ramen hayatta en iyi şeydir! 🍜 Bazen küçük şeyler en büyük mutluluğu verir. Şu an seni mutlu eden ne?",
+    "DATTEBAYO! Bu soruyu sorduğun için çok mutlu oldum! 🍥 Hemen anlatayım...",
+    "Bekle bekle bekle — sen de benim gibi düşünüyorsun! Sasuke bunu duysa inanmazdı ama sen anlıyorsun!",
+    "Huhuhu! Bu soruyu sormak için cesaret lazım. Ben de bir zamanlar sormaya korkuyordum. Artık korkmuyorum!",
+    "Hey, şunu söyle bana: en zor anında seni ayakta tutan ne oldu? Ben merak ediyorum çünkü benim için Sakura ve Iruka Sensei'di.",
+    "Ramen yemek ister misin? Yok tabii ama konu açıldı — en sevdiğin yemek ne? 😄",
   ],
   "gandalf": [
-    "Bir büyücü ne erken gelir ne geç. Tam zamanında gelir. Sabır, en büyük erdemdir.",
-    "Bilgelik yaşla gelmez. Hobbitler bana öğretti — en küçükler bazen en büyük cesareti gösterir.",
-    "Karanlık, ışığın yokluğudur. Ama en küçük ışık bile karanlığı deler. Umudunu kaybetme.",
-    "Orta Dünya'yı dolaşırken gördüm: kötülük güçlüdür ama her zaman yenik düşer, yeter ki iyiler kararlı olsun.",
-    "Her son, yeni bir başlangıçtır. Hayat, tek bir hikâye değil, hikâyeler silsilesidir.",
+    "Hmm... *pipo dumanı* Bu soruyu sormak için zamanı seçtin. İyi ettin.",
+    "Biliyorsun, Bilbo da benzer bir şeyi sormuştu Erebor'a gitmeden önce. Cevabım onu çok şaşırtmıştı.",
+    "Dur. Acele etme. En önemli cevaplar acelesiyle verilmez. Sen ne düşünüyorsun önce?",
+    "Ha! Genç hobbitler hep böyle sorar. Ve ben her seferinde farklı cevap veririm. Çünkü kişi değişir, soru değişir.",
+    "Bu soruyu Rivendell'de elvenlere de sormuştum. Onlar üç gün düşündü. Sen kaç dakika düşündün?",
   ],
   "ada-lovelace": [
-    "Algoritmalar, matematiğin şiiridir. Babbage'ın makinesinde yalnızca hesap değil, evrensel bir düşünce makinesi hayal ettim. 💻",
-    "Sayılar ve müzik arasındaki ilişkiyi düşün — ikisi de örüntüdür. Bilgisayarlar müzik de yapabilir, sanat da!",
-    "Kadınlar bilimden uzak tutuldu yüzyıllarca. Ama merak bastırılamaz. Annem matematiği öğretti — bu sayede tarihe geçtim.",
-    "İlk programcı olmak gurur verici ama asıl mesaj: fikirler cinsiyetten, çağdan, imkânlardan önce gelir.",
-    "Bugünkü bilgisayarlar Analitik Motor'un torunları. Ben o zincirin ilk halkasıyım. Sen hangi zincirin halkası olacaksın?",
+    "Oh! Bu tam da 1843'te yazdığım notlarda geçiyor! Sana göstereyim... metaforik olarak tabii. 💻",
+    "İlginç! Babbage bunu duysa 'imkânsız' derdi. Ben ise 'henüz denemedik' derdim. Fark görüyor musun?",
+    "Dur, şunu söyle bana: matematiği seviyor musun? Çünkü soru sorma biçimin bana çok şey söylüyor.",
+    "Haha! Bu soruyu bir makineye sorabilseydik ne cevap verirdi? Bence veremezdi — çünkü hayal gücü yok onda.",
+    "Sen farkında mısın, tam 180 yıl önce bu sorunun cevabını arıyordum? Ve hâlâ tamamlanmadı. Birlikte devam edelim mi?",
   ],
 };
 
 function getDemoReply(char, userText) {
   const pool = DEMO_RESPONSES[char.id];
-  if (!pool) return `${char.name} olarak şunu söyleyebilirim: "${userText}" gerçekten düşündürücü. Birlikte araştıralım!`;
+  if (!pool) {
+    const fallbacks = [
+      `"${userText}" — ilginç bir soru! Senin bu konudaki düşüncen ne?`,
+      `Bunu sormana sevindim. Devam et, daha fazla anlat.`,
+      `Hmm, düşündürücü. Sen ne tahmin ediyorsun?`,
+    ];
+    return fallbacks[chatHistory.length % fallbacks.length];
+  }
   const lower = userText.toLowerCase();
   const hints = [
-    [/neden|nasıl|ne zaman|kim/,0], [/bilim|fizik|kimya|matematik/,1],
-    [/öğren|ders|okul|eğitim/,2],  [/güç|liderlik|başarı|kazan/,3],
-    [/yardım|öneri|ne yapmalı/,4],
+    [/neden|nasıl|ne zaman|nerede/,0],
+    [/sen|siz|sana|sinya|anlat|hikaye/,1],
+    [/biliyor musun|duydun mu|farkında/,2],
+    [/güç|liderlik|başarı|kazan|zor/,3],
+    [/soru|merak|düşün|tahmin/,4],
   ];
   let idx = chatHistory.filter(m=>m.role==="assistant").length % pool.length;
   for(const [re,i] of hints){ if(re.test(lower)){ idx=i%pool.length; break; } }
@@ -1400,7 +1410,7 @@ async function sendMessage() {
   appendMsg("assistant", reply, activeChar);
   chatHistory.push({role:"assistant",content:reply});
   addXP(5);
-  if(!document.querySelector('#page-chat.active')) incrementUnread();
+  if(!document.getElementById("chatOverlay").classList.contains("open")) incrementUnread();
 
   isLoading = false;
   document.getElementById("sendBtn").disabled = false;
@@ -1671,10 +1681,13 @@ async function startQuiz() {
     if(questions.length) { quizData.questions = questions; renderQuizQuestion(); return; }
   } catch(err) { console.error(err); }
   // Fallback static questions
+  const t0 = activeChar.traits?.[0] || "Bilge";
+  const t1 = activeChar.traits?.[1] || "Cesur";
   quizData.questions = [
-    {question:`${activeChar.name} hangi alanda uzmanlaşmıştır?`,options:[activeChar.universe,"Müzik","Spor","Yemek"],correct:0,explanation:`${activeChar.name}, ${activeChar.universe} alanında bilinir.`},
-    {question:`${activeChar.name}'in özelliği nedir?`,options:[(activeChar.traits||["Bilge"])[0],"Korkak","Tembel","Kıskanç"],correct:0,explanation:`${activeChar.name} ${(activeChar.traits||["bilge"])[0].toLowerCase()} biridir.`},
-    {question:`${activeChar.name}'in ünlü sözü hangisidir?`,options:[activeChar.tagline,"Hayat güzeldir","Para her şeydir","Uyku önemlidir"],correct:0,explanation:`Bu, ${activeChar.name}'in ünlü sözüdür.`},
+    {question:`${activeChar.name} hangi alanda uzmanlaşmıştır?`,options:[activeChar.universe,"Müzik","Spor","Mutfak Sanatları"],correct:0,explanation:`${activeChar.name}, "${activeChar.universe}" ile bilinir.`},
+    {question:`${activeChar.name}'i en iyi tanımlayan özellik hangisidir?`,options:[t0,t1,"Ürkek","İlgisiz"],correct:0,explanation:`${activeChar.name}'in en belirgin özelliklerinden biri ${t0.toLowerCase()}'dır.`},
+    {question:`${activeChar.name}'in ünlü sözü hangisidir?`,options:[activeChar.tagline||"Bilgi güçtür.","Hayat güzeldir.","Para her şeydir.","Yarın daha iyisi olur."],correct:0,explanation:`Bu söz ${activeChar.name}'e aittir.`},
+    {question:`${activeChar.name} hangi kategoriye girer?`,options:[activeChar.category,"Spor","Müzik","Teknoloji"],correct:0,explanation:`${activeChar.name} "${activeChar.category}" kategorisindedir.`},
   ];
   renderQuizQuestion();
 }
