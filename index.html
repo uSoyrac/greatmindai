@@ -1016,6 +1016,8 @@ let chatHistory = [];
 let isLoading = false;
 let activeLang = "tr";
 let ttsEnabled = false;
+const _msgStore = {};
+let _msgId = 0;
 let currentDetailChar = null;
 let customChars = [];
 let quizData = {questions:[],current:0,score:0,answered:false};
@@ -1314,7 +1316,9 @@ function appendMsg(role, content, char) {
       ? `<div class="msg-bubble-avatar-emoji" style="background:${char.accentColor}22">${char.avatarEmoji}</div>`
       : `<img class="msg-bubble-avatar" src="${char.avatarUrl}" alt="${char.name}"/>`;
   }
-  const ttsBtn = !isUser ? `<div class="msg-tts-btn" onclick="speakText(this,'${encodeURIComponent(content)}')">🔊 Dinle</div>` : "";
+  const msgId = ++_msgId;
+  if(!isUser) _msgStore[msgId] = content;
+  const ttsBtn = !isUser ? `<div class="msg-tts-btn" onclick="speakMsg(${msgId})">🔊 Dinle</div>` : "";
   const div = document.createElement("div");
   div.className = "msg-row "+(isUser?"user":"");
   div.innerHTML = `${!isUser?avatarHtml:""}<div><div class="msg-bubble ${role}">${escHtml(content)}</div><div class="msg-time">${getTime()}</div>${ttsBtn}</div>`;
@@ -1581,10 +1585,27 @@ async function callGeminiAPI(systemPrompt, history) {
     const fullSystem = systemPrompt + "\n\n" + (langMap[activeLang]||langMap.tr) + styleNote;
 
     // Gemini formatı: user / model
-    const contents = history.map(m => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }]
-    }));
+    // ÖNEMLİ: Gemini ilk mesajın 'user' olmasını zorunlu kılıyor.
+    // Karakterin firstMessage'ı (assistant) başta olduğu için bunu atlıyoruz.
+    let filtered = history.filter((m, i) => {
+      if(i === 0 && m.role === 'assistant') return false; // ilk hoşgeldin mesajını atla
+      return true;
+    });
+    // Hâlâ başı model ise sil
+    while(filtered.length && filtered[0].role === 'assistant') filtered.shift();
+    if(!filtered.length) return null;
+
+    // Ardışık aynı rol varsa birleştir (Gemini strict alternation ister)
+    const merged = [];
+    for(const m of filtered) {
+      const role = m.role === 'assistant' ? 'model' : 'user';
+      if(merged.length && merged[merged.length-1].role === role) {
+        merged[merged.length-1].parts[0].text += '\n' + m.content;
+      } else {
+        merged.push({ role, parts:[{ text: m.content }] });
+      }
+    }
+    const contents = merged;
 
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
@@ -1688,9 +1709,9 @@ function disableVoiceMode() {
   window.speechSynthesis?.cancel();
   stopRecording();
 }
-function speakText(el, encodedText) {
-  const text = decodeURIComponent(encodedText);
-  speakTextDirect(text, activeChar);
+function speakMsg(id) {
+  const text = _msgStore[id];
+  if(text) speakTextDirect(text, activeChar);
 }
 
 // ─── Akıllı ses seçici ────────────────────────────────────────────────────
