@@ -181,6 +181,14 @@ input,textarea{font-family:inherit;color:var(--text)}
 .send-btn{width:44px;height:44px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;transition:.2s}
 .send-btn:hover{opacity:.9;transform:scale(1.05)}
 .send-btn:disabled{opacity:.4;transform:none}
+.mic-btn{width:44px;height:44px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;cursor:pointer;transition:.2s}
+.mic-btn:hover{border-color:var(--purple)}
+.mic-btn.recording{background:rgba(239,68,68,.15);border-color:#EF4444;animation:micPulse 1.2s ease-in-out infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 10px rgba(239,68,68,0)}}
+.chat-tts-btn.speaking{border-color:#E040A0;background:rgba(224,64,160,.2);animation:ttsPulse 1.5s ease-in-out infinite}
+@keyframes ttsPulse{0%,100%{opacity:1}50%{opacity:.5}}
+.voice-mode-bar{display:none;align-items:center;justify-content:center;gap:8px;padding:8px 16px;background:linear-gradient(135deg,rgba(123,79,212,.15),rgba(224,64,160,.15));border-top:1px solid rgba(123,79,212,.3);font-size:13px;font-weight:600;color:var(--purple)}
+.voice-mode-bar.active{display:flex}
 .quiz-prompt{margin:8px 16px;padding:12px 16px;background:linear-gradient(135deg,rgba(123,79,212,.15),rgba(0,200,232,.1));border:1px solid rgba(0,200,232,.3);border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
 .quiz-prompt-text{font-size:13px;font-weight:600;color:var(--cyan)}
 .quiz-prompt-btn{padding:6px 14px;border-radius:20px;background:var(--grad);color:#fff;font-size:12px;font-weight:700;white-space:nowrap}
@@ -589,7 +597,7 @@ input,textarea{font-family:inherit;color:var(--text)}
         <div class="chat-header-sub" id="chatSub"></div>
       </div>
       <div class="chat-header-actions">
-        <button class="chat-tts-btn" id="ttsToggleBtn" onclick="toggleTTS()" title="Sesli Okuma">🔊</button>
+        <button class="chat-tts-btn" id="ttsToggleBtn" onclick="toggleVoiceMode()" title="Sesli Mod (TTS + Mikrofon)">🔊</button>
         <div class="lang-btn" id="langBtn" onclick="toggleLangDropdown(event)">
           <span id="langFlag">🇹🇷</span>
           <span id="langCode">TR</span>
@@ -609,8 +617,13 @@ input,textarea{font-family:inherit;color:var(--text)}
       <span class="quiz-prompt-text">🎯 Sohbet tamamlandı! Quiz'e katıl ve XP kazan</span>
       <span class="quiz-prompt-btn">Başla →</span>
     </div>
+    <div class="voice-mode-bar" id="voiceModeBar">
+      🎙️ Sesli Mod Aktif — Mikrofona bas, konuş, AI otomatik okur
+      <button onclick="disableVoiceMode()" style="padding:3px 10px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--purple);font-size:11px;cursor:pointer">Kapat</button>
+    </div>
     <div class="chat-input-area">
-      <textarea class="chat-textarea" id="chatInput" placeholder="Mesaj yaz..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="Sesli Giriş">🎤</button>
+      <textarea class="chat-textarea" id="chatInput" placeholder="Mesaj yaz veya 🎤 bas konuş..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
       <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>➤</button>
     </div>
   </div>
@@ -1243,6 +1256,12 @@ function openChat(id, prefillQuestion) {
   document.getElementById("chatInput").value = "";
   document.getElementById("chatInput").style.height = "44px";
   document.getElementById("sendBtn").disabled = false;
+  // Sesli modu sıfırla
+  voiceMode = false; ttsEnabled = false;
+  const ttsB = document.getElementById("ttsToggleBtn");
+  if(ttsB) { ttsB.classList.remove("active","speaking"); ttsB.textContent = "🔊"; }
+  const vBar = document.getElementById("voiceModeBar");
+  if(vBar) vBar.classList.remove("active");
   document.getElementById("chatOverlay").classList.add("open");
   // Welcome message
   appendMsg("assistant", char.firstMessage||"Merhaba! Nasıl yardımcı olabilirim?", char);
@@ -1258,6 +1277,9 @@ function openChat(id, prefillQuestion) {
   }
 }
 function closeChat() {
+  // Ses ve kayıt durdur
+  window.speechSynthesis?.cancel();
+  stopRecording();
   document.getElementById("chatOverlay").classList.remove("open");
   const userMsgCount = chatHistory.filter(m=>m.role==='user').length;
   if(chatHistory.length>2) {
@@ -1643,11 +1665,28 @@ function autoResize(el) {
 }
 
 // ─── TTS ─────────────────────────────────────────────────────────────────
-function toggleTTS() {
-  ttsEnabled = !ttsEnabled;
+// ─── TTS (Text-to-Speech) ────────────────────────────────────────────────
+let voiceMode = false; // sesli mod: TTS + STT birlikte
+
+function toggleVoiceMode() {
+  voiceMode = !voiceMode;
+  ttsEnabled = voiceMode;
   const btn = document.getElementById("ttsToggleBtn");
-  btn.classList.toggle("active", ttsEnabled);
-  btn.title = ttsEnabled ? "Sesli Okuma Açık" : "Sesli Okuma Kapalı";
+  const bar = document.getElementById("voiceModeBar");
+  btn.classList.toggle("active", voiceMode);
+  btn.textContent = voiceMode ? "🔊" : "🔊";
+  btn.title = voiceMode ? "Sesli Mod Açık — kapat" : "Sesli Modu Aç";
+  if(bar) bar.classList.toggle("active", voiceMode);
+  if(!voiceMode) { window.speechSynthesis?.cancel(); stopRecording(); }
+}
+function disableVoiceMode() {
+  voiceMode = false; ttsEnabled = false;
+  const btn = document.getElementById("ttsToggleBtn");
+  const bar = document.getElementById("voiceModeBar");
+  if(btn) { btn.classList.remove("active"); btn.title = "Sesli Modu Aç"; }
+  if(bar) bar.classList.remove("active");
+  window.speechSynthesis?.cancel();
+  stopRecording();
 }
 function speakText(el, encodedText) {
   const text = decodeURIComponent(encodedText);
@@ -1657,14 +1696,88 @@ function speakTextDirect(text, char) {
   if(!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(text);
-  if(char&&char.voiceConfig) {
-    utt.lang = char.voiceConfig.language||"tr-TR";
-    utt.pitch = char.voiceConfig.pitch||1.0;
-    utt.rate = char.voiceConfig.rate||1.0;
+  const vc = char?.voiceConfig;
+  if(vc) {
+    utt.lang  = vc.language || "tr-TR";
+    utt.pitch = vc.pitch    || 1.0;
+    utt.rate  = vc.rate     || 1.0;
   } else {
     utt.lang = activeLang==="en"?"en-US":activeLang==="de"?"de-DE":"tr-TR";
   }
+  // Konuşma başlarken TTS butonunu animate et
+  const ttsBtn = document.getElementById("ttsToggleBtn");
+  utt.onstart = ()=> ttsBtn?.classList.add("speaking");
+  utt.onend   = ()=> {
+    ttsBtn?.classList.remove("speaking");
+    // Sesli modda AI konuşmayı bitirince mikrofonu aç
+    if(voiceMode && !isLoading) setTimeout(startRecording, 500);
+  };
+  utt.onerror = ()=> ttsBtn?.classList.remove("speaking");
   window.speechSynthesis.speak(utt);
+}
+
+// ─── STT (Speech-to-Text / Mikrofon) ─────────────────────────────────────
+let recognition = null;
+let isRecording  = false;
+
+function hasSpeechRecognition() {
+  return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+}
+
+function toggleMic() {
+  if(!hasSpeechRecognition()) {
+    showCelebration("🎤","Desteklenmiyor","Sesli giriş için Chrome veya Safari kullan.");
+    return;
+  }
+  if(isRecording) { stopRecording(); return; }
+  startRecording();
+}
+
+function startRecording() {
+  if(isRecording || isLoading) return;
+  if(!hasSpeechRecognition()) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous   = false;
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+  recognition.lang = activeLang==="en"?"en-US":activeLang==="de"?"de-DE":"tr-TR";
+
+  const micBtn = document.getElementById("micBtn");
+  const input  = document.getElementById("chatInput");
+
+  recognition.onstart = () => {
+    isRecording = true;
+    window.speechSynthesis?.cancel(); // AI konuşuyorsa durdur
+    if(micBtn) { micBtn.classList.add("recording"); micBtn.textContent = "⏹️"; }
+    if(input)  { input.placeholder = "🎤 Dinleniyor... (dur için tekrar bas)"; }
+  };
+  recognition.onresult = (e) => {
+    const transcript = Array.from(e.results).map(r=>r[0].transcript).join("");
+    if(input) { input.value = transcript; autoResize(input); }
+    document.getElementById("sendBtn").disabled = !transcript.trim();
+  };
+  recognition.onend = () => {
+    isRecording = false;
+    if(micBtn) { micBtn.classList.remove("recording"); micBtn.textContent = "🎤"; }
+    if(input)  { input.placeholder = "Mesaj yaz veya 🎤 bas konuş..."; }
+    // Konuşma yakalandıysa otomatik gönder
+    if(input?.value.trim()) setTimeout(()=>sendMessage(), 200);
+  };
+  recognition.onerror = (e) => {
+    isRecording = false;
+    if(micBtn) { micBtn.classList.remove("recording"); micBtn.textContent = "🎤"; }
+    if(input)  { input.placeholder = "Mesaj yaz veya 🎤 bas konuş..."; }
+    if(e.error === "not-allowed") showCelebration("🎤","Mikrofon İzni Gerekli","Tarayıcı ayarlarından mikrofon iznini ver.");
+  };
+  try { recognition.start(); } catch(e) { console.error("STT start error:", e); }
+}
+
+function stopRecording() {
+  try { recognition?.stop(); } catch(e) {}
+  isRecording = false;
+  const micBtn = document.getElementById("micBtn");
+  if(micBtn) { micBtn.classList.remove("recording"); micBtn.textContent = "🎤"; }
 }
 
 // ─── Username ────────────────────────────────────────────────────────────
