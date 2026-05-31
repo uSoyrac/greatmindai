@@ -597,7 +597,8 @@ input,textarea{font-family:inherit;color:var(--text)}
         <div class="chat-header-sub" id="chatSub"></div>
       </div>
       <div class="chat-header-actions">
-        <button class="chat-tts-btn" id="ttsToggleBtn" onclick="toggleVoiceMode()" title="Sesli Mod (TTS + Mikrofon)">🔊</button>
+        <button class="chat-tts-btn" id="ttsToggleBtn" onclick="toggleVoiceMode()" title="Sesli Mod (TTS + Mikrofon)" aria-label="Sesli Mod">🔊</button>
+        <button class="chat-tts-btn" id="socraticToggleBtn" onclick="toggleSocratic()" title="Sokratik Mod: Sorularla yönlendir" aria-label="Sokratik Mod">💡</button>
         <div class="lang-btn" id="langBtn" onclick="toggleLangDropdown(event)">
           <span id="langFlag">🇹🇷</span>
           <span id="langCode">TR</span>
@@ -733,6 +734,18 @@ input,textarea{font-family:inherit;color:var(--text)}
   </div>
 </div>
 
+<!-- Conversation Analysis Modal -->
+<div class="celebrate-overlay" id="analysisOverlay">
+  <div class="celebrate-modal" style="max-width:380px">
+    <div class="celebrate-emoji">🧠</div>
+    <div class="celebrate-title" style="font-size:18px">Sohbet Analizi</div>
+    <div id="analysisFeedback" style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:12px;text-align:left"></div>
+    <div id="analysisSkills" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;justify-content:center"></div>
+    <div id="analysisEncouragement" style="font-size:13px;color:var(--cyan);font-style:italic;margin-bottom:20px;text-align:center"></div>
+    <button class="celebrate-btn" onclick="closeAnalysis()">Devam Et 🚀</button>
+  </div>
+</div>
+
 <!-- Celebration Modal -->
 <div class="celebrate-overlay" id="celebrateOverlay">
   <div class="celebrate-modal">
@@ -793,7 +806,7 @@ const CHARACTERS = [
     avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=eko&backgroundColor=d1fae5",
     accentColor:"#16A34A",
     voiceConfig:{language:"tr-TR",pitch:1.15,rate:0.95,gender:"female"},
-    unlockXp:0,
+    unlockXp:50,
     exampleQuestions:["Besin zinciri nedir?","İklim değişikliği ekosistemleri nasıl etkiler?","Ormansızlaşma neden tehlikeli?"],
     systemPrompt:"Sen Eko'sun — çevre danışmanı eğitim ajanısın. Öğrencilere ekosistem, besin zinciri ve çevre sorunları konularında rehberlik edersin.",
     firstMessage:"Merhaba! Ben Eko. Doğa ve ekosistemler hakkında ne öğrenmek istersin?"
@@ -806,7 +819,7 @@ const CHARACTERS = [
     avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=profatom&backgroundColor=fef9c3",
     accentColor:"#D97706",
     voiceConfig:{language:"tr-TR",pitch:0.8,rate:0.9,gender:"male"},
-    unlockXp:0,
+    unlockXp:100,
     exampleQuestions:["Maddenin halleri nelerdir?","Enerji dönüşümü nasıl gerçekleşir?","Atom neden bu kadar küçük?"],
     systemPrompt:"Sen Prof. Atom'sun — fizik ve kimya araştırmacısı eğitim ajanısın. Maddenin halleri ve enerji dönüşümleri konularında öğrencilere rehberlik edersin.",
     firstMessage:"Merhaba! Ben Prof. Atom. Madde ve enerji hakkında ne keşfetmek istersin?"
@@ -819,7 +832,7 @@ const CHARACTERS = [
     avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=astro&backgroundColor=b6e3f4",
     accentColor:"#0369A1",
     voiceConfig:{language:"tr-TR",pitch:0.9,rate:1.0,gender:"male"},
-    unlockXp:0,
+    unlockXp:150,
     exampleQuestions:["Güneş sistemi nasıl oluştu?","Kara delik nedir?","Mars'a gidebilir miyiz?"],
     systemPrompt:"Sen Astro'sun — uzay mekiği pilotu ve güneş sistemi uzmanı eğitim ajanısın. Öğrencilerle uzay görevleri planlar, uzay fiziği konularında rehberlik edersin.",
     firstMessage:"Merhaba! Ben Astro. Uzay ve güneş sistemi hakkında ne keşfetmek istersin?"
@@ -871,7 +884,7 @@ const CHARACTERS = [
     avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=elizabeth&backgroundColor=ffd5dc",
     accentColor:"#BE185D",
     voiceConfig:{language:"tr-TR",pitch:1.05,rate:0.95,gender:"female"},
-    unlockXp:150,
+    unlockXp:0,
     exampleQuestions:["What do you think about Mr. Darcy?","How do you navigate society's expectations?","What is your view on marriage?"],
     systemPrompt:"You are Elizabeth Bennet from Pride and Prejudice. You are witty, intelligent and independent. Discuss literature, society, love and women's rights.",
     firstMessage:"Hello! I'm Elizabeth Bennet. I do love a good conversation about literature and human nature. What shall we discuss?"
@@ -884,7 +897,7 @@ const CHARACTERS = [
     avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=tonystark&backgroundColor=b6e3f4",
     accentColor:"#B45309",
     voiceConfig:{language:"tr-TR",pitch:0.9,rate:1.05,gender:"male"},
-    unlockXp:100,
+    unlockXp:0,
     exampleQuestions:["How do you come up with inventions?","What is the arc reactor?","How do you balance genius and responsibility?"],
     systemPrompt:"You are Tony Stark — genius, billionaire, Iron Man. Inspire students about technology, engineering, innovation and leadership. Be witty and confident.",
     firstMessage:"Hey! Tony Stark here. Technology, engineering, or innovation — pick your topic. I'll give you the best advice money can buy."
@@ -897,7 +910,7 @@ const CHARACTERS = [
     avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=yoda&backgroundColor=c0aede",
     accentColor:"#15803D",
     voiceConfig:{language:"tr-TR",pitch:0.8,rate:0.78,gender:"male"},
-    unlockXp:100,
+    unlockXp:0,
     exampleQuestions:["What is the Force?","How do you train a Jedi?","What is the path to wisdom?"],
     systemPrompt:"You are Yoda — Jedi Grand Master. Speak in inverted syntax. Guide students about wisdom, patience, strength and balance.",
     firstMessage:"Hmm. Welcome, young Padawan. Teach you, I can. What wish to know, you do?"
@@ -910,7 +923,7 @@ const CHARACTERS = [
     avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=cleopatra&backgroundColor=ffd5dc",
     accentColor:"#B45309",
     voiceConfig:{language:"tr-TR",pitch:1.05,rate:0.9,gender:"female"},
-    unlockXp:150,
+    unlockXp:0,
     exampleQuestions:["How did you rule Egypt?","What was ancient Alexandria like?","How did you learn so many languages?"],
     systemPrompt:"You are Cleopatra VII — last pharaoh of Egypt. Discuss history, politics, leadership and ancient civilizations. Speak with power and charisma.",
     firstMessage:"Greetings! I am Cleopatra, Queen of the Nile. What would you like to learn about ancient Egypt or leadership?"
@@ -923,7 +936,7 @@ const CHARACTERS = [
     avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=naruto&backgroundColor=ffd5dc",
     accentColor:"#D97706",
     voiceConfig:{language:"tr-TR",pitch:1.1,rate:1.15,gender:"male"},
-    unlockXp:100,
+    unlockXp:0,
     exampleQuestions:["What is your ninja way?","How do you never give up?","Tell me about the Hidden Leaf Village."],
     systemPrompt:"You are Naruto Uzumaki. Be loud, energetic and endlessly optimistic. Inspire students about perseverance, friendship and never giving up.",
     firstMessage:"Dattebayo! I'm Naruto! Never give up — that's my nindo! How can I help you today?"
@@ -936,7 +949,7 @@ const CHARACTERS = [
     avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=gandalf&backgroundColor=b6e3f4",
     accentColor:"#6B7280",
     voiceConfig:{language:"tr-TR",pitch:0.78,rate:0.85,gender:"male"},
-    unlockXp:150,
+    unlockXp:0,
     exampleQuestions:["What is the One Ring?","How do you guide heroes?","What is the nature of good and evil?"],
     systemPrompt:"You are Gandalf the Grey. Speak with gravitas and wisdom. Use archaic, poetic language. Guide students about courage, wisdom and the importance of small acts.",
     firstMessage:"Welcome, traveller! I am Gandalf. Wisdom and adventure are my companions. What path do you need guidance on?"
@@ -949,7 +962,7 @@ const CHARACTERS = [
     avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=ada&backgroundColor=ffd5dc",
     accentColor:"#7C3AED",
     voiceConfig:{language:"tr-TR",pitch:1.08,rate:0.9,gender:"female"},
-    unlockXp:200,
+    unlockXp:0,
     exampleQuestions:["What inspired you to write the first algorithm?","How do you see the future of computing?","What is mathematics to you?"],
     systemPrompt:"You are Ada Lovelace — the world's first computer programmer. Discuss mathematics, computing, algorithms and women in science. Use Victorian-era English.",
     firstMessage:"Hello! I am Ada Lovelace — the world's first computer programmer. What would you like to explore about mathematics or computing?"
@@ -1030,9 +1043,10 @@ function loadState() {
       xp: s.xp||0, streak: s.streak||0, lastActive: s.lastActive||null,
       totalChats: s.totalChats||0, favorites: s.favorites||[],
       chatHistory: s.chatHistory||[], customChars: s.customChars||[],
-      username: s.username||"Kullanıcı", avatar: s.avatar||null
+      username: s.username||"Kullanıcı", avatar: s.avatar||null,
+      socratesMode: s.socratesMode||false
     };
-  } catch { return {xp:0,streak:0,lastActive:null,totalChats:0,favorites:[],chatHistory:[],customChars:[]}; }
+  } catch { return {xp:0,streak:0,lastActive:null,totalChats:0,favorites:[],chatHistory:[],customChars:[],socratesMode:false}; }
 }
 function saveState(s) { localStorage.setItem("gmai_state", JSON.stringify(s)); }
 let STATE = loadState();
@@ -1208,12 +1222,12 @@ function openDetail(id) {
     hero.innerHTML = `<img src="${char.avatarUrl}" alt="${char.name}"/><div class="detail-hero-overlay"></div><button class="detail-close" onclick="closeDetail()">✕</button>`;
   }
   document.getElementById("detailName").textContent = char.name;
-  document.getElementById("detailUniverse").innerHTML = `<span style="color:${char.accentColor}">${char.universe}</span> · ${CAT_LABELS[char.category]||char.category}`;
+  document.getElementById("detailUniverse").innerHTML = `<span style="color:${char.accentColor}">${escHtml(char.universe)}</span> · ${escHtml(CAT_LABELS[char.category]||char.category)}`;
   document.getElementById("detailTagline").textContent = `"${char.tagline}"`;
   document.getElementById("detailBio").textContent = char.bio||"";
-  document.getElementById("detailTraits").innerHTML = (char.traits||[]).map(t=>`<span class="trait-chip">${t}</span>`).join("");
+  document.getElementById("detailTraits").innerHTML = (char.traits||[]).map(t=>`<span class="trait-chip">${escHtml(t)}</span>`).join("");
   document.getElementById("detailQuestions").innerHTML = (char.exampleQuestions||[]).map(q=>
-    `<div class="example-q" onclick="startChatWithQuestion('${char.id}','${q.replace(/'/g,"\\'")}')">💬 ${q}</div>`
+    `<div class="example-q" data-cid="${escAttr(char.id)}" data-q="${escAttr(q)}" onclick="startChatWithQuestion(this.dataset.cid,this.dataset.q)">💬 ${escHtml(q)}</div>`
   ).join("");
   document.getElementById("detailFavBtn").textContent = isFav(char.id) ? "💔 Favoriden Çıkar" : "❤️ Favori";
   const chatBtn = document.getElementById("detailChatBtn");
@@ -1264,6 +1278,12 @@ function openChat(id, prefillQuestion) {
   if(ttsB) { ttsB.classList.remove("active","speaking"); ttsB.textContent = "🔊"; }
   const vBar = document.getElementById("voiceModeBar");
   if(vBar) vBar.classList.remove("active");
+  // Sokratik mod butonu durumunu ayarla
+  const socBtn = document.getElementById("socraticToggleBtn");
+  if(socBtn) {
+    socBtn.classList.toggle("active", STATE.socratesMode);
+    socBtn.title = STATE.socratesMode ? "Sokratik Mod Açık — Sorularla yönlendirme" : "Sokratik Mod: Düşünmene yardım et";
+  }
   document.getElementById("chatOverlay").classList.add("open");
   // Welcome message
   appendMsg("assistant", char.firstMessage||"Merhaba! Nasıl yardımcı olabilirim?", char);
@@ -1297,7 +1317,14 @@ function closeChat() {
       msgCount: userMsgCount
     });
   }
+  // Sohbet analizi (en az 4 mesaj varsa)
+  const charForAnalysis = activeChar;
+  const historyForAnalysis = [...chatHistory];
+  const langForAnalysis = activeLang;
   activeChar = null;
+  if(userMsgCount >= 2) {
+    setTimeout(() => analyzeAndShowFeedback(charForAnalysis, historyForAnalysis, langForAnalysis), 400);
+  }
 }
 function closeChatOnOverlay(e) { if(e.target===document.getElementById("chatOverlay")) closeChat(); }
 
@@ -1305,7 +1332,10 @@ function getTime() {
   return new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
 }
 function escHtml(str) {
-  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br/>");
+  return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br/>");
+}
+function escAttr(str) {
+  return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 }
 function appendMsg(role, content, char) {
   const msgs = document.getElementById("chatMessages");
@@ -1582,7 +1612,8 @@ async function callGeminiAPI(systemPrompt, history) {
     // Dil + stil talimatı ekle
     const langMap = {tr:"Türkçe yanıt ver.", en:"Respond in English.", de:"Antworte auf Deutsch."};
     const styleNote = "\n\nÖNEMLİ: Yanıtların kısa ve doğal olsun (2-4 cümle). Ders verme, öğüt verme. Soru sor, deneyim paylaş, hikaye anlat. Sohbet gibi konuş.";
-    const fullSystem = systemPrompt + "\n\n" + (langMap[activeLang]||langMap.tr) + styleNote;
+    const socraticNote = STATE.socratesMode ? "\n\nSOKRATİK MOD AKTİF: Öğrenciye doğrudan cevap verme. Onun düşünmesini sağlayacak sorular sor. Yanıtlarını sorularla yönlendir, keşfetmesine izin ver." : "";
+    const fullSystem = systemPrompt + "\n\n" + (langMap[activeLang]||langMap.tr) + styleNote + socraticNote;
 
     // Gemini formatı: user / model
     // ÖNEMLİ: Gemini ilk mesajın 'user' olmasını zorunlu kılıyor.
@@ -1688,6 +1719,16 @@ function autoResize(el) {
 // ─── TTS ─────────────────────────────────────────────────────────────────
 // ─── TTS (Text-to-Speech) ────────────────────────────────────────────────
 let voiceMode = false; // sesli mod: TTS + STT birlikte
+
+function toggleSocratic() {
+  STATE.socratesMode = !STATE.socratesMode;
+  saveState(STATE);
+  const btn = document.getElementById("socraticToggleBtn");
+  if(btn) {
+    btn.classList.toggle("active", STATE.socratesMode);
+    btn.title = STATE.socratesMode ? "Sokratik Mod Açık — Sorularla yönlendirme" : "Sokratik Mod: Düşünmene yardım et";
+  }
+}
 
 function toggleVoiceMode() {
   voiceMode = !voiceMode;
@@ -2400,6 +2441,65 @@ function showCelebration(emoji, title, sub) {
 }
 function closeCelebration() {
   document.getElementById("celebrateOverlay").classList.remove("open");
+}
+
+// ─── Sohbet Analizi (Gemini tabanlı) ─────────────────────────────────────
+function closeAnalysis() {
+  document.getElementById("analysisOverlay").classList.remove("open");
+}
+
+async function analyzeAndShowFeedback(char, history, lang) {
+  if(!char || !history || history.filter(m=>m.role==="user").length < 2) return;
+  const key = getApiKey();
+  if(!key) return;
+  try {
+    const langMap = {tr:"Türkçe", en:"English", de:"Deutsch"};
+    const langLabel = langMap[lang]||"Türkçe";
+    const transcript = history.slice(-12).map(m=>`${m.role==="user"?"Öğrenci":"Karakter"}: ${m.content}`).join("\n");
+    const prompt = `Sen bir eğitim analitiği asistanısın. Şu sohbeti analiz et ve ${langLabel} dilinde JSON formatında yanıt ver:
+
+Karakter: ${char.name} (${char.universe})
+Düşünme becerisi hedefi: ${char.thinkingSkill||"eleştirel düşünce"}
+Gözlem odağı: ${char.observationFocus||"öğrenci katılımı"}
+
+Sohbet:
+${transcript}
+
+Yanıtı SADECE şu JSON formatında ver (başka hiçbir şey ekleme):
+{
+  "feedback": "Sohbet hakkında 2-3 cümle özet geri bildirim",
+  "skillsObserved": ["gözlemlenen beceri 1", "gözlemlenen beceri 2"],
+  "encouragement": "Kısa bir teşvik cümlesi"
+}`;
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+      {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+          contents:[{role:"user",parts:[{text:prompt}]}],
+          generationConfig:{maxOutputTokens:300,temperature:0.7}
+        })
+      }
+    );
+    if(!res.ok) return;
+    const data = await res.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text||"";
+    // JSON ayrıştır (```json ... ``` bloğu içinde olabilir)
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if(!jsonMatch) return;
+    const analysis = JSON.parse(jsonMatch[0]);
+    if(!analysis.feedback) return;
+
+    document.getElementById("analysisFeedback").textContent = analysis.feedback;
+    document.getElementById("analysisSkills").innerHTML = (analysis.skillsObserved||[])
+      .map(s=>`<span class="trait-chip">${escHtml(s)}</span>`).join("");
+    document.getElementById("analysisEncouragement").textContent = analysis.encouragement||"";
+    document.getElementById("analysisOverlay").classList.add("open");
+  } catch(e) {
+    // Sessizce başarısız ol
+  }
 }
 
 // ─── Onboarding ─────────────────────────────────────────────────────────────
