@@ -519,6 +519,18 @@ input,textarea{font-family:inherit;color:var(--text)}
   .detail-modal{max-height:95vh}
   .navbar-actions .nav-btn-outline{display:none}
   .research-stats{grid-template-columns:repeat(3,1fr)}
+  /* Navbar sıkışmasını önle: yönetici araçlarını gizle, "+ Karakter" → sadece "+" */
+  .navbar{padding:12px 14px}
+  .navbar-actions{gap:7px}
+  .navbar-title{font-size:15px}
+  .nav-admin{display:none}            /* 🔑 API + 📊 Sheets: kurulum araçları, öğrenciye gereksiz */
+  .nav-grad-label{display:none}       /* mobilde sadece + ikonu */
+  .nav-btn-grad{padding:8px 13px;font-size:17px;line-height:1}
+}
+@media(max-width:380px){
+  .navbar-title{display:none}         /* çok dar: logo yeterli */
+  .navbar-actions{gap:6px}
+  .nav-btn-icon,.theme-toggle{width:32px;height:32px;font-size:15px}
 }
 </style>
 </head>
@@ -535,9 +547,9 @@ input,textarea{font-family:inherit;color:var(--text)}
     <button class="nav-btn nav-btn-icon" id="historyNavBtn" onclick="showPage('history');clearHistoryBadge()" title="Sohbet Geçmişi">💬<span class="notif-badge" id="historyBadge"></span></button>
     <button class="nav-btn nav-btn-icon" onclick="showPage('leaderboard')" title="Liderlik">🏆</button>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
-    <button class="nav-btn nav-btn-icon" onclick="showApiKeyModal()" title="API Key Ayarla" id="apiKeyBtn">🔑</button>
-    <button class="nav-btn nav-btn-icon" onclick="showSheetsModal()" title="Veri Toplama Ayarı" id="sheetsBtn">📊</button>
-    <button class="nav-btn nav-btn-grad" onclick="openWizard()">+ Karakter Oluştur</button>
+    <button class="nav-btn nav-btn-icon nav-admin" onclick="showApiKeyModal()" title="API Key Ayarla" id="apiKeyBtn">🔑</button>
+    <button class="nav-btn nav-btn-icon nav-admin" onclick="showSheetsModal()" title="Veri Toplama Ayarı" id="sheetsBtn">📊</button>
+    <button class="nav-btn nav-btn-grad" onclick="openWizard()"><span class="nav-grad-plus">+</span> <span class="nav-grad-label">Karakter Oluştur</span></button>
   </div>
 </nav>
 
