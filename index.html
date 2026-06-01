@@ -474,6 +474,30 @@ input,textarea{font-family:inherit;color:var(--text)}
 .research-table tr:last-child td{border-bottom:none}
 .research-table .tscore{font-weight:800;color:var(--cyan)}
 
+/* Hesap / e-posta kimliği */
+.research-account{margin:4px 24px 0;padding:10px 14px;background:linear-gradient(135deg,rgba(123,79,212,.12),rgba(0,200,232,.06));border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;gap:10px;font-size:13px}
+.research-account .ra-avatar{width:34px;height:34px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.research-account .ra-info{flex:1;min-width:0}
+.research-account .ra-name{font-weight:700;color:var(--text)}
+.research-account .ra-email{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.research-account .ra-edit{font-size:11px;color:var(--cyan);cursor:pointer;flex-shrink:0;padding:4px 8px;border:1px solid var(--border);border-radius:8px}
+
+/* Gelişim Analitiği / trend grafikleri */
+.research-trend{margin:8px 24px 12px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px}
+.research-trend-title{font-size:14px;font-weight:800;margin-bottom:10px;color:var(--text)}
+.trend-canvas{width:100%;height:auto;display:block;background:var(--surface2);border-radius:10px;margin-bottom:6px}
+.trend-legend{font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px}
+
+/* Canlı gözlem etiketleri (sohbet sırasında) */
+.msg-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.msg-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;background:rgba(0,200,232,.12);border:1px solid rgba(0,200,232,.28);color:var(--cyan);white-space:nowrap}
+
+/* Araştırmacı notu alanı (analiz modalı) */
+.analysis-note-field{margin-bottom:14px}
+.analysis-note-field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.analysis-note-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;resize:vertical;min-height:54px;font-family:inherit}
+.analysis-note-input:focus{border-color:var(--purple)}
+
 /* ── Responsive ── */
 @media(max-width:600px){
   .hero{padding:32px 16px 24px}
@@ -629,6 +653,7 @@ input,textarea{font-family:inherit;color:var(--text)}
     <div class="page-header-title">🔬 Araştırmacı Paneli</div>
     <div class="page-header-sub">Öğrenci-AI etkileşim analizleri ve raporlar</div>
   </div>
+  <div class="research-account" id="researchAccount"></div>
   <div class="analysis-student-field" style="padding:8px 24px 0">
     <label>👤 Aktif Öğrenci Adı / Kodu</label>
     <input class="analysis-student-input" id="researchStudentInput" placeholder="Örn: Öğrenci 01 veya 7A-15" oninput="setActiveStudent(this.value)"/>
@@ -641,11 +666,19 @@ input,textarea{font-family:inherit;color:var(--text)}
     <button class="research-tool-btn" onclick="printReports()">📄 PDF / Yazdır</button>
     <button class="research-tool-btn" onclick="clearReports()">🗑️ Temizle</button>
   </div>
+  <!-- Gelişim Analitiği (trend grafikleri) -->
+  <div class="research-trend" id="researchTrend" style="display:none">
+    <div class="research-trend-title">📈 Gelişim Analitiği</div>
+    <canvas id="trendCanvas" class="trend-canvas" width="600" height="180"></canvas>
+    <div class="trend-legend">Puan gelişimi (zaman sırasıyla, eski → yeni)</div>
+    <canvas id="critCanvas" class="trend-canvas" width="600" height="200"></canvas>
+    <div class="trend-legend">Kriter ortalamaları (0-2)</div>
+  </div>
   <div class="report-list" id="reportList"></div>
   <div class="research-empty" id="researchEmpty" style="display:none">
     <div class="research-empty-icon">📋</div>
     <div>Henüz analiz raporu yok.</div>
-    <div style="font-size:12px;margin-top:6px">Bir karakterle sohbet edip kapattığında otomatik analiz oluşturulur.</div>
+    <div style="font-size:12px;margin-top:6px">Bir karakterle <b>en az 2 mesaj</b> gönderip sohbeti kapattığında otomatik analiz oluşturulur.</div>
   </div>
 </div>
 
@@ -793,6 +826,11 @@ input,textarea{font-family:inherit;color:var(--text)}
     <div class="ob-field">
       <label class="ob-label">Kullanıcı Adın</label>
       <input id="obNameInput" class="ob-input" type="text" placeholder="Örn: Kaşif, Araştırmacı..." maxlength="20" onkeydown="if(event.key==='Enter') finishOnboarding()" />
+    </div>
+    <div class="ob-field">
+      <label class="ob-label">E-posta ile Giriş</label>
+      <input id="obEmailInput" class="ob-input" type="email" placeholder="ornek@eposta.com" maxlength="60" autocomplete="email" onkeydown="if(event.key==='Enter') finishOnboarding()" />
+      <div id="obEmailErr" style="display:none;font-size:11px;color:var(--pink);margin-top:4px">Lütfen geçerli bir e-posta gir.</div>
     </div>
     <div class="ob-field">
       <label class="ob-label">Avatar Seç</label>
@@ -1132,6 +1170,8 @@ async function trackEvent(event, extra={}) {
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         userId: getAnonId(),
+        email: STATE?.email || localStorage.getItem('gmai_email') || '',
+        username: STATE?.username || '',
         event,
         lang: activeLang||'tr',
         xp: STATE?.xp||0,
@@ -1165,9 +1205,10 @@ function loadState() {
       chatHistory: s.chatHistory||[], customChars: s.customChars||[],
       username: s.username||"Kullanıcı", avatar: s.avatar||null,
       socratesMode: s.socratesMode||false,
-      reports: s.reports||[], activeStudent: s.activeStudent||""
+      reports: s.reports||[], activeStudent: s.activeStudent||"",
+      email: s.email||""
     };
-  } catch { return {xp:0,streak:0,lastActive:null,totalChats:0,favorites:[],chatHistory:[],customChars:[],socratesMode:false,reports:[],activeStudent:""}; }
+  } catch { return {xp:0,streak:0,lastActive:null,totalChats:0,favorites:[],chatHistory:[],customChars:[],socratesMode:false,reports:[],activeStudent:"",email:""}; }
 }
 function saveState(s) { localStorage.setItem("gmai_state", JSON.stringify(s)); }
 let STATE = loadState();
@@ -1471,12 +1512,39 @@ function appendMsg(role, content, char) {
   const msgId = ++_msgId;
   if(!isUser) _msgStore[msgId] = content;
   const ttsBtn = !isUser ? `<div class="msg-tts-btn" onclick="speakMsg(${msgId})">🔊 Dinle</div>` : "";
+  // Canlı gözlem etiketleri (sadece öğrenci mesajları)
+  let tagsHtml = "";
+  if(isUser) {
+    const tags = computeMessageTags(content, char);
+    if(tags.length) tagsHtml = `<div class="msg-tags">${tags.map(t=>`<span class="msg-tag">${t}</span>`).join("")}</div>`;
+  }
   const div = document.createElement("div");
   div.className = "msg-row "+(isUser?"user":"");
-  div.innerHTML = `${!isUser?avatarHtml:""}<div><div class="msg-bubble ${role}">${escHtml(content)}</div><div class="msg-time">${getTime()}</div>${ttsBtn}</div>`;
+  div.innerHTML = `${!isUser?avatarHtml:""}<div><div class="msg-bubble ${role}">${escHtml(content)}</div><div class="msg-time">${getTime()}</div>${ttsBtn}${tagsHtml}</div>`;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
   if(!isUser && ttsEnabled) speakTextDirect(content, char);
+}
+// Öğrenci mesajından anlık gözlem etiketleri (keyword tabanlı, LLM'siz)
+function computeMessageTags(text, char) {
+  const t = (text||"").toLocaleLowerCase("tr");
+  const tags = [];
+  // İsimle hitap (karakter adının herhangi bir parçası geçiyor mu)
+  if(char && char.name) {
+    const parts = char.name.toLocaleLowerCase("tr").split(/\s+/).filter(p=>p.length>2);
+    if(parts.some(p=>t.includes(p))) tags.push("🏷 İsimle hitap");
+  }
+  // Teşekkür / nezaket
+  if(/teşekkür|teşekkürler|sağ ?ol|rica|lütfen|çok naziksin|teşekür/.test(t)) tags.push("🙏 Nezaket");
+  // Soru sorma
+  if(t.includes("?") || /\b(neden|nasıl|nedir|niçin|niye|mi|mı|mu|mü)\b/.test(t)) tags.push("❓ Soru sordu");
+  // Açıklama isteme
+  if(/açıkla|anlat|örnek ver|detay|daha fazla|nasıl yani|ne demek/.test(t)) tags.push("🧠 Açıklama istedi");
+  // Sosyal / kişisel bağ
+  if(/sen|senin|seni|arkadaş|seviyorum|harikasın|çok iyisin|merhaba|selam/.test(t)) tags.push("🤝 Sosyal etkileşim");
+  // Göreve odak (uzun, içerikli mesaj)
+  if(t.replace(/\s/g,"").length > 25 && !tags.includes("❓ Soru sordu")) tags.push("🎯 Göreve odaklı");
+  return tags.slice(0,3); // en fazla 3 etiket, kalabalık olmasın
 }
 function showTyping() {
   const msgs = document.getElementById("chatMessages");
@@ -2699,10 +2767,19 @@ function renderAnalysisModal(char, result, report) {
     <div class="criteria-list">${critHtml}</div>
     ${result.summary?`<div class="analysis-summary">📝 <b>Özet:</b> ${escHtml(result.summary)}</div>`:""}
     ${result.suggestion?`<div class="analysis-suggestion">💡 <b>Araştırmacıya öneri:</b> ${escHtml(result.suggestion)}</div>`:""}
+    <div class="analysis-note-field">
+      <label>✍️ Araştırmacı Notu</label>
+      <textarea class="analysis-note-input" id="analysisNoteInput" placeholder="Kendi gözlem notunu ekle (rapora ve dışa aktarıma dahil olur)..."
+        oninput="updateReportNote('${report.id}', this.value)">${escAttr(report.note||"")}</textarea>
+    </div>
     <div class="analysis-actions">
       <button class="analysis-btn analysis-btn-sec" onclick="shareReport('${report.id}')">📤 Raporu Paylaş</button>
       <button class="analysis-btn analysis-btn-primary" onclick="closeAnalysis()">Tamam ✓</button>
     </div>`;
+}
+function updateReportNote(reportId, val) {
+  const r = (STATE.reports||[]).find(r=>r.id===reportId);
+  if(r) { r.note = (val||"").toString(); saveState(STATE); }
 }
 
 // ─── Rapor Depolama & Geçmiş ──────────────────────────────────────────────
@@ -2712,10 +2789,13 @@ function saveReport(char, result, lang) {
     id: "r"+Date.now().toString(36)+Math.random().toString(36).substr(2,4),
     ts: new Date().toISOString(),
     student: STATE.activeStudent||"",
+    email: STATE.email||"",
     charId: char.id, charName: char.name, universe: char.universe,
     grade: ped.grade, skill: ped.skill, focus: ped.focus,
     score10: result.score10, total: result.total,
     criteria: result.criteria, summary: result.summary, suggestion: result.suggestion,
+    note: (result.note||"").toString(),
+    tags: result.tags||[],
     lang: lang||"tr"
   };
   STATE.reports = [report, ...(STATE.reports||[])].slice(0,200);
@@ -2738,8 +2818,10 @@ function renderReportList() {
   const reports = STATE.reports||[];
   const list = document.getElementById("reportList");
   const empty = document.getElementById("researchEmpty");
-  // İstatistikler
+  // İstatistikler + hesap + trend
   renderResearchStats();
+  renderResearchAccount();
+  renderTrendCharts();
   if(!reports.length){ list.innerHTML=""; empty.style.display="block"; return; }
   empty.style.display="none";
   list.innerHTML = reports.map(r=>`
@@ -2751,6 +2833,122 @@ function renderReportList() {
       ${r.student?`<div class="report-item-student">👤 ${escHtml(r.student)}</div>`:""}
       <div class="report-item-meta">${escHtml(r.universe)} · ${fmtDate(r.ts)}</div>
     </div>`).join("");
+}
+
+// Araştırmacı hesabı (e-posta kimliği)
+function renderResearchAccount() {
+  const el = document.getElementById("researchAccount");
+  if(!el) return;
+  const email = STATE.email || localStorage.getItem('gmai_email') || "";
+  const name = STATE.username || "Kullanıcı";
+  const av = STATE.avatar || "🧠";
+  if(email) {
+    el.style.display = "flex";
+    el.innerHTML = `
+      <div class="ra-avatar">${av}</div>
+      <div class="ra-info">
+        <div class="ra-name">${escHtml(name)}</div>
+        <div class="ra-email">✉️ ${escHtml(email)}</div>
+      </div>
+      <div class="ra-edit" onclick="editEmail()">Değiştir</div>`;
+  } else {
+    el.style.display = "flex";
+    el.innerHTML = `
+      <div class="ra-avatar">👤</div>
+      <div class="ra-info"><div class="ra-name">Giriş yapılmadı</div><div class="ra-email">Kayıt tutmak için e-posta gir</div></div>
+      <div class="ra-edit" onclick="editEmail()">Giriş Yap</div>`;
+  }
+}
+function editEmail() {
+  const cur = STATE.email || localStorage.getItem('gmai_email') || "";
+  const v = window.prompt("E-posta adresin (kayıtların buna bağlanır):", cur);
+  if(v===null) return;
+  const email = v.trim().toLowerCase();
+  if(!isValidEmail(email)) { showCelebration("⚠️","Geçersiz E-posta","Lütfen geçerli bir e-posta adresi gir."); return; }
+  STATE.email = email;
+  saveState(STATE);
+  localStorage.setItem('gmai_email', email);
+  renderResearchAccount();
+  trackEvent('email_set', {email: email});
+}
+
+// Gelişim Analitiği — trend grafikleri (canvas, kütüphanesiz)
+function renderTrendCharts() {
+  const reports = (STATE.reports||[]);
+  const box = document.getElementById("researchTrend");
+  if(!box) return;
+  if(reports.length < 2) { box.style.display = "none"; return; }
+  box.style.display = "block";
+
+  // 1) Puan zaman serisi (eski → yeni)
+  const ordered = [...reports].reverse(); // reports en yeni başta; grafikte eski→yeni
+  drawLineChart("trendCanvas", ordered.map(r=>r.score10), 10);
+
+  // 2) Kriter ortalamaları (0-2)
+  const sums = {}, ns = {};
+  ANALYSIS_CRITERIA.forEach(c=>{ sums[c.key]=0; ns[c.key]=0; });
+  reports.forEach(r=>(r.criteria||[]).forEach(c=>{ if(sums[c.key]!=null){ sums[c.key]+=c.score; ns[c.key]++; } }));
+  const labels = ANALYSIS_CRITERIA.map(c=>c.name.split(' ')[0]);
+  const vals = ANALYSIS_CRITERIA.map(c=> ns[c.key] ? sums[c.key]/ns[c.key] : 0);
+  drawBarChart("critCanvas", labels, vals, 2);
+}
+
+function _cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#7B4FD4'; }
+
+function drawLineChart(canvasId, data, maxY) {
+  const cv = document.getElementById(canvasId);
+  if(!cv || !cv.getContext) return;
+  const ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height, pad = 28;
+  ctx.clearRect(0,0,W,H);
+  const muted = _cssVar('--muted'), cyan = _cssVar('--cyan'), purple = _cssVar('--purple'), border = _cssVar('--border');
+  // eksen
+  ctx.strokeStyle = border; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad,8); ctx.lineTo(pad,H-pad); ctx.lineTo(W-8,H-pad); ctx.stroke();
+  ctx.fillStyle = muted; ctx.font = "11px sans-serif";
+  ctx.fillText(maxY+"", 4, 14); ctx.fillText("0", 10, H-pad+4);
+  if(!data.length) return;
+  const n = data.length;
+  const xStep = (W-pad-16)/Math.max(1,n-1);
+  const pt = i => [pad + i*xStep, (H-pad) - (data[i]/maxY)*(H-pad-12)];
+  // dolgu gradyanı
+  const grad = ctx.createLinearGradient(0,8,0,H-pad);
+  grad.addColorStop(0, 'rgba(0,200,232,.35)'); grad.addColorStop(1,'rgba(0,200,232,0)');
+  ctx.beginPath(); ctx.moveTo(pad, H-pad);
+  for(let i=0;i<n;i++){ const [x,y]=pt(i); ctx.lineTo(x,y); }
+  ctx.lineTo(pad+(n-1)*xStep, H-pad); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+  // çizgi
+  ctx.beginPath();
+  for(let i=0;i<n;i++){ const [x,y]=pt(i); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+  ctx.strokeStyle = cyan; ctx.lineWidth = 2.5; ctx.stroke();
+  // noktalar
+  for(let i=0;i<n;i++){ const [x,y]=pt(i); ctx.beginPath(); ctx.arc(x,y,3.5,0,7); ctx.fillStyle=purple; ctx.fill(); }
+}
+
+function drawBarChart(canvasId, labels, vals, maxY) {
+  const cv = document.getElementById(canvasId);
+  if(!cv || !cv.getContext) return;
+  const ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height, pad = 24, bottomPad = 44;
+  ctx.clearRect(0,0,W,H);
+  const muted = _cssVar('--muted'), border = _cssVar('--border');
+  ctx.strokeStyle = border; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad,8); ctx.lineTo(pad,H-bottomPad); ctx.lineTo(W-8,H-bottomPad); ctx.stroke();
+  const n = labels.length, gap = 14;
+  const bw = (W-pad-16-gap*(n-1))/n;
+  for(let i=0;i<n;i++){
+    const x = pad + i*(bw+gap);
+    const h = (vals[i]/maxY)*(H-bottomPad-12);
+    const y = (H-bottomPad) - h;
+    const g = ctx.createLinearGradient(0,y,0,H-bottomPad);
+    g.addColorStop(0,_cssVar('--purple')); g.addColorStop(1,_cssVar('--cyan'));
+    ctx.fillStyle = g; ctx.fillRect(x,y,bw,h);
+    ctx.fillStyle = muted; ctx.font = "10px sans-serif"; ctx.textAlign="center";
+    ctx.fillText(labels[i], x+bw/2, H-bottomPad+14);
+    ctx.fillStyle = _cssVar('--cyan'); ctx.font = "bold 11px sans-serif";
+    ctx.fillText(vals[i].toFixed(1), x+bw/2, y-4);
+    ctx.textAlign="left";
+  }
 }
 
 function renderResearchStats() {
@@ -2771,7 +2969,7 @@ function openReport(id) {
   const r = getReport(id);
   if(!r) return;
   const char = allChars().find(c=>c.id===r.charId) || {id:r.charId,name:r.charName,universe:r.universe};
-  const result = {criteria:r.criteria, total:r.total, score10:r.score10, summary:r.summary, suggestion:r.suggestion};
+  const result = {criteria:r.criteria, total:r.total, score10:r.score10, summary:r.summary, suggestion:r.suggestion, note:r.note, tags:r.tags};
   renderAnalysisModal(char, result, r);
   document.getElementById("analysisOverlay").classList.add("open");
 }
@@ -2808,16 +3006,16 @@ function exportReports(format) {
     _downloadFile(`greatmindai-raporlar-${stamp}.json`, JSON.stringify(reports,null,2), "application/json");
   } else {
     // CSV
-    const head = ["Tarih","OgrenciKodu","Karakter","Konu","SinifDuzeyi","DusunmeBecerisi","ToplamPuan(0-12)","Puan(0-10)"];
+    const head = ["Tarih","Eposta","OgrenciKodu","Karakter","Konu","SinifDuzeyi","DusunmeBecerisi","ToplamPuan(0-12)","Puan(0-10)"];
     ANALYSIS_CRITERIA.forEach(c=>head.push(c.name));
-    head.push("Ozet","Oneri");
+    head.push("Ozet","Oneri","ArastirmaciNotu");
     const rows = reports.map(r=>{
       const cm = {}; (r.criteria||[]).forEach(c=>cm[c.key]=c.score);
       const cells = [
-        fmtDate(r.ts), r.student||"", r.charName, r.universe, r.grade, r.skill, r.total, r.score10
+        fmtDate(r.ts), r.email||"", r.student||"", r.charName, r.universe, r.grade, r.skill, r.total, r.score10
       ];
       ANALYSIS_CRITERIA.forEach(c=>cells.push(cm[c.key]!=null?cm[c.key]:""));
-      cells.push(r.summary||"", r.suggestion||"");
+      cells.push(r.summary||"", r.suggestion||"", r.note||"");
       return cells.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",");
     });
     const csv = "﻿"+[head.map(h=>`"${h}"`).join(","), ...rows].join("\r\n");
@@ -2976,20 +3174,35 @@ function selectOnboardingAvatar(el, emoji) {
   el.classList.add('selected');
   el.dataset.selected = emoji;
 }
+function isValidEmail(e) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((e||"").trim());
+}
 function finishOnboarding() {
   const nameEl = document.getElementById('obNameInput');
-  const name = (nameEl.value||'').trim() || 'Kaşif';
+  const emailEl = document.getElementById('obEmailInput');
+  const errEl = document.getElementById('obEmailErr');
+  const email = (emailEl?emailEl.value:'').trim().toLowerCase();
+  // E-posta zorunlu ve geçerli olmalı (kayıt tutulabilsin)
+  if(!isValidEmail(email)) {
+    if(errEl) errEl.style.display = 'block';
+    if(emailEl) { emailEl.style.borderColor = 'var(--pink)'; emailEl.focus(); }
+    return;
+  }
+  if(errEl) errEl.style.display = 'none';
+  const name = (nameEl.value||'').trim() || email.split('@')[0] || 'Kaşif';
   const selectedBtn = document.querySelector('.ob-avatar-btn.selected');
   const avatar = selectedBtn ? selectedBtn.textContent : '🧠';
   STATE.username = name;
   STATE.avatar = avatar;
+  STATE.email = email;
   saveState(STATE);
   localStorage.setItem('gmai_onboarded','1');
+  localStorage.setItem('gmai_email', email);
   document.getElementById('onboardingOverlay').classList.remove('open');
   initUsername();
   initAvatar();
-  // 📊 Veri: yeni öğrenci kaydoldu
-  trackEvent('onboarding_complete', {device: /mobile|android|iphone/i.test(navigator.userAgent)?'mobile':'desktop'});
+  // 📊 Veri: yeni öğrenci kaydoldu (e-posta kimliği ile)
+  trackEvent('onboarding_complete', {email: email, device: /mobile|android|iphone/i.test(navigator.userAgent)?'mobile':'desktop'});
   setTimeout(startTour, 600);
 }
 
