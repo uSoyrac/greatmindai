@@ -1182,7 +1182,7 @@ function getAnonId() {
 // ─── Merkezi Veri Toplama (kayıpsız) ──────────────────────────────────────
 // Tüm öğrenciler bu merkezi Google Apps Script URL'sine veri gönderir.
 // Hocanın Apps Script "Web App" /exec adresi buraya gömülür.
-const DEFAULT_SHEETS_URL = "";  // ← Apps Script /exec URL'si buraya
+const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwPZTwyjdCfmcCyrlyBL-kvJCGcwFF0cWBgV-eHB2sJ7g38qqKzme1DXCqmVqbMdFmI2g/exec";  // ← Merkezi Sheets (Apps Script)
 function getSheetsUrl() { return (localStorage.getItem('gmai_sheets_url')||'').trim() || DEFAULT_SHEETS_URL; }
 
 // Bekleyen olay kuyruğu (offline / başarısız gönderimler kaybolmasın)
