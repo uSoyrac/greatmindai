@@ -3,3 +3,4 @@ _test_*.html
 _server.js
 .claude/launch.json
 *.log
+_smoke*.html
