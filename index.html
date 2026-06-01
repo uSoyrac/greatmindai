@@ -409,6 +409,71 @@ input,textarea{font-family:inherit;color:var(--text)}
 .tour-btn-skip{font-size:12px;color:var(--muted);padding:6px 10px;border-radius:8px;background:var(--surface2);cursor:pointer;border:1px solid var(--border)}
 .tour-btn-next{font-size:12px;color:#fff;padding:6px 12px;border-radius:8px;background:var(--grad);cursor:pointer;font-weight:700;border:none}
 
+/* ── Araştırmacı Paneli & Gelişmiş Analiz ── */
+.analysis-modal{background:var(--surface);border-radius:24px;width:92%;max-width:440px;max-height:90vh;overflow-y:auto;padding:24px;text-align:left}
+.analysis-task{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+.analysis-task-row{display:flex;justify-content:space-between;gap:10px;font-size:12px;margin-bottom:4px}
+.analysis-task-row:last-child{margin-bottom:0}
+.analysis-task-label{color:var(--muted);flex-shrink:0}
+.analysis-task-val{color:var(--text);font-weight:600;text-align:right}
+.analysis-obs{font-size:12px;color:var(--muted);font-style:italic;padding:8px 12px;background:rgba(0,200,232,.06);border-left:3px solid var(--cyan);border-radius:8px;margin-bottom:14px}
+.analysis-student-field{margin-bottom:14px}
+.analysis-student-field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.analysis-student-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:13px;outline:none}
+.analysis-student-input:focus{border-color:var(--purple)}
+.score-ring-wrap{display:flex;align-items:center;gap:14px;margin-bottom:16px;padding:14px;background:linear-gradient(135deg,rgba(123,79,212,.15),rgba(0,200,232,.08));border:1px solid rgba(0,200,232,.25);border-radius:14px}
+.score-big{font-size:34px;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;white-space:nowrap}
+.score-meta{flex:1}
+.score-bar-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:6px}
+.score-bar-fill{height:100%;background:var(--grad2);border-radius:4px;transition:width .6s}
+.score-label{font-size:12px;color:var(--muted)}
+.criteria-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.criterion{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+.criterion-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.criterion-icon{font-size:15px;flex-shrink:0}
+.criterion-name{font-size:13px;font-weight:700;flex:1}
+.criterion-score{font-size:12px;font-weight:800;color:var(--cyan);background:rgba(0,200,232,.12);padding:2px 8px;border-radius:10px}
+.criterion-evidence{font-size:12px;color:var(--muted);line-height:1.5;padding-left:23px;font-style:italic}
+.criterion-evidence::before{content:"“"}
+.criterion-evidence::after{content:"”"}
+.analysis-summary{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:12px;padding:12px;background:var(--surface2);border-radius:12px}
+.analysis-suggestion{font-size:13px;color:var(--cyan);line-height:1.6;margin-bottom:16px;padding:12px;background:rgba(0,200,232,.07);border-radius:12px;border-left:3px solid var(--cyan)}
+.analysis-actions{display:flex;gap:8px;flex-wrap:wrap}
+.analysis-btn{flex:1;min-width:120px;padding:12px;border-radius:12px;font-size:13px;font-weight:700;text-align:center;border:none;cursor:pointer;transition:.2s}
+.analysis-btn-primary{background:var(--grad);color:#fff}
+.analysis-btn-sec{background:var(--surface2);border:1.5px solid var(--border);color:var(--text)}
+.analysis-btn-sec:hover{border-color:var(--cyan)}
+.analysis-loading{text-align:center;padding:30px 0;color:var(--muted);font-size:14px}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Araştırmacı Paneli sayfası */
+.research-header{padding:20px 24px 8px}
+.research-toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:8px 24px 12px}
+.research-tool-btn{padding:9px 14px;border-radius:20px;font-size:12px;font-weight:600;background:var(--surface2);border:1.5px solid var(--border);color:var(--text);cursor:pointer;transition:.2s;white-space:nowrap}
+.research-tool-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.research-tool-btn.primary{background:var(--grad);color:#fff;border-color:transparent}
+.research-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:4px 24px 14px}
+.research-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.research-stat-num{font-size:20px;font-weight:800;background:var(--grad2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.research-stat-label{font-size:10px;color:var(--muted);margin-top:2px}
+.report-list{padding:0 24px}
+.report-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:.2s}
+.report-item:hover{border-color:var(--purple)}
+.report-item-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+.report-item-char{font-size:14px;font-weight:700}
+.report-item-score{font-size:14px;font-weight:800;color:var(--cyan);white-space:nowrap}
+.report-item-meta{font-size:11px;color:var(--muted)}
+.report-item-student{font-size:11px;color:var(--purple);font-weight:600}
+.research-empty{text-align:center;padding:50px 24px;color:var(--muted)}
+.research-empty-icon{font-size:44px;margin-bottom:12px}
+.research-table-wrap{overflow-x:auto;padding:0 24px 16px}
+.research-table{width:100%;border-collapse:collapse;font-size:12px;min-width:480px}
+.research-table th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:700;border-bottom:1.5px solid var(--border);white-space:nowrap}
+.research-table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text)}
+.research-table tr:last-child td{border-bottom:none}
+.research-table .tscore{font-weight:800;color:var(--cyan)}
+
 /* ── Responsive ── */
 @media(max-width:600px){
   .hero{padding:32px 16px 24px}
@@ -416,6 +481,7 @@ input,textarea{font-family:inherit;color:var(--text)}
   .chat-modal{height:95vh}
   .detail-modal{max-height:95vh}
   .navbar-actions .nav-btn-outline{display:none}
+  .research-stats{grid-template-columns:repeat(3,1fr)}
 }
 </style>
 </head>
@@ -552,7 +618,34 @@ input,textarea{font-family:inherit;color:var(--text)}
     <div class="profile-link" onclick="showPage('history')"><span class="profile-link-icon">💬</span><span class="profile-link-label">Sohbet Geçmişi</span><span class="profile-link-arrow">›</span></div>
     <div class="profile-link" onclick="showPage('leaderboard')"><span class="profile-link-icon">🏆</span><span class="profile-link-label">Liderlik Tablosu</span><span class="profile-link-arrow">›</span></div>
     <div class="profile-link" onclick="showPage('favorites')"><span class="profile-link-icon">❤️</span><span class="profile-link-label">Favoriler</span><span class="profile-link-arrow">›</span></div>
+    <div class="profile-link" onclick="showPage('research')"><span class="profile-link-icon">🔬</span><span class="profile-link-label">Araştırmacı Paneli</span><span class="profile-link-arrow">›</span></div>
     <div class="profile-link" onclick="openWizard()"><span class="profile-link-icon">✨</span><span class="profile-link-label">Karakter Oluştur</span><span class="profile-link-arrow">›</span></div>
+  </div>
+</div>
+
+<!-- Araştırmacı Paneli Sayfası -->
+<div id="page-research" class="page page-content">
+  <div class="research-header">
+    <div class="page-header-title">🔬 Araştırmacı Paneli</div>
+    <div class="page-header-sub">Öğrenci-AI etkileşim analizleri ve raporlar</div>
+  </div>
+  <div class="analysis-student-field" style="padding:8px 24px 0">
+    <label>👤 Aktif Öğrenci Adı / Kodu</label>
+    <input class="analysis-student-input" id="researchStudentInput" placeholder="Örn: Öğrenci 01 veya 7A-15" oninput="setActiveStudent(this.value)"/>
+  </div>
+  <div class="research-stats" id="researchStats"></div>
+  <div class="research-toolbar">
+    <button class="research-tool-btn primary" onclick="runBulkAnalysis()">📊 Tüm Sohbetleri Analiz Et</button>
+    <button class="research-tool-btn" onclick="exportReports('csv')">📤 CSV</button>
+    <button class="research-tool-btn" onclick="exportReports('json')">📤 JSON</button>
+    <button class="research-tool-btn" onclick="printReports()">📄 PDF / Yazdır</button>
+    <button class="research-tool-btn" onclick="clearReports()">🗑️ Temizle</button>
+  </div>
+  <div class="report-list" id="reportList"></div>
+  <div class="research-empty" id="researchEmpty" style="display:none">
+    <div class="research-empty-icon">📋</div>
+    <div>Henüz analiz raporu yok.</div>
+    <div style="font-size:12px;margin-top:6px">Bir karakterle sohbet edip kapattığında otomatik analiz oluşturulur.</div>
   </div>
 </div>
 
@@ -653,20 +746,6 @@ input,textarea{font-family:inherit;color:var(--text)}
   </div>
 </div>
 
-<!-- Onboarding Modal -->
-<div class="onboard-overlay" id="onboardOverlay">
-  <div class="onboard-modal">
-    <img src="logo.webp" class="onboard-logo" alt="Great Mind AI"/>
-    <div class="onboard-title">Great Mind AI'ya Hoş Geldin!</div>
-    <div class="onboard-sub">AI karakterlerle sohbet et, quiz çöz ve XP kazan. Başlamak için adını ve avatarını seç.</div>
-    <div class="onboard-label">👤 Kullanıcı Adın</div>
-    <input class="onboard-input" id="onboardNameInput" placeholder="Adını gir..." maxlength="20" onkeydown="if(event.key==='Enter')completeOnboarding()"/>
-    <div class="onboard-label">🧠 Avatar Seç</div>
-    <div class="onboard-avatar-grid" id="onboardAvatarGrid"></div>
-    <button class="onboard-start-btn" onclick="completeOnboarding()">Başla 🚀</button>
-  </div>
-</div>
-
 <!-- Share Preview Modal -->
 <div class="share-preview-overlay" id="sharePreviewOverlay">
   <div class="share-preview-modal">
@@ -734,15 +813,34 @@ input,textarea{font-family:inherit;color:var(--text)}
   </div>
 </div>
 
-<!-- Conversation Analysis Modal -->
+<!-- Conversation Analysis Modal (Gelişmiş Araştırmacı Analizi) -->
 <div class="celebrate-overlay" id="analysisOverlay">
-  <div class="celebrate-modal" style="max-width:380px">
-    <div class="celebrate-emoji">🧠</div>
-    <div class="celebrate-title" style="font-size:18px">Sohbet Analizi</div>
-    <div id="analysisFeedback" style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:12px;text-align:left"></div>
-    <div id="analysisSkills" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;justify-content:center"></div>
-    <div id="analysisEncouragement" style="font-size:13px;color:var(--cyan);font-style:italic;margin-bottom:20px;text-align:center"></div>
-    <button class="celebrate-btn" onclick="closeAnalysis()">Devam Et 🚀</button>
+  <div class="analysis-modal">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="font-size:38px">🔬</div>
+      <div style="font-size:18px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Araştırmacı Analizi</div>
+    </div>
+    <div id="analysisBody">
+      <!-- JS doldurur -->
+      <div class="analysis-loading">
+        <div class="spinner"></div>
+        Sohbet analiz ediliyor…
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toplu Analiz / Karşılaştırma Modal -->
+<div class="celebrate-overlay" id="bulkOverlay">
+  <div class="analysis-modal" style="max-width:600px">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="font-size:38px">📊</div>
+      <div style="font-size:18px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Karşılaştırmalı Analiz</div>
+    </div>
+    <div id="bulkBody"></div>
+    <div class="analysis-actions" style="margin-top:14px">
+      <button class="analysis-btn analysis-btn-sec" onclick="closeBulk()">Kapat</button>
+    </div>
   </div>
 </div>
 
@@ -972,6 +1070,42 @@ const CHARACTERS = [
 const CATEGORIES = ["Tümü","Eğitim","Historical","Fantasy","Sci-Fi","Anime","Villain"];
 const CAT_LABELS = {"Eğitim":"📚 Eğitim","Historical":"🏛️ Tarih","Fantasy":"🧙 Fantezi","Sci-Fi":"🚀 Bilim Kurgu","Anime":"⚡ Anime","Villain":"😈 Kötü Adam"};
 const CAT_COLORS = {"Eğitim":"#059669","Historical":"#1D4ED8","Fantasy":"#7C3AED","Sci-Fi":"#0369A1","Anime":"#D97706","Villain":"#374151"};
+
+// ─── Pedagoji & Gözlem Verisi (araştırmacı analizi için) ──────────────────
+const PEDAGOGY = {
+  "ataturk":{skill:"tarihsel düşünce",focus:"neden-sonuç ilişkisi, tarihsel bağlam kurma",grade:"6-8. sınıf"},
+  "einstein":{skill:"bilimsel düşünce",focus:"hipotez kurma, düşünce deneyleri",grade:"6-8. sınıf"},
+  "dr-mikro":{skill:"analitik düşünce",focus:"semptom analizi, sistematik sorgulama",grade:"5-7. sınıf"},
+  "eko":{skill:"sistem düşüncesi",focus:"ekosistem ilişkileri, çevre etkisi analizi",grade:"6-7. sınıf"},
+  "prof-atom":{skill:"bilimsel model kurma",focus:"madde ve enerji kavramları",grade:"5-6. sınıf"},
+  "astro":{skill:"uzamsal düşünce",focus:"güneş sistemi ilişkileri, uzay fiziği",grade:"6-7. sınıf"},
+  "sherlock":{skill:"tümdengelim",focus:"kanıt toplama, mantıksal çıkarım",grade:"7-9. sınıf"},
+  "hermione":{skill:"akademik araştırma",focus:"kaynak değerlendirme, argüman kurma",grade:"6-8. sınıf"},
+  "darth-vader":{skill:"etik karar verme",focus:"sonuçları değerlendirme, güç ve sorumluluk",grade:"8-10. sınıf"},
+  "elizabeth-bennet":{skill:"eleştirel sosyal analiz",focus:"karakter analizi, sosyal bağlam",grade:"8-10. sınıf"},
+  "tony-stark":{skill:"mühendislik düşüncesi",focus:"problem çözme, yenilik süreci",grade:"6-9. sınıf"},
+  "yoda":{skill:"metabilişsel farkındalık",focus:"öz-yönetim, sabır ve odaklanma",grade:"5-8. sınıf"},
+  "cleopatra":{skill:"stratejik düşünce",focus:"liderlik ve strateji analizi",grade:"7-9. sınıf"},
+  "naruto-uzumaki":{skill:"büyüme zihniyeti",focus:"ısrar, azim ve öz inanç",grade:"5-7. sınıf"},
+  "gandalf":{skill:"ahlaki akıl yürütme",focus:"cesaret ve doğru tercihlerin önemi",grade:"6-9. sınıf"},
+  "ada-lovelace":{skill:"algoritmik düşünce",focus:"soyutlama, adımsal problem çözme",grade:"7-9. sınıf"}
+};
+function getPedagogy(char) {
+  return PEDAGOGY[char?.id] || {
+    skill: char?.thinkingSkill || "eleştirel düşünce",
+    focus: char?.observationFocus || "öğrenci katılımı ve etkileşim kalitesi",
+    grade: "5-9. sınıf"
+  };
+}
+// Antropomorfik algı + pedagojik gözlem kriterleri (her biri 0-2 puan)
+const ANALYSIS_CRITERIA = [
+  {key:"isimle_hitap",   icon:"🏷",  name:"İsimle Hitap",        desc:"Öğrenci AI karakterine ismiyle / kişisel hitap etti mi?"},
+  {key:"nezaket",        icon:"🙏",  name:"Nezaket & Teşekkür",  desc:"Lütfen, teşekkür, rica gibi nazik sosyal ifadeler kullandı mı?"},
+  {key:"gorev_odak",     icon:"🎯",  name:"Göreve Odaklılık",     desc:"Konuya/göreve odaklı, ilgili mesajlar gönderdi mi?"},
+  {key:"merak_soru",     icon:"❓",  name:"Merak & Soru Sorma",   desc:"Derinleşmek için soru sordu, açıklama istedi mi?"},
+  {key:"dusunme_beceri", icon:"🧠",  name:"Düşünme Becerisi",     desc:"Hedeflenen düşünme becerisini gösterdi mi?"},
+  {key:"sosyal_etki",    icon:"🤝",  name:"Sosyal Etkileşim",     desc:"AI'yı sosyal bir varlık gibi görüp diyalog kurdu mu?"}
+];
 const VOICE_CONFIGS = [
   {id:"natural",name:"Doğal",desc:"Dengeli, net",icon:"🗣️",pitch:1.0,rate:1.0},
   {id:"deep",name:"Derin",desc:"Otoriter, güçlü",icon:"🎙️",pitch:0.75,rate:0.85},
@@ -1044,13 +1178,15 @@ function loadState() {
       totalChats: s.totalChats||0, favorites: s.favorites||[],
       chatHistory: s.chatHistory||[], customChars: s.customChars||[],
       username: s.username||"Kullanıcı", avatar: s.avatar||null,
-      socratesMode: s.socratesMode||false
+      socratesMode: s.socratesMode||false,
+      reports: s.reports||[], activeStudent: s.activeStudent||""
     };
-  } catch { return {xp:0,streak:0,lastActive:null,totalChats:0,favorites:[],chatHistory:[],customChars:[],socratesMode:false}; }
+  } catch { return {xp:0,streak:0,lastActive:null,totalChats:0,favorites:[],chatHistory:[],customChars:[],socratesMode:false,reports:[],activeStudent:""}; }
 }
 function saveState(s) { localStorage.setItem("gmai_state", JSON.stringify(s)); }
 let STATE = loadState();
 customChars = STATE.customChars||[];
+if(!STATE.reports) STATE.reports = [];
 
 // ─── XP & Streak ─────────────────────────────────────────────────────────
 function addXP(amount) {
@@ -2373,6 +2509,12 @@ function showPage(name) {
   if(name==="leaderboard") renderLeaderboard();
   if(name==="history") { renderHistory(); clearUnread(); }
   if(name==="profile") updateStreakUI();
+  if(name==="research") {
+    const inp = document.getElementById("researchStudentInput");
+    if(inp) inp.value = STATE.activeStudent||"";
+    renderReportList();
+  }
+  window.scrollTo(0,0);
 }
 
 // ─── Avatar Picker ───────────────────────────────────────────────────────────
@@ -2443,63 +2585,398 @@ function closeCelebration() {
   document.getElementById("celebrateOverlay").classList.remove("open");
 }
 
-// ─── Sohbet Analizi (Gemini tabanlı) ─────────────────────────────────────
+// ─── Araştırmacı Analizi (6 kriter, kanıt, 0-10 puan) ─────────────────────
 function closeAnalysis() {
   document.getElementById("analysisOverlay").classList.remove("open");
 }
 
-async function analyzeAndShowFeedback(char, history, lang) {
-  if(!char || !history || history.filter(m=>m.role==="user").length < 2) return;
+// Gemini ile 6 kriterli analiz yap → yapısal sonuç döndür
+async function runConversationAnalysis(char, history, lang) {
   const key = getApiKey();
-  if(!key) return;
-  try {
-    const langMap = {tr:"Türkçe", en:"English", de:"Deutsch"};
-    const langLabel = langMap[lang]||"Türkçe";
-    const transcript = history.slice(-12).map(m=>`${m.role==="user"?"Öğrenci":"Karakter"}: ${m.content}`).join("\n");
-    const prompt = `Sen bir eğitim analitiği asistanısın. Şu sohbeti analiz et ve ${langLabel} dilinde JSON formatında yanıt ver:
+  if(!key) return null;
+  const langMap = {tr:"Türkçe", en:"English", de:"Deutsch"};
+  const langLabel = langMap[lang]||"Türkçe";
+  const ped = getPedagogy(char);
+  const transcript = history.filter(m=>m.role==="user"||m.role==="assistant")
+    .map(m=>`${m.role==="user"?"ÖĞRENCİ":"KARAKTER ("+char.name+")"}: ${m.content}`).join("\n");
+  const criteriaList = ANALYSIS_CRITERIA.map((c,i)=>`${i+1}. ${c.name} (${c.key}): ${c.desc}`).join("\n");
 
-Karakter: ${char.name} (${char.universe})
-Düşünme becerisi hedefi: ${char.thinkingSkill||"eleştirel düşünce"}
-Gözlem odağı: ${char.observationFocus||"öğrenci katılımı"}
+  const prompt = `Sen öğrenci-yapay zekâ etkileşimlerini inceleyen bir eğitim araştırmacısısın. Antropomorfik algı ve düşünme becerileri açısından aşağıdaki sohbeti değerlendir. Yanıtı tamamen ${langLabel} dilinde ver.
 
-Sohbet:
+KARAKTER: ${char.name} (${char.universe})
+HEDEF DÜŞÜNME BECERİSİ: ${ped.skill}
+GÖZLEM ODAĞI: ${ped.focus}
+
+DEĞERLENDİRME KRİTERLERİ (her biri 0-2 puan: 0=hiç yok, 1=kısmen, 2=güçlü/açık):
+${criteriaList}
+
+SOHBET DÖKÜMÜ:
 ${transcript}
 
-Yanıtı SADECE şu JSON formatında ver (başka hiçbir şey ekleme):
+Her kriter için: bir puan (0,1,2) ve sohbetten DOĞRUDAN bir kanıt alıntısı ver (öğrencinin gerçek sözünden kısa alıntı; yoksa "Belirgin kanıt yok" yaz). Sadece geçerli JSON döndür, başka metin yazma:
 {
-  "feedback": "Sohbet hakkında 2-3 cümle özet geri bildirim",
-  "skillsObserved": ["gözlemlenen beceri 1", "gözlemlenen beceri 2"],
-  "encouragement": "Kısa bir teşvik cümlesi"
+  "criteria": [
+    {"key":"isimle_hitap","score":0,"evidence":"..."},
+    {"key":"nezaket","score":0,"evidence":"..."},
+    {"key":"gorev_odak","score":0,"evidence":"..."},
+    {"key":"merak_soru","score":0,"evidence":"..."},
+    {"key":"dusunme_beceri","score":0,"evidence":"..."},
+    {"key":"sosyal_etki","score":0,"evidence":"..."}
+  ],
+  "summary":"Etkileşimin 2-3 cümlelik genel değerlendirmesi",
+  "suggestion":"Araştırmacı/öğretmen için 1-2 cümlelik somut öneri"
 }`;
 
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
-      {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({
-          contents:[{role:"user",parts:[{text:prompt}]}],
-          generationConfig:{maxOutputTokens:300,temperature:0.7}
-        })
-      }
-    );
-    if(!res.ok) return;
-    const data = await res.json();
-    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text||"";
-    // JSON ayrıştır (```json ... ``` bloğu içinde olabilir)
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if(!jsonMatch) return;
-    const analysis = JSON.parse(jsonMatch[0]);
-    if(!analysis.feedback) return;
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+    {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        contents:[{role:"user",parts:[{text:prompt}]}],
+        generationConfig:{maxOutputTokens:800,temperature:0.5}
+      })
+    }
+  );
+  if(!res.ok) return null;
+  const data = await res.json();
+  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text||"";
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  if(!jsonMatch) return null;
+  let parsed;
+  try { parsed = JSON.parse(jsonMatch[0]); } catch { return null; }
+  if(!parsed.criteria || !Array.isArray(parsed.criteria)) return null;
 
-    document.getElementById("analysisFeedback").textContent = analysis.feedback;
-    document.getElementById("analysisSkills").innerHTML = (analysis.skillsObserved||[])
-      .map(s=>`<span class="trait-chip">${escHtml(s)}</span>`).join("");
-    document.getElementById("analysisEncouragement").textContent = analysis.encouragement||"";
-    document.getElementById("analysisOverlay").classList.add("open");
+  // Kriterleri normalize et — her zaman 6 kriter, sıralı
+  const critMap = {};
+  parsed.criteria.forEach(c=>{ if(c&&c.key) critMap[c.key]=c; });
+  const criteria = ANALYSIS_CRITERIA.map(def=>{
+    const r = critMap[def.key]||{};
+    let sc = parseInt(r.score); if(isNaN(sc)||sc<0) sc=0; if(sc>2) sc=2;
+    return {key:def.key, icon:def.icon, name:def.name, score:sc, evidence:(r.evidence||"Belirgin kanıt yok").toString().slice(0,200)};
+  });
+  const total = criteria.reduce((a,c)=>a+c.score,0);     // 0-12
+  const score10 = Math.round(total/12*10*10)/10;          // 0-10, 1 ondalık
+  return {
+    criteria, total, score10,
+    summary: (parsed.summary||"").toString(),
+    suggestion: (parsed.suggestion||"").toString()
+  };
+}
+
+// Sohbet kapanınca otomatik çağrılır
+async function analyzeAndShowFeedback(char, history, lang) {
+  if(!char || !history || history.filter(m=>m.role==="user").length < 2) return;
+  if(!getApiKey()) return;
+  // Modalı yükleniyor durumunda aç
+  document.getElementById("analysisBody").innerHTML =
+    `<div class="analysis-loading"><div class="spinner"></div>Sohbet analiz ediliyor…</div>`;
+  document.getElementById("analysisOverlay").classList.add("open");
+  try {
+    const result = await runConversationAnalysis(char, history, lang);
+    if(!result) { closeAnalysis(); return; }
+    const report = saveReport(char, result, lang);
+    renderAnalysisModal(char, result, report);
   } catch(e) {
-    // Sessizce başarısız ol
+    closeAnalysis();
   }
+}
+
+// Analiz modalını doldur
+function renderAnalysisModal(char, result, report) {
+  const ped = getPedagogy(char);
+  const critHtml = result.criteria.map(c=>{
+    const ok = c.score>0;
+    return `<div class="criterion">
+      <div class="criterion-head">
+        <span class="criterion-icon">${ok?"✅":"❌"}</span>
+        <span class="criterion-name">${c.icon} ${escHtml(c.name)}</span>
+        <span class="criterion-score">${c.score}/2</span>
+      </div>
+      <div class="criterion-evidence">${escHtml(c.evidence)}</div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("analysisBody").innerHTML = `
+    <div class="analysis-task">
+      <div class="analysis-task-row"><span class="analysis-task-label">Karakter</span><span class="analysis-task-val">${escHtml(char.name)}</span></div>
+      <div class="analysis-task-row"><span class="analysis-task-label">Sınıf Düzeyi</span><span class="analysis-task-val">${escHtml(ped.grade)}</span></div>
+      <div class="analysis-task-row"><span class="analysis-task-label">Konu</span><span class="analysis-task-val">${escHtml(char.universe)}</span></div>
+      <div class="analysis-task-row"><span class="analysis-task-label">Düşünme Becerisi</span><span class="analysis-task-val">${escHtml(ped.skill)}</span></div>
+    </div>
+    <div class="analysis-obs">🔎 Gözlem Odağı: ${escHtml(ped.focus)}</div>
+    <div class="analysis-student-field">
+      <label>👤 Öğrenci Adı / Kodu</label>
+      <input class="analysis-student-input" id="analysisStudentInput" value="${escAttr(report.student||"")}"
+        placeholder="Örn: Öğrenci 01" oninput="updateReportStudent('${report.id}', this.value)"/>
+    </div>
+    <div class="score-ring-wrap">
+      <div class="score-big">${result.score10}/10</div>
+      <div class="score-meta">
+        <div class="score-label">Toplam etkileşim kalitesi (${result.total}/12 puan)</div>
+        <div class="score-bar-track"><div class="score-bar-fill" style="width:${result.score10*10}%"></div></div>
+      </div>
+    </div>
+    <div class="criteria-list">${critHtml}</div>
+    ${result.summary?`<div class="analysis-summary">📝 <b>Özet:</b> ${escHtml(result.summary)}</div>`:""}
+    ${result.suggestion?`<div class="analysis-suggestion">💡 <b>Araştırmacıya öneri:</b> ${escHtml(result.suggestion)}</div>`:""}
+    <div class="analysis-actions">
+      <button class="analysis-btn analysis-btn-sec" onclick="shareReport('${report.id}')">📤 Raporu Paylaş</button>
+      <button class="analysis-btn analysis-btn-primary" onclick="closeAnalysis()">Tamam ✓</button>
+    </div>`;
+}
+
+// ─── Rapor Depolama & Geçmiş ──────────────────────────────────────────────
+function saveReport(char, result, lang) {
+  const ped = getPedagogy(char);
+  const report = {
+    id: "r"+Date.now().toString(36)+Math.random().toString(36).substr(2,4),
+    ts: new Date().toISOString(),
+    student: STATE.activeStudent||"",
+    charId: char.id, charName: char.name, universe: char.universe,
+    grade: ped.grade, skill: ped.skill, focus: ped.focus,
+    score10: result.score10, total: result.total,
+    criteria: result.criteria, summary: result.summary, suggestion: result.suggestion,
+    lang: lang||"tr"
+  };
+  STATE.reports = [report, ...(STATE.reports||[])].slice(0,200);
+  saveState(STATE);
+  return report;
+}
+function updateReportStudent(reportId, val) {
+  const r = (STATE.reports||[]).find(r=>r.id===reportId);
+  if(r) { r.student = val.trim(); saveState(STATE); }
+}
+function getReport(id) { return (STATE.reports||[]).find(r=>r.id===id); }
+
+function fmtDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("tr-TR",{day:"2-digit",month:"2-digit",year:"numeric"})
+    + " " + d.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
+}
+
+function renderReportList() {
+  const reports = STATE.reports||[];
+  const list = document.getElementById("reportList");
+  const empty = document.getElementById("researchEmpty");
+  // İstatistikler
+  renderResearchStats();
+  if(!reports.length){ list.innerHTML=""; empty.style.display="block"; return; }
+  empty.style.display="none";
+  list.innerHTML = reports.map(r=>`
+    <div class="report-item" onclick="openReport('${r.id}')">
+      <div class="report-item-top">
+        <span class="report-item-char">${escHtml(r.charName)}</span>
+        <span class="report-item-score">${r.score10}/10</span>
+      </div>
+      ${r.student?`<div class="report-item-student">👤 ${escHtml(r.student)}</div>`:""}
+      <div class="report-item-meta">${escHtml(r.universe)} · ${fmtDate(r.ts)}</div>
+    </div>`).join("");
+}
+
+function renderResearchStats() {
+  const reports = STATE.reports||[];
+  const el = document.getElementById("researchStats");
+  if(!el) return;
+  const count = reports.length;
+  const avg = count ? (reports.reduce((a,r)=>a+r.score10,0)/count).toFixed(1) : "0";
+  const students = new Set(reports.map(r=>r.student).filter(Boolean)).size;
+  el.innerHTML = `
+    <div class="research-stat"><div class="research-stat-num">${count}</div><div class="research-stat-label">Rapor</div></div>
+    <div class="research-stat"><div class="research-stat-num">${avg}</div><div class="research-stat-label">Ort. Puan</div></div>
+    <div class="research-stat"><div class="research-stat-num">${students}</div><div class="research-stat-label">Öğrenci</div></div>`;
+}
+
+// Geçmiş rapora tıklayınca tekrar göster
+function openReport(id) {
+  const r = getReport(id);
+  if(!r) return;
+  const char = allChars().find(c=>c.id===r.charId) || {id:r.charId,name:r.charName,universe:r.universe};
+  const result = {criteria:r.criteria, total:r.total, score10:r.score10, summary:r.summary, suggestion:r.suggestion};
+  renderAnalysisModal(char, result, r);
+  document.getElementById("analysisOverlay").classList.add("open");
+}
+
+function setActiveStudent(val) {
+  STATE.activeStudent = (val||"").trim();
+  saveState(STATE);
+}
+
+function clearReports() {
+  if(!(STATE.reports||[]).length) return;
+  if(window.confirm("Tüm analiz raporları kalıcı olarak silinecek. Emin misin?")) {
+    STATE.reports = [];
+    saveState(STATE);
+    renderReportList();
+  }
+}
+
+// ─── Dışa Aktarma (CSV / JSON / PDF) ──────────────────────────────────────
+function _downloadFile(filename, content, mime) {
+  const blob = new Blob([content], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+function exportReports(format) {
+  const reports = STATE.reports||[];
+  if(!reports.length){ showCelebration("📋","Rapor Yok","Dışa aktarılacak analiz raporu bulunamadı."); return; }
+  const stamp = new Date().toISOString().slice(0,10);
+  if(format==="json") {
+    _downloadFile(`greatmindai-raporlar-${stamp}.json`, JSON.stringify(reports,null,2), "application/json");
+  } else {
+    // CSV
+    const head = ["Tarih","OgrenciKodu","Karakter","Konu","SinifDuzeyi","DusunmeBecerisi","ToplamPuan(0-12)","Puan(0-10)"];
+    ANALYSIS_CRITERIA.forEach(c=>head.push(c.name));
+    head.push("Ozet","Oneri");
+    const rows = reports.map(r=>{
+      const cm = {}; (r.criteria||[]).forEach(c=>cm[c.key]=c.score);
+      const cells = [
+        fmtDate(r.ts), r.student||"", r.charName, r.universe, r.grade, r.skill, r.total, r.score10
+      ];
+      ANALYSIS_CRITERIA.forEach(c=>cells.push(cm[c.key]!=null?cm[c.key]:""));
+      cells.push(r.summary||"", r.suggestion||"");
+      return cells.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",");
+    });
+    const csv = "﻿"+[head.map(h=>`"${h}"`).join(","), ...rows].join("\r\n");
+    _downloadFile(`greatmindai-raporlar-${stamp}.csv`, csv, "text/csv;charset=utf-8");
+  }
+}
+
+function printReports() {
+  const reports = STATE.reports||[];
+  if(!reports.length){ showCelebration("📋","Rapor Yok","Yazdırılacak analiz raporu bulunamadı."); return; }
+  const rowsHtml = reports.map(r=>{
+    const crit = (r.criteria||[]).map(c=>`<li><b>${c.score>0?"✓":"✗"} ${escHtml(c.name)}:</b> ${c.score}/2 — <i>${escHtml(c.evidence)}</i></li>`).join("");
+    return `<div class="rep">
+      <h3>${escHtml(r.charName)} <span class="sc">${r.score10}/10</span></h3>
+      <p class="meta">${r.student?("Öğrenci: "+escHtml(r.student)+" · "):""}${escHtml(r.universe)} · ${escHtml(r.grade)} · ${fmtDate(r.ts)}</p>
+      <p class="meta">Düşünme Becerisi: ${escHtml(r.skill)} · Gözlem Odağı: ${escHtml(r.focus)}</p>
+      <ul>${crit}</ul>
+      ${r.summary?`<p><b>Özet:</b> ${escHtml(r.summary)}</p>`:""}
+      ${r.suggestion?`<p><b>Öneri:</b> ${escHtml(r.suggestion)}</p>`:""}
+    </div>`;
+  }).join("");
+  const html = `<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><title>Great Mind AI — Araştırma Raporu</title>
+    <style>
+      body{font-family:-apple-system,Segoe UI,sans-serif;color:#1a1040;max-width:760px;margin:0 auto;padding:24px}
+      h1{color:#7B4FD4} .rep{border:1px solid #ccc;border-radius:10px;padding:14px 18px;margin-bottom:14px;page-break-inside:avoid}
+      .rep h3{margin:0 0 4px;display:flex;justify-content:space-between} .sc{color:#00a;}
+      .meta{color:#666;font-size:12px;margin:2px 0} ul{margin:8px 0;padding-left:20px;font-size:13px} li{margin-bottom:3px}
+      p{font-size:13px;line-height:1.5} @media print{.noprint{display:none}}
+    </style></head><body>
+    <h1>🔬 Great Mind AI — Araştırma Raporu</h1>
+    <p class="meta">Oluşturma: ${fmtDate(new Date().toISOString())} · Toplam ${reports.length} analiz</p>
+    <button class="noprint" onclick="window.print()" style="padding:10px 18px;background:#7B4FD4;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-bottom:16px">🖨️ Yazdır / PDF Kaydet</button>
+    ${rowsHtml}
+    </body></html>`;
+  const w = window.open("", "_blank");
+  if(!w){ showCelebration("⚠️","Pop-up Engellendi","PDF için tarayıcı pop-up iznini açmalısın."); return; }
+  w.document.write(html); w.document.close();
+}
+
+// ─── Tek Sohbet Paylaşımı ─────────────────────────────────────────────────
+async function shareReport(id) {
+  const r = getReport(id);
+  if(!r) return;
+  const lines = [
+    `🔬 Great Mind AI — Etkileşim Analizi`,
+    r.student?`👤 Öğrenci: ${r.student}`:null,
+    `🎭 Karakter: ${r.charName} (${r.universe})`,
+    `🎓 Sınıf: ${r.grade} · Beceri: ${r.skill}`,
+    `📊 Puan: ${r.score10}/10 (${r.total}/12)`,
+    ``,
+    ...r.criteria.map(c=>`${c.score>0?"✅":"❌"} ${c.name}: ${c.score}/2`),
+    ``,
+    r.summary?`📝 ${r.summary}`:null,
+    r.suggestion?`💡 ${r.suggestion}`:null,
+    ``,
+    `📅 ${fmtDate(r.ts)}`
+  ].filter(x=>x!==null);
+  const text = lines.join("\n");
+  try {
+    if(navigator.share) {
+      await navigator.share({title:"Great Mind AI — Analiz Raporu", text});
+    } else {
+      await navigator.clipboard.writeText(text);
+      showCelebration("📋","Kopyalandı","Rapor panoya kopyalandı. İstediğin yere yapıştırabilirsin.");
+    }
+  } catch(e) { if(e.name!=="AbortError") { try{ await navigator.clipboard.writeText(text); showCelebration("📋","Kopyalandı","Rapor panoya kopyalandı."); }catch{} } }
+}
+
+// ─── Toplu Analiz (Tüm Eğitim Ajanları) ───────────────────────────────────
+function closeBulk() { document.getElementById("bulkOverlay").classList.remove("open"); }
+
+async function runBulkAnalysis() {
+  const reports = STATE.reports||[];
+  if(!reports.length){ showCelebration("📋","Veri Yok","Önce karakterlerle sohbet edip analiz oluşturmalısın."); return; }
+  document.getElementById("bulkBody").innerHTML =
+    `<div class="analysis-loading"><div class="spinner"></div>Karşılaştırmalı özet hazırlanıyor…</div>`;
+  document.getElementById("bulkOverlay").classList.add("open");
+
+  // Karakter bazında grupla
+  const byChar = {};
+  reports.forEach(r=>{
+    if(!byChar[r.charId]) byChar[r.charId] = {name:r.charName, scores:[], crit:{}};
+    byChar[r.charId].scores.push(r.score10);
+    (r.criteria||[]).forEach(c=>{
+      if(!byChar[r.charId].crit[c.key]) byChar[r.charId].crit[c.key]={sum:0,n:0,name:c.name};
+      byChar[r.charId].crit[c.key].sum += c.score;
+      byChar[r.charId].crit[c.key].n += 1;
+    });
+  });
+
+  // Karşılaştırma tablosu
+  const rows = Object.values(byChar).map(g=>{
+    const avg = (g.scores.reduce((a,b)=>a+b,0)/g.scores.length).toFixed(1);
+    return {name:g.name, count:g.scores.length, avg:parseFloat(avg), crit:g.crit};
+  }).sort((a,b)=>b.avg-a.avg);
+
+  // En güçlü / en zayıf kriter (genel)
+  const critTotals = {};
+  ANALYSIS_CRITERIA.forEach(c=>critTotals[c.key]={name:c.name, sum:0, n:0});
+  reports.forEach(r=>(r.criteria||[]).forEach(c=>{
+    if(critTotals[c.key]){ critTotals[c.key].sum+=c.score; critTotals[c.key].n+=1; }
+  }));
+  const critAvgs = Object.values(critTotals).filter(c=>c.n>0)
+    .map(c=>({name:c.name, avg:c.sum/c.n})).sort((a,b)=>b.avg-a.avg);
+  const strongest = critAvgs[0], weakest = critAvgs[critAvgs.length-1];
+
+  let tableHtml = `<div class="research-table-wrap"><table class="research-table">
+    <thead><tr><th>Karakter</th><th>Analiz</th><th>Ort. Puan</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr><td>${escHtml(r.name)}</td><td>${r.count}</td><td class="tscore">${r.avg}/10</td></tr>`).join("")}
+    </tbody></table></div>`;
+
+  let insightHtml = `
+    <div class="analysis-summary" style="margin-top:12px">
+      📈 <b>Genel Bakış:</b> ${reports.length} analiz, ${rows.length} farklı karakter üzerinden değerlendirildi.
+      ${strongest?`En güçlü kriter: <b>${escHtml(strongest.name)}</b> (ort. ${strongest.avg.toFixed(1)}/2).`:""}
+      ${weakest&&weakest!==strongest?`Geliştirilmesi gereken: <b>${escHtml(weakest.name)}</b> (ort. ${weakest.avg.toFixed(1)}/2).`:""}
+    </div>`;
+
+  // LLM ile yorumlu özet (varsa)
+  let aiHtml = "";
+  if(getApiKey()) {
+    try {
+      const summaryData = rows.map(r=>`${r.name}: ort ${r.avg}/10 (${r.count} analiz)`).join("; ");
+      const critData = critAvgs.map(c=>`${c.name}: ${c.avg.toFixed(1)}/2`).join("; ");
+      const prompt = `Bir eğitim araştırmacısı için kısa, Türkçe karşılaştırmalı yorum yaz (3-4 cümle). Karakter ortalamaları: ${summaryData}. Kriter ortalamaları: ${critData}. Öğrencilerin antropomorfik algı ve düşünme becerisi eğilimleri hakkında çıkarım yap. Sadece yorum metni döndür.`;
+      const key = getApiKey();
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+        {method:"POST",headers:{"Content-Type":"application/json"},
+         body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:300,temperature:0.6}})});
+      if(res.ok){
+        const d = await res.json();
+        const txt = d.candidates?.[0]?.content?.parts?.[0]?.text||"";
+        if(txt.trim()) aiHtml = `<div class="analysis-suggestion">🤖 <b>Yapay Zekâ Yorumu:</b> ${escHtml(txt.trim())}</div>`;
+      }
+    } catch(e){}
+  }
+
+  document.getElementById("bulkBody").innerHTML = tableHtml + insightHtml + aiHtml;
 }
 
 // ─── Onboarding ─────────────────────────────────────────────────────────────
