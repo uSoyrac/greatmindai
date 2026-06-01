@@ -1194,7 +1194,7 @@ function getAnonId() {
 // ─── Merkezi Veri Toplama (kayıpsız) ──────────────────────────────────────
 // Tüm öğrenciler bu merkezi Google Apps Script URL'sine veri gönderir.
 // Hocanın Apps Script "Web App" /exec adresi buraya gömülür.
-const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwPZTwyjdCfmcCyrlyBL-kvJCGcwFF0cWBgV-eHB2sJ7g38qqKzme1DXCqmVqbMdFmI2g/exec";  // ← Merkezi Sheets (Apps Script)
+const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbzRzkaWJ5XD5BtAhTsYZfCwA72RG50CtJbmbR2WmcHEncoKesA_L1FS0UiIYF6ob8kp8A/exec";  // ← Merkezi Sheets (Apps Script)
 function getSheetsUrl() { return (localStorage.getItem('gmai_sheets_url')||'').trim() || DEFAULT_SHEETS_URL; }
 
 // Bekleyen olay kuyruğu (offline / başarısız gönderimler kaybolmasın)
@@ -1872,9 +1872,24 @@ function confirmApiKey() {
   cancelApiKey();
 }
 
+// Gemini çağrısı — Apps Script proxy üzerinden (API anahtarı sunucuda gizli kalır,
+// public repo'da görünmez → bir daha "leaked" olarak bloke edilmez)
+async function geminiGenerate(bodyObj) {
+  const url = getSheetsUrl();
+  if(!url) return null;
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=UTF-8" }, // simple request → CORS preflight yok
+      body: JSON.stringify({ action: 'gemini', model: 'gemini-2.5-flash-lite', ...bodyObj })
+    });
+    if(!res.ok) return null;
+    return await res.json();   // { candidates: [...] }  veya  { error: ... }
+  } catch(e) { return null; }
+}
+
 async function callGeminiAPI(systemPrompt, history) {
-  const key = getApiKey();
-  if(!key) return null;
+  if(!getSheetsUrl()) return null;
   try {
     // Dil + stil talimatı ekle
     const langMap = {tr:"Türkçe yanıt ver.", en:"Respond in English.", de:"Antworte auf Deutsch."};
@@ -1905,25 +1920,12 @@ async function callGeminiAPI(systemPrompt, history) {
     }
     const contents = merged;
 
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: fullSystem }] },
-          contents: contents,
-          generationConfig: { maxOutputTokens: 400, temperature: 0.9 }
-        })
-      }
-    );
-    if(!res.ok) {
-      if(res.status===400||res.status===401||res.status===403) {
-        saveApiKey(""); return "__invalid_key__";
-      }
-      throw new Error("HTTP "+res.status);
-    }
-    const data = await res.json();
+    const data = await geminiGenerate({
+      system_instruction: { parts: [{ text: fullSystem }] },
+      contents: contents,
+      generationConfig: { maxOutputTokens: 400, temperature: 0.9 }
+    });
+    if(!data || data.error) return null;   // proxy/anahtar sorunu → demo yanıt
     return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
   } catch(e) {
     console.error("Gemini API hatası:", e);
@@ -1946,7 +1948,7 @@ async function sendMessage() {
   let reply = null;
 
   // Önce Gemini API ile gerçek AI dene
-  if(getApiKey()) {
+  if(getSheetsUrl()) {
     reply = await callGeminiAPI(activeChar.systemPrompt, chatHistory);
     if(reply === "__invalid_key__") {
       // Geçersiz key: modal aç, demo yanıt gösterme
@@ -2405,22 +2407,15 @@ function renderLeaderboard() {
 
 // ─── Quiz ─────────────────────────────────────────────────────────────────
 async function generateQuizWithGemini(char) {
-  const key = getApiKey();
-  if(!key) return null;
+  if(!getSheetsUrl()) return null;
   const langNote = activeLang==="en" ? "in English" : activeLang==="de" ? "auf Deutsch" : "Türkçe";
   const prompt = `${char.name} (${char.universe}) hakkında 4 çoktan seçmeli quiz sorusu oluştur. ${langNote} yaz.\nSadece geçerli JSON array döndür, başka açıklama ekleme:\n[{"question":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."}]\n"correct" alanı doğru cevabın 0-tabanlı indexi. 4 farklı seçenek olsun.`;
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
-      { method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({
-          contents:[{role:"user",parts:[{text:prompt}]}],
-          generationConfig:{maxOutputTokens:800,temperature:0.7}
-        })
-      }
-    );
-    if(!res.ok) return null;
-    const data = await res.json();
+    const data = await geminiGenerate({
+      contents:[{role:"user",parts:[{text:prompt}]}],
+      generationConfig:{maxOutputTokens:800,temperature:0.7}
+    });
+    if(!data || data.error) return null;
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     const match = text.match(/\[[\s\S]*?\]/);
     if(!match) return null;
@@ -2438,7 +2433,7 @@ async function startQuiz() {
   quizData = {questions:[],current:0,score:0,answered:false};
 
   // Gemini ile AI quiz dene
-  if(getApiKey()) {
+  if(getSheetsUrl()) {
     const aiQuestions = await generateQuizWithGemini(activeChar);
     if(aiQuestions?.length) {
       quizData.questions = aiQuestions;
@@ -2783,8 +2778,7 @@ function closeAnalysis() {
 
 // Gemini ile 6 kriterli analiz yap → yapısal sonuç döndür
 async function runConversationAnalysis(char, history, lang) {
-  const key = getApiKey();
-  if(!key) return null;
+  if(!getSheetsUrl()) return null;
   const langMap = {tr:"Türkçe", en:"English", de:"Deutsch"};
   const langLabel = langMap[lang]||"Türkçe";
   const ped = getPedagogy(char);
@@ -2818,19 +2812,11 @@ Her kriter için: bir puan (0,1,2) ve sohbetten DOĞRUDAN bir kanıt alıntısı
   "suggestion":"Araştırmacı/öğretmen için 1-2 cümlelik somut öneri"
 }`;
 
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
-    {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({
-        contents:[{role:"user",parts:[{text:prompt}]}],
-        generationConfig:{maxOutputTokens:800,temperature:0.5}
-      })
-    }
-  );
-  if(!res.ok) return null;
-  const data = await res.json();
+  const data = await geminiGenerate({
+    contents:[{role:"user",parts:[{text:prompt}]}],
+    generationConfig:{maxOutputTokens:800,temperature:0.5}
+  });
+  if(!data || data.error) return null;
   const raw = data.candidates?.[0]?.content?.parts?.[0]?.text||"";
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
   if(!jsonMatch) return null;
@@ -2858,7 +2844,7 @@ Her kriter için: bir puan (0,1,2) ve sohbetten DOĞRUDAN bir kanıt alıntısı
 // Sohbet kapanınca otomatik çağrılır
 async function analyzeAndShowFeedback(char, history, lang) {
   if(!char || !history || history.filter(m=>m.role==="user").length < 2) return;
-  if(!getApiKey()) return;
+  if(!getSheetsUrl()) return;
   // Modalı yükleniyor durumunda aç
   document.getElementById("analysisBody").innerHTML =
     `<div class="analysis-loading"><div class="spinner"></div>Sohbet analiz ediliyor…</div>`;
@@ -3312,17 +3298,13 @@ async function runBulkAnalysis() {
 
   // LLM ile yorumlu özet (varsa)
   let aiHtml = "";
-  if(getApiKey()) {
+  if(getSheetsUrl()) {
     try {
       const summaryData = rows.map(r=>`${r.name}: ort ${r.avg}/10 (${r.count} analiz)`).join("; ");
       const critData = critAvgs.map(c=>`${c.name}: ${c.avg.toFixed(1)}/2`).join("; ");
       const prompt = `Bir eğitim araştırmacısı için kısa, Türkçe karşılaştırmalı yorum yaz (3-4 cümle). Karakter ortalamaları: ${summaryData}. Kriter ortalamaları: ${critData}. Öğrencilerin antropomorfik algı ve düşünme becerisi eğilimleri hakkında çıkarım yap. Sadece yorum metni döndür.`;
-      const key = getApiKey();
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
-        {method:"POST",headers:{"Content-Type":"application/json"},
-         body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:300,temperature:0.6}})});
-      if(res.ok){
-        const d = await res.json();
+      const d = await geminiGenerate({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:300,temperature:0.6}});
+      if(d && !d.error){
         const txt = d.candidates?.[0]?.content?.parts?.[0]?.text||"";
         if(txt.trim()) aiHtml = `<div class="analysis-suggestion">🤖 <b>Yapay Zekâ Yorumu:</b> ${escHtml(txt.trim())}</div>`;
       }
@@ -3519,7 +3501,7 @@ window.addEventListener('pagehide', flushPendingEvents);
 function updateApiKeyBtn() {
   const btn = document.getElementById("apiKeyBtn");
   if(!btn) return;
-  if(getApiKey()) {
+  if(getSheetsUrl()) {
     btn.textContent = "🟢";
     btn.title = "Gemini AI Bağlı ✓ — Tıkla key'i değiştir";
   } else {
