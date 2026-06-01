@@ -3546,6 +3546,13 @@ confirmApiKey = function() {
   updateApiKeyBtn();
 };
 
+// ─── PWA: Service Worker kaydı (telefona kurulabilir + offline) ──────────
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
 // ─── PWA: Ana Ekrana Ekle Banner ─────────────────────────────────────────
 let _pwaPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {
