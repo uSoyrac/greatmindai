@@ -1,115 +1,138 @@
-# Great Mind AI — Akademik Veri Toplama Kurulum Rehberi
+# Great Mind AI — Merkezi Veri Toplama Kurulumu
 
-## Adım 1: Google Sheets Oluştur
+Tüm öğrencilerin etkileşim ve analiz verileri **tek bir Google Sheets**'te,
+**hiç kayıp olmadan** toplanır. Kurulum 5 dakika, **bir kez** yapılır.
 
-1. [Google Sheets](https://sheets.google.com) aç → "Yeni Boş Belge"
-2. Başlığı **"Great Mind AI — Akademik Veriler"** yap
-3. İlk satıra şu başlıkları yaz (A1'den itibaren):
-
-```
-Tarih | Saat | Anonim ID | Etkinlik | Karakter | Kategori | Mesaj Sayısı | Quiz Skoru | Quiz % | XP | Seri | Dil | Cihaz
-```
+> Mimari: Uygulama → Google Apps Script (webhook) → Google Sheets
+> (Statik site doğrudan Sheet'e yazamaz; Apps Script köprü görevi görür.)
 
 ---
 
-## Adım 2: Apps Script Kur
+## Adım 1: Google Sheet Oluştur
 
-1. Google Sheets'te üst menüden **Uzantılar → Apps Script** tıkla
-2. Açılan editörde tüm kodu sil, aşağıdakini yapıştır:
+1. [sheets.google.com](https://sheets.google.com) → **Boş tablo**
+2. Adını **"Great Mind AI — Veri"** yap
+3. **Başlık satırını yazmana gerek yok** — kod ilk çalıştığında otomatik oluşturur.
+
+---
+
+## Adım 2: Apps Script Kodu
+
+1. Sheet'te üst menü: **Uzantılar → Apps Script**
+2. Açılan editördeki her şeyi sil, aşağıdaki kodu yapıştır:
 
 ```javascript
+// Great Mind AI — Merkezi Veri Toplayıcı
+const SHEET_NAME = 'Veriler';
+
 function doPost(e) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000); // eşzamanlı yazımları sıraya al (kayıp olmasın)
   try {
     const data = JSON.parse(e.postData.contents);
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
+
+    // Tüm olası alanlar (sıralı sütunlar)
+    const COLS = [
+      'eventId','ts','tarih','saat','event','userId','email','username',
+      'lang','device','xp','streak','totalChats','reportCount','badgeCount',
+      // sohbet / quiz
+      'character','charId','category','msgCount','quizScore','quizPct',
+      // analiz raporu
+      'reportId','student','konu','sinif','dusunmeBecerisi','gozlemOdagi',
+      'puan10','puanToplam12','ozet','oneri','arastirmaciNotu',
+      // 6 kriter puanı + kanıt
+      'k_isimle_hitap','kanit_isimle_hitap','k_nezaket','kanit_nezaket',
+      'k_gorev_odak','kanit_gorev_odak','k_merak_soru','kanit_merak_soru',
+      'k_dusunme_beceri','kanit_dusunme_beceri','k_sosyal_etki','kanit_sosyal_etki'
+    ];
+
+    // Başlık satırı yoksa oluştur
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(COLS);
+      sheet.setFrozenRows(1);
+    }
+
+    // İstanbul saatiyle tarih/saat ekle
     const now = new Date();
-    const tarih = Utilities.formatDate(now, "Europe/Istanbul", "dd.MM.yyyy");
-    const saat  = Utilities.formatDate(now, "Europe/Istanbul", "HH:mm:ss");
-    
-    sheet.appendRow([
-      tarih,
-      saat,
-      data.userId    || '',
-      data.event     || '',
-      data.character || '',
-      data.category  || '',
-      data.msgCount  || '',
-      data.quizScore || '',
-      data.quizPct   || '',
-      data.xp        || 0,
-      data.streak    || 0,
-      data.lang      || 'tr',
-      data.device    || '',
-    ]);
-    
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: true }))
+    data.tarih = Utilities.formatDate(now, 'Europe/Istanbul', 'dd.MM.yyyy');
+    data.saat  = Utilities.formatDate(now, 'Europe/Istanbul', 'HH:mm:ss');
+
+    // Satırı sütun sırasına göre diz
+    const row = COLS.map(function(c){ return (c in data) ? data[c] : ''; });
+    sheet.appendRow(row);
+
+    return ContentService.createTextOutput(JSON.stringify({ok:true}))
       .setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: false, error: err.toString() }))
+    return ContentService.createTextOutput(JSON.stringify({ok:false, error:String(err)}))
       .setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
   }
 }
 
-function doGet(e) {
-  return ContentService
-    .createTextOutput(JSON.stringify({ ok: true, service: "Great Mind AI Data Collector" }))
+function doGet() {
+  return ContentService.createTextOutput(JSON.stringify({ok:true, service:'Great Mind AI'}))
     .setMimeType(ContentService.MimeType.JSON);
 }
 ```
 
-3. **Kaydet** (Ctrl+S veya diskete bas)
+3. **Kaydet** (💾 veya Ctrl+S)
 
 ---
 
 ## Adım 3: Web App Olarak Yayınla
 
-1. Sağ üstte **"Dağıt"** → **"Yeni dağıtım"** tıkla
-2. Dişli ⚙️ simgesine tıkla → **"Web uygulaması"** seç
-3. Şu ayarları yap:
+1. Sağ üstte **Dağıt → Yeni dağıtım**
+2. ⚙️ (dişli) → **Web uygulaması**
+3. Ayarlar:
    - **Açıklama:** Great Mind AI
-   - **Farklı çalıştır:** Ben olarak (kendi Google hesabın)
-   - **Erişimi olan kullanıcılar:** **Herkes** ← ÖNEMLİ!
-4. **"Dağıt"** tıkla → Google hesabına izin ver
-5. Çıkan **Web Uygulama URL'sini** kopyala  
-   *(https://script.google.com/macros/s/XXXXX.../exec formatında)*
+   - **Çalıştıran:** **Ben** (kendi hesabın)
+   - **Erişimi olanlar:** **Herkes** ← ÇOK ÖNEMLİ
+4. **Dağıt** → Google izinlerini onayla (kendi hesabın için güvenli)
+5. Çıkan **Web Uygulaması URL'sini kopyala**
+   *(`https://script.google.com/macros/s/XXXX.../exec` biçiminde)*
 
 ---
 
-## Adım 4: URL'i Uygulamaya Gir
+## Adım 4: URL'yi Bağla — İki Yol
 
-1. **https://usoyrac.github.io/greatmindai/** adresini aç
-2. Sağ üstte **📊** butonuna tıkla
-3. Kopyaladığın URL'i yapıştır → **Kaydet**
+### A) Otomatik (önerilen, tüm öğrenciler için)
+Bu `/exec` URL'sini **bana ver**; uygulamaya gömerim. O andan itibaren
+**her öğrenci hiçbir ayar yapmadan** otomatik bu Sheet'e veri gönderir.
 
-✅ Artık her öğrenci etkileşimi otomatik Google Sheets'e kaydedilir!
+### B) Manuel (tek cihaz için)
+1. **https://usoyrac.github.io/greatmindai/** aç
+2. Sağ üstte **📊** → URL'yi yapıştır → **Kaydet**
+   (📊✓ olur = veri toplama aktif)
 
 ---
 
-## Toplanan Veriler
+## Toplanan Veriler (kapsamlı)
 
-| Sütun | Açıklama |
+| Grup | Sütunlar |
 |---|---|
-| Tarih / Saat | İstanbul saati |
-| Anonim ID | Öğrenci başına benzersiz kod (isim değil) |
-| Etkinlik | app_open / chat_start / chat_end / quiz_complete / onboarding_complete |
-| Karakter | Hangi karakterle sohbet edildi |
-| Kategori | Eğitim / Historical / Fantasy... |
-| Mesaj Sayısı | Sohbette kaç mesaj gönderildi |
-| Quiz Skoru | Örn: 3/4 |
-| Quiz % | Başarı yüzdesi |
-| XP | Öğrencinin toplam puanı |
-| Seri | Kaç gündür aktif |
-| Dil | tr / en / de |
-| Cihaz | mobile / desktop |
+| Kimlik | eventId, ts, tarih, saat, userId, **email**, username |
+| Olay | event (app_open / chat_start / chat_end / quiz_complete / **report_created** / report_note / onboarding_complete) |
+| Bağlam | lang, device, xp, streak, totalChats, reportCount, badgeCount |
+| Sohbet/Quiz | character, charId, category, msgCount, quizScore, quizPct |
+| **Analiz raporu** | reportId, student, konu, sinif, dusunmeBecerisi, gozlemOdagi, puan10, puanToplam12, ozet, oneri, arastirmaciNotu |
+| **6 kriter** | k_* (0-2 puan) + kanit_* (sohbetten alıntı) — isimle hitap, nezaket, göreve odaklılık, merak, düşünme becerisi, sosyal etkileşim |
+
+### Kayıpsızlık garantisi
+- Her olay önce cihazda **kuyruğa** alınır, sonra gönderilir.
+- İnternet yoksa / gönderim başarısızsa olay **kuyrukta kalır**, çevrimiçi
+  olunca / uygulama tekrar açılınca **otomatik gönderilir**.
+- `sendBeacon` + `keepalive` ile sayfa kapanırken bile veri ulaşır.
+- Apps Script tarafında `LockService` ile eşzamanlı yazımlar sıraya alınır.
 
 ---
 
 ## Gizlilik (KVKK)
-
-- Gerçek isim **toplanmaz**
-- Konum, e-posta gibi kişisel veri **toplanmaz**
-- Sohbet içeriği (mesaj metni) **toplanmaz** — sadece sayısal metrikler
-- Her öğrenci anonim bir kod ile tanımlanır
+- Sohbet metinlerinin tamamı toplanmaz — yalnızca analiz metrikleri ve
+  araştırma için seçilmiş kanıt alıntıları.
+- E-posta yalnızca araştırmacının öğrencileri ayırt etmesi içindir.
+- Konum, telefon gibi kişisel veri toplanmaz.
+- Her cihaz ayrıca anonim bir `userId` ile de işaretlenir.

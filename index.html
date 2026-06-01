@@ -1179,28 +1179,77 @@ function getAnonId() {
   }
   return id;
 }
-function getSheetsUrl() { return localStorage.getItem('gmai_sheets_url')||''; }
+// ─── Merkezi Veri Toplama (kayıpsız) ──────────────────────────────────────
+// Tüm öğrenciler bu merkezi Google Apps Script URL'sine veri gönderir.
+// Hocanın Apps Script "Web App" /exec adresi buraya gömülür.
+const DEFAULT_SHEETS_URL = "";  // ← Apps Script /exec URL'si buraya
+function getSheetsUrl() { return (localStorage.getItem('gmai_sheets_url')||'').trim() || DEFAULT_SHEETS_URL; }
 
-async function trackEvent(event, extra={}) {
-  const url = getSheetsUrl();
-  if(!url) return;
+// Bekleyen olay kuyruğu (offline / başarısız gönderimler kaybolmasın)
+function _loadQueue() { try { return JSON.parse(localStorage.getItem('gmai_pending')||'[]'); } catch { return []; } }
+function _saveQueue(q) { try { localStorage.setItem('gmai_pending', JSON.stringify(q.slice(-500))); } catch(e){} }
+
+// Tek bir payload'ı gönder. Başarı (network ulaştı) → true, hata → false
+async function _postEvent(url, payload) {
+  // 1) sendBeacon (sayfa kapanırken bile güvenilir)
+  try {
+    if(navigator.sendBeacon) {
+      const blob = new Blob([JSON.stringify(payload)], {type:'text/plain;charset=UTF-8'});
+      if(navigator.sendBeacon(url, blob)) return true;
+    }
+  } catch(e) {}
+  // 2) fetch (no-cors) — keepalive ile
   try {
     await fetch(url, {
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        userId: getAnonId(),
-        email: STATE?.email || localStorage.getItem('gmai_email') || '',
-        username: STATE?.username || '',
-        event,
-        lang: activeLang||'tr',
-        xp: STATE?.xp||0,
-        streak: STATE?.streak||0,
-        ...extra
-      })
+      method:'POST', mode:'no-cors', keepalive:true,
+      headers:{'Content-Type':'text/plain;charset=UTF-8'},
+      body: JSON.stringify(payload)
     });
-  } catch(e) { /* sessizce geç */ }
+    return true;   // no-cors opaque: network'e ulaştıysa resolve olur
+  } catch(e) { return false; }
+}
+
+// Kuyruğu boşalt — gönderilemeyenler kuyrukta kalır
+let _flushing = false;
+async function flushPendingEvents() {
+  if(_flushing) return;
+  const url = getSheetsUrl();
+  if(!url) return;
+  _flushing = true;
+  try {
+    let q = _loadQueue();
+    const remain = [];
+    for(const item of q) {
+      const okSent = await _postEvent(url, item);
+      if(!okSent) remain.push(item);
+    }
+    _saveQueue(remain);
+  } catch(e) {} finally { _flushing = false; }
+}
+
+async function trackEvent(event, extra={}) {
+  // Zengin, standart payload
+  const payload = {
+    eventId: 'e'+Date.now().toString(36)+Math.random().toString(36).substr(2,5),
+    ts: new Date().toISOString(),
+    userId: getAnonId(),
+    email: STATE?.email || localStorage.getItem('gmai_email') || '',
+    username: STATE?.username || '',
+    event,
+    lang: activeLang||'tr',
+    xp: STATE?.xp||0,
+    streak: STATE?.streak||0,
+    totalChats: STATE?.totalChats||0,
+    reportCount: (STATE?.reports||[]).length,
+    badgeCount: (STATE?.badges||[]).length,
+    device: /mobile|android|iphone|ipad/i.test(navigator.userAgent)?'mobile':'desktop',
+    ...extra
+  };
+  // Önce kuyruğa ekle (kayıp olmasın), sonra göndermeyi dene
+  const q = _loadQueue();
+  q.push(payload);
+  _saveQueue(q);
+  flushPendingEvents();
 }
 
 // ─── State ───────────────────────────────────────────────────────────────
@@ -2860,9 +2909,18 @@ function renderAnalysisModal(char, result, report) {
       <button class="analysis-btn analysis-btn-primary" onclick="closeAnalysis()">Tamam ✓</button>
     </div>`;
 }
+let _noteTimer = null;
 function updateReportNote(reportId, val) {
   const r = (STATE.reports||[]).find(r=>r.id===reportId);
-  if(r) { r.note = (val||"").toString(); saveState(STATE); }
+  if(r) {
+    r.note = (val||"").toString();
+    saveState(STATE);
+    // Debounce: yazma bitince (1.5sn) notu merkeze gönder
+    clearTimeout(_noteTimer);
+    _noteTimer = setTimeout(()=>{
+      trackEvent('report_note', {reportId: r.id, student: r.student, character: r.charName, arastirmaciNotu: r.note});
+    }, 1500);
+  }
 }
 
 // ─── Rapor Depolama & Geçmiş ──────────────────────────────────────────────
@@ -2884,6 +2942,28 @@ function saveReport(char, result, lang) {
   STATE.reports = [report, ...(STATE.reports||[])].slice(0,200);
   saveState(STATE);
   checkBadges({silent:true});
+  // 📊 Kapsamlı analiz verisini merkezi Sheets'e gönder (kayıpsız kuyruk)
+  const critFields = {};
+  (result.criteria||[]).forEach(c=>{
+    critFields["k_"+c.key] = c.score;                 // kriter puanı (0-2)
+    critFields["kanit_"+c.key] = (c.evidence||"");    // kanıt alıntısı
+  });
+  trackEvent('report_created', {
+    reportId: report.id,
+    student: report.student,
+    character: report.charName,
+    charId: report.charId,
+    konu: report.universe,
+    sinif: report.grade,
+    dusunmeBecerisi: report.skill,
+    gozlemOdagi: report.focus,
+    puan10: report.score10,
+    puanToplam12: report.total,
+    ozet: report.summary,
+    oneri: report.suggestion,
+    arastirmaciNotu: report.note,
+    ...critFields
+  });
   return report;
 }
 function updateReportStudent(reportId, val) {
@@ -3415,8 +3495,13 @@ initTheme();
 checkBadges({silent:true});
 checkOnboarding();
 updateSheetsBtn();
-// 📊 Uygulama açılışını kaydet
+// 📊 Uygulama açılışını kaydet + bekleyen olayları (önceki oturumdan) gönder
+flushPendingEvents();
 setTimeout(()=>trackEvent('app_open', {device:/mobile|android|iphone/i.test(navigator.userAgent)?'mobile':'desktop'}), 1000);
+// Çevrimiçi olunca ve sayfa görünür olunca kuyruğu boşalt (kayıpsızlık)
+window.addEventListener('online', flushPendingEvents);
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') flushPendingEvents(); });
+window.addEventListener('pagehide', flushPendingEvents);
 
 // API key buton durumu
 function updateApiKeyBtn() {
