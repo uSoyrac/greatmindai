@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Great Mind AI</title>
 
-<!-- Google ile Giriş (Client ID tanımlıysa aktif olur) -->
-<script src="https://accounts.google.com/gsi/client" async defer onload="window._gisReady=true; if(window.initGoogleSignIn) initGoogleSignIn();"></script>
-
 <!-- PWA -->
 <link rel="manifest" href="manifest.json"/>
 <meta name="theme-color" content="#7B4FD4"/>
@@ -383,9 +380,6 @@ input,textarea{font-family:inherit;color:var(--text)}
 .ob-avatar-btn.selected{border-color:var(--cyan);background:rgba(0,200,232,.15)}
 .ob-btn{width:100%;padding:14px;border-radius:14px;background:var(--grad);color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin-top:20px;transition:.2s}
 .ob-btn:hover{opacity:.9}
-.ob-or{display:flex;align-items:center;text-align:center;color:var(--muted);font-size:12px;margin-top:14px}
-.ob-or::before,.ob-or::after{content:"";flex:1;height:1px;background:var(--border)}
-.ob-or span{padding:0 12px}
 
 /* ── Notification Badge ── */
 .nav-btn-icon{position:relative}
@@ -861,11 +855,6 @@ input,textarea{font-family:inherit;color:var(--text)}
     <div class="ob-logo">🧠</div>
     <div class="ob-title">Great Mind AI'ya Hoş Geldin!</div>
     <div class="ob-sub">Tarihîn en büyük zihinleriyle sohbet et, öğren ve keşfet.</div>
-    <!-- Hızlı kaydol: Google ile (Client ID tanımlıysa görünür) -->
-    <div id="googleBtnWrap" style="display:none;margin-bottom:14px">
-      <div id="googleBtn" style="display:flex;justify-content:center"></div>
-      <div class="ob-or"><span>veya bilgilerinle kaydol</span></div>
-    </div>
     <div class="ob-field" style="display:flex;gap:10px">
       <div style="flex:1">
         <label class="ob-label">Ad</label>
@@ -3339,7 +3328,6 @@ function checkOnboarding() {
     document.querySelectorAll('.ob-avatar-btn').forEach((btn,i)=>{
       if(i===0) btn.classList.add('selected');
     });
-    initGoogleSignIn();  // Google ile giriş butonu (Client ID varsa)
   } else {
     // Already onboarded but tour not done yet
     setTimeout(startTour, 800);
@@ -3373,7 +3361,7 @@ function finishOnboarding() {
   completeSignup(first, last, email, 'form');
 }
 
-// Kaydı tamamla (form veya Google ile ortak)
+// Kaydı tamamla (Ad + Soyad + E-posta)
 function completeSignup(first, last, email, provider) {
   const selectedBtn = document.querySelector('.ob-avatar-btn.selected');
   const avatar = selectedBtn ? selectedBtn.textContent : (STATE.avatar||'🧠');
@@ -3394,39 +3382,12 @@ function completeSignup(first, last, email, provider) {
   setTimeout(startTour, 600);
 }
 
-// ─── Google ile Hızlı Giriş (Google Identity Services) ────────────────────
-// Client ID'yi Google Cloud Console'dan alıp buraya yaz; boşken Google butonu gizli kalır.
-const GOOGLE_CLIENT_ID = "";   // ← örn: "1234567890-abc.apps.googleusercontent.com"
-
-function _decodeJwt(t) {
-  try { return JSON.parse(decodeURIComponent(escape(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))))); }
-  catch(e){ return {}; }
-}
-function onGoogleSignIn(resp) {
-  const p = _decodeJwt(resp.credential);
-  if(!p.email) return;
-  const first = p.given_name || (p.name||'').split(' ')[0] || '';
-  const last  = p.family_name || (p.name||'').split(' ').slice(1).join(' ') || '';
-  completeSignup(first, last, p.email.toLowerCase(), 'google');
-}
-function initGoogleSignIn() {
-  if(!GOOGLE_CLIENT_ID || !(window.google && google.accounts && google.accounts.id)) return;
-  try {
-    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogleSignIn });
-    const btn = document.getElementById('googleBtn');
-    if(btn) google.accounts.id.renderButton(btn, { theme:'filled_blue', size:'large', text:'signup_with', shape:'pill', width:280, locale:'tr' });
-    const wrap = document.getElementById('googleBtnWrap');
-    if(wrap) wrap.style.display = 'block';
-  } catch(e) {}
-}
-
 // Sağ üstteki 👤 — kayıtlıysa profile git, değilse kayıt modalını aç
 function openProfileOrSignup() {
   if(localStorage.getItem('gmai_onboarded')) {
     showPage('profile');
   } else {
     document.getElementById('onboardingOverlay').classList.add('open');
-    initGoogleSignIn();
   }
 }
 
