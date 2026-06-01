@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Great Mind AI</title>
 
+<!-- Google ile Giriş (Client ID tanımlıysa aktif olur) -->
+<script src="https://accounts.google.com/gsi/client" async defer onload="window._gisReady=true; if(window.initGoogleSignIn) initGoogleSignIn();"></script>
+
 <!-- PWA -->
 <link rel="manifest" href="manifest.json"/>
 <meta name="theme-color" content="#7B4FD4"/>
@@ -380,6 +383,9 @@ input,textarea{font-family:inherit;color:var(--text)}
 .ob-avatar-btn.selected{border-color:var(--cyan);background:rgba(0,200,232,.15)}
 .ob-btn{width:100%;padding:14px;border-radius:14px;background:var(--grad);color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin-top:20px;transition:.2s}
 .ob-btn:hover{opacity:.9}
+.ob-or{display:flex;align-items:center;text-align:center;color:var(--muted);font-size:12px;margin-top:14px}
+.ob-or::before,.ob-or::after{content:"";flex:1;height:1px;background:var(--border)}
+.ob-or span{padding:0 12px}
 
 /* ── Notification Badge ── */
 .nav-btn-icon{position:relative}
@@ -547,6 +553,7 @@ input,textarea{font-family:inherit;color:var(--text)}
     <button class="nav-btn nav-btn-icon" id="historyNavBtn" onclick="showPage('history');clearHistoryBadge()" title="Sohbet Geçmişi">💬<span class="notif-badge" id="historyBadge"></span></button>
     <button class="nav-btn nav-btn-icon" onclick="showPage('leaderboard')" title="Liderlik">🏆</button>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
+    <button class="nav-btn nav-btn-icon" onclick="openProfileOrSignup()" title="Profil / Kaydol" id="profileNavBtn">👤</button>
     <button class="nav-btn nav-btn-grad" onclick="openWizard()"><span class="nav-grad-plus">+</span> <span class="nav-grad-label">Karakter Oluştur</span></button>
   </div>
 </nav>
@@ -854,14 +861,25 @@ input,textarea{font-family:inherit;color:var(--text)}
     <div class="ob-logo">🧠</div>
     <div class="ob-title">Great Mind AI'ya Hoş Geldin!</div>
     <div class="ob-sub">Tarihîn en büyük zihinleriyle sohbet et, öğren ve keşfet.</div>
-    <div class="ob-field">
-      <label class="ob-label">Kullanıcı Adın</label>
-      <input id="obNameInput" class="ob-input" type="text" placeholder="Örn: Kaşif, Araştırmacı..." maxlength="20" onkeydown="if(event.key==='Enter') finishOnboarding()" />
+    <!-- Hızlı kaydol: Google ile (Client ID tanımlıysa görünür) -->
+    <div id="googleBtnWrap" style="display:none;margin-bottom:14px">
+      <div id="googleBtn" style="display:flex;justify-content:center"></div>
+      <div class="ob-or"><span>veya bilgilerinle kaydol</span></div>
+    </div>
+    <div class="ob-field" style="display:flex;gap:10px">
+      <div style="flex:1">
+        <label class="ob-label">Ad</label>
+        <input id="obFirstName" class="ob-input" type="text" placeholder="Adın" maxlength="30" autocomplete="given-name" onkeydown="if(event.key==='Enter') finishOnboarding()" />
+      </div>
+      <div style="flex:1">
+        <label class="ob-label">Soyad</label>
+        <input id="obLastName" class="ob-input" type="text" placeholder="Soyadın" maxlength="30" autocomplete="family-name" onkeydown="if(event.key==='Enter') finishOnboarding()" />
+      </div>
     </div>
     <div class="ob-field">
-      <label class="ob-label">E-posta ile Giriş</label>
+      <label class="ob-label">E-posta</label>
       <input id="obEmailInput" class="ob-input" type="email" placeholder="ornek@eposta.com" maxlength="60" autocomplete="email" onkeydown="if(event.key==='Enter') finishOnboarding()" />
-      <div id="obEmailErr" style="display:none;font-size:11px;color:var(--pink);margin-top:4px">Lütfen geçerli bir e-posta gir.</div>
+      <div id="obEmailErr" style="display:none;font-size:11px;color:var(--pink);margin-top:4px">Lütfen ad, soyad ve geçerli bir e-posta gir.</div>
     </div>
     <div class="ob-field">
       <label class="ob-label">Avatar Seç</label>
@@ -1286,9 +1304,10 @@ function loadState() {
       username: s.username||"Kullanıcı", avatar: s.avatar||null,
       socratesMode: s.socratesMode||false,
       reports: s.reports||[], activeStudent: s.activeStudent||"",
-      email: s.email||"", badges: s.badges||[]
+      email: s.email||"", badges: s.badges||[],
+      firstName: s.firstName||"", lastName: s.lastName||"", authProvider: s.authProvider||""
     };
-  } catch { return {xp:0,streak:0,lastActive:null,totalChats:0,favorites:[],chatHistory:[],customChars:[],socratesMode:false,reports:[],activeStudent:"",email:"",badges:[]}; }
+  } catch { return {xp:0,streak:0,lastActive:null,totalChats:0,favorites:[],chatHistory:[],customChars:[],socratesMode:false,reports:[],activeStudent:"",email:"",badges:[],firstName:"",lastName:"",authProvider:""}; }
 }
 function saveState(s) { localStorage.setItem("gmai_state", JSON.stringify(s)); }
 let STATE = loadState();
@@ -3320,6 +3339,7 @@ function checkOnboarding() {
     document.querySelectorAll('.ob-avatar-btn').forEach((btn,i)=>{
       if(i===0) btn.classList.add('selected');
     });
+    initGoogleSignIn();  // Google ile giriş butonu (Client ID varsa)
   } else {
     // Already onboarded but tour not done yet
     setTimeout(startTour, 800);
@@ -3334,32 +3354,80 @@ function isValidEmail(e) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((e||"").trim());
 }
 function finishOnboarding() {
-  const nameEl = document.getElementById('obNameInput');
+  const fEl = document.getElementById('obFirstName');
+  const lEl = document.getElementById('obLastName');
   const emailEl = document.getElementById('obEmailInput');
   const errEl = document.getElementById('obEmailErr');
+  const first = (fEl?fEl.value:'').trim();
+  const last  = (lEl?lEl.value:'').trim();
   const email = (emailEl?emailEl.value:'').trim().toLowerCase();
-  // E-posta zorunlu ve geçerli olmalı (kayıt tutulabilsin)
-  if(!isValidEmail(email)) {
+  // Ad, soyad ve geçerli e-posta zorunlu
+  if(!first || !last || !isValidEmail(email)) {
     if(errEl) errEl.style.display = 'block';
-    if(emailEl) { emailEl.style.borderColor = 'var(--pink)'; emailEl.focus(); }
+    if(!first && fEl) { fEl.style.borderColor='var(--pink)'; fEl.focus(); }
+    else if(!last && lEl) { lEl.style.borderColor='var(--pink)'; lEl.focus(); }
+    else if(emailEl) { emailEl.style.borderColor='var(--pink)'; emailEl.focus(); }
     return;
   }
   if(errEl) errEl.style.display = 'none';
-  const name = (nameEl.value||'').trim() || email.split('@')[0] || 'Kaşif';
+  completeSignup(first, last, email, 'form');
+}
+
+// Kaydı tamamla (form veya Google ile ortak)
+function completeSignup(first, last, email, provider) {
   const selectedBtn = document.querySelector('.ob-avatar-btn.selected');
-  const avatar = selectedBtn ? selectedBtn.textContent : '🧠';
-  STATE.username = name;
+  const avatar = selectedBtn ? selectedBtn.textContent : (STATE.avatar||'🧠');
+  STATE.firstName = first;
+  STATE.lastName = last;
+  STATE.username = (first + ' ' + last).trim();
   STATE.avatar = avatar;
   STATE.email = email;
+  STATE.authProvider = provider || 'form';
   saveState(STATE);
   localStorage.setItem('gmai_onboarded','1');
   localStorage.setItem('gmai_email', email);
   document.getElementById('onboardingOverlay').classList.remove('open');
   initUsername();
   initAvatar();
-  // 📊 Veri: yeni öğrenci kaydoldu (e-posta kimliği ile)
-  trackEvent('onboarding_complete', {email: email, device: /mobile|android|iphone/i.test(navigator.userAgent)?'mobile':'desktop'});
+  // 📊 Veri: yeni öğrenci kaydoldu (ad-soyad + e-posta kimliği ile)
+  trackEvent('onboarding_complete', {email, firstName:first, lastName:last, authProvider:provider, device: /mobile|android|iphone/i.test(navigator.userAgent)?'mobile':'desktop'});
   setTimeout(startTour, 600);
+}
+
+// ─── Google ile Hızlı Giriş (Google Identity Services) ────────────────────
+// Client ID'yi Google Cloud Console'dan alıp buraya yaz; boşken Google butonu gizli kalır.
+const GOOGLE_CLIENT_ID = "";   // ← örn: "1234567890-abc.apps.googleusercontent.com"
+
+function _decodeJwt(t) {
+  try { return JSON.parse(decodeURIComponent(escape(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))))); }
+  catch(e){ return {}; }
+}
+function onGoogleSignIn(resp) {
+  const p = _decodeJwt(resp.credential);
+  if(!p.email) return;
+  const first = p.given_name || (p.name||'').split(' ')[0] || '';
+  const last  = p.family_name || (p.name||'').split(' ').slice(1).join(' ') || '';
+  completeSignup(first, last, p.email.toLowerCase(), 'google');
+}
+function initGoogleSignIn() {
+  if(!GOOGLE_CLIENT_ID || !(window.google && google.accounts && google.accounts.id)) return;
+  try {
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogleSignIn });
+    const btn = document.getElementById('googleBtn');
+    if(btn) google.accounts.id.renderButton(btn, { theme:'filled_blue', size:'large', text:'signup_with', shape:'pill', width:280, locale:'tr' });
+    const wrap = document.getElementById('googleBtnWrap');
+    if(wrap) wrap.style.display = 'block';
+  } catch(e) {}
+}
+
+// Sağ üstteki 👤 — kayıtlıysa profile git, değilse kayıt modalını aç
+function openProfileOrSignup() {
+  if(localStorage.getItem('gmai_onboarded')) {
+    showPage('profile');
+  } else {
+    document.getElementById('onboardingOverlay').classList.add('open');
+    initGoogleSignIn();
+  }
 }
 
 // ─── Guided Tour ────────────────────────────────────────────────────────────────
