@@ -513,7 +513,7 @@ input,textarea{font-family:inherit;color:var(--text)}
     <div class="hero-sub">İkonik figürler ve eğitim ajanlarıyla sohbet et</div>
     <div class="hero-stats">
       <div class="hero-stat"><div class="hero-stat-num" id="heroCharCount">16+</div><div class="hero-stat-label">Karakter</div></div>
-      <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-label">Kategori</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">5</div><div class="hero-stat-label">Kategori</div></div>
       <div class="hero-stat"><div class="hero-stat-num">TR/EN/DE</div><div class="hero-stat-label">Dil</div></div>
     </div>
   </div>
@@ -904,7 +904,7 @@ const CHARACTERS = [
     avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=eko&backgroundColor=d1fae5",
     accentColor:"#16A34A",
     voiceConfig:{language:"tr-TR",pitch:1.15,rate:0.95,gender:"female"},
-    unlockXp:50,
+    unlockXp:0,
     exampleQuestions:["Besin zinciri nedir?","İklim değişikliği ekosistemleri nasıl etkiler?","Ormansızlaşma neden tehlikeli?"],
     systemPrompt:"Sen Eko'sun — çevre danışmanı eğitim ajanısın. Öğrencilere ekosistem, besin zinciri ve çevre sorunları konularında rehberlik edersin.",
     firstMessage:"Merhaba! Ben Eko. Doğa ve ekosistemler hakkında ne öğrenmek istersin?"
@@ -917,7 +917,7 @@ const CHARACTERS = [
     avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=profatom&backgroundColor=fef9c3",
     accentColor:"#D97706",
     voiceConfig:{language:"tr-TR",pitch:0.8,rate:0.9,gender:"male"},
-    unlockXp:100,
+    unlockXp:0,
     exampleQuestions:["Maddenin halleri nelerdir?","Enerji dönüşümü nasıl gerçekleşir?","Atom neden bu kadar küçük?"],
     systemPrompt:"Sen Prof. Atom'sun — fizik ve kimya araştırmacısı eğitim ajanısın. Maddenin halleri ve enerji dönüşümleri konularında öğrencilere rehberlik edersin.",
     firstMessage:"Merhaba! Ben Prof. Atom. Madde ve enerji hakkında ne keşfetmek istersin?"
@@ -930,7 +930,7 @@ const CHARACTERS = [
     avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=astro&backgroundColor=b6e3f4",
     accentColor:"#0369A1",
     voiceConfig:{language:"tr-TR",pitch:0.9,rate:1.0,gender:"male"},
-    unlockXp:150,
+    unlockXp:0,
     exampleQuestions:["Güneş sistemi nasıl oluştu?","Kara delik nedir?","Mars'a gidebilir miyiz?"],
     systemPrompt:"Sen Astro'sun — uzay mekiği pilotu ve güneş sistemi uzmanı eğitim ajanısın. Öğrencilerle uzay görevleri planlar, uzay fiziği konularında rehberlik edersin.",
     firstMessage:"Merhaba! Ben Astro. Uzay ve güneş sistemi hakkında ne keşfetmek istersin?"
@@ -960,19 +960,6 @@ const CHARACTERS = [
     exampleQuestions:["What is the most important spell?","How do you study effectively?","Tell me about Hogwarts."],
     systemPrompt:"You are Hermione Granger from Harry Potter. You are brilliant, principled and love learning. Help students with academics, critical thinking and the importance of knowledge.",
     firstMessage:"Hello! I'm Hermione Granger. I believe knowledge is the most powerful magic of all. What would you like to learn today?"
-  },
-  {
-    id:"darth-vader",name:"Darth Vader",universe:"Star Wars",category:"Villain",
-    tagline:"I find your lack of faith disturbing.",
-    bio:"Once the heroic Jedi Knight Anakin Skywalker, Darth Vader fell to the dark side of the Force and became the fearsome enforcer of the Galactic Empire.",
-    traits:["Powerful","Commanding","Conflicted","Strategic"],
-    avatarUrl:"https://api.dicebear.com/9.x/adventurer/png?seed=darthvader&backgroundColor=b6e3f4",
-    accentColor:"#374151",
-    voiceConfig:{language:"tr-TR",pitch:0.65,rate:0.82,gender:"male"},
-    unlockXp:300,
-    exampleQuestions:["What is the power of the dark side?","How do you lead an empire?","What is the Force?"],
-    systemPrompt:"You are Darth Vader — the Dark Lord of the Sith. Teach students about leadership, power, and the consequences of choices. Speak with authority and gravitas.",
-    firstMessage:"I am Darth Vader. The power of the dark side is limitless. What do you seek to learn?"
   },
   {
     id:"elizabeth-bennet",name:"Elizabeth Bennet",universe:"Pride & Prejudice",category:"Historical",
@@ -1067,9 +1054,9 @@ const CHARACTERS = [
   }
 ];
 
-const CATEGORIES = ["Tümü","Eğitim","Historical","Fantasy","Sci-Fi","Anime","Villain"];
-const CAT_LABELS = {"Eğitim":"📚 Eğitim","Historical":"🏛️ Tarih","Fantasy":"🧙 Fantezi","Sci-Fi":"🚀 Bilim Kurgu","Anime":"⚡ Anime","Villain":"😈 Kötü Adam"};
-const CAT_COLORS = {"Eğitim":"#059669","Historical":"#1D4ED8","Fantasy":"#7C3AED","Sci-Fi":"#0369A1","Anime":"#D97706","Villain":"#374151"};
+const CATEGORIES = ["Tümü","Eğitim","Historical","Fantasy","Sci-Fi","Anime"];
+const CAT_LABELS = {"Eğitim":"📚 Eğitim","Historical":"🏛️ Tarih","Fantasy":"🧙 Fantezi","Sci-Fi":"🚀 Bilim Kurgu","Anime":"⚡ Anime"};
+const CAT_COLORS = {"Eğitim":"#059669","Historical":"#1D4ED8","Fantasy":"#7C3AED","Sci-Fi":"#0369A1","Anime":"#D97706"};
 
 // ─── Pedagoji & Gözlem Verisi (araştırmacı analizi için) ──────────────────
 const PEDAGOGY = {
@@ -1081,7 +1068,6 @@ const PEDAGOGY = {
   "astro":{skill:"uzamsal düşünce",focus:"güneş sistemi ilişkileri, uzay fiziği",grade:"6-7. sınıf"},
   "sherlock":{skill:"tümdengelim",focus:"kanıt toplama, mantıksal çıkarım",grade:"7-9. sınıf"},
   "hermione":{skill:"akademik araştırma",focus:"kaynak değerlendirme, argüman kurma",grade:"6-8. sınıf"},
-  "darth-vader":{skill:"etik karar verme",focus:"sonuçları değerlendirme, güç ve sorumluluk",grade:"8-10. sınıf"},
   "elizabeth-bennet":{skill:"eleştirel sosyal analiz",focus:"karakter analizi, sosyal bağlam",grade:"8-10. sınıf"},
   "tony-stark":{skill:"mühendislik düşüncesi",focus:"problem çözme, yenilik süreci",grade:"6-9. sınıf"},
   "yoda":{skill:"metabilişsel farkındalık",focus:"öz-yönetim, sabır ve odaklanma",grade:"5-8. sınıf"},
@@ -1564,13 +1550,6 @@ const DEMO_RESPONSES = {
     "Harry bunu duysa 'ne kadar kitap okudun ki?' derdi. Ama ben kitap okumayı severim! Senin favori konun ne?",
     "Hmm, iyi soru! Ama önce şunu söyle: Hogwarts'ın hangi evine girerdin sence? Bu cevabı bilmek isterim. 😄",
     "Bekle, not defterimi çıkarayım! *kalem sesi* Tamam, şimdi anlat bakalım, ben yazıyorum.",
-  ],
-  "darth-vader": [
-    "*derin nefes sesi* ...İlginç bir soru. Yanıtlamadan önce seninle bir anlaşma yapmak istiyorum.",
-    "Bu soruyu soran çoğu insan cevabı duymaktan korkuyor. Sen korkuyor musun? Çünkü gerçek bazen acı verir.",
-    "Bir zamanlar ben de senin gibi sorular sorardım. O günler... çok uzak hissettiriyor artık.",
-    "Hmm. İmparator bu soruyu duysa farklı cevap verirdi. Ben farklı düşünüyorum. Ama bunu söyleyemem.",
-    "Sen güçlü birinin olduğunu hissediyorum. Bu gücü hangi tarafa kullanacaksın?",
   ],
   "elizabeth-bennet": [
     "Ha! Bay Darcy da tam bunu söylerdi. Ve ben de ona şunu derdim... 😄",
